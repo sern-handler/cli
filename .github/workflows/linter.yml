@@ -31,7 +31,7 @@ jobs:
       - name: Run linters
         uses: wearerequired/lint-action@42567b31ed576cdd5a431d77ca5bc8822430d1d0 # tag=v1
         with:
-          eslint: true
+          eslint: false
           prettier: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
           auto_fix: false

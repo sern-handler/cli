@@ -2,10 +2,11 @@
 	"name": "@sern-handler/cli",
 	"version": "0.1.0",
 	"description": "A CLI for @sern-handler",
-	"main": "src/index.js",
+	"exports": "./src/index.js",
 	"bin": {
 		"sern": "./src/index.js"
 	},
+	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
@@ -20,14 +21,15 @@
 		"sern",
 		"sern-handler"
 	],
-	"author": "",
+	"author": "EvolutionX",
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/sern-handler/cli/issues"
 	},
 	"homepage": "https://github.com/sern-handler/cli#readme",
 	"dependencies": {
-		"yargs": "^17.4.1"
+		"find-up": "6.3.0",
+		"inquirer": "8.2.2"
 	},
 	"devDependencies": {
 		"cz-conventional-changelog": "3.3.0",
