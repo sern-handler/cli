@@ -1,5 +1,5 @@
 {
-	"name": "@sern-handler/cli",
+	"name": "@sern/cli",
 	"version": "0.1.0",
 	"description": "A CLI for @sern-handler",
 	"exports": "./src/index.js",
@@ -8,7 +8,9 @@
 	},
 	"type": "module",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"release": "standard-version",
+		"preview": "standard-version --dry-run"
 	},
 	"repository": {
 		"type": "git",
@@ -28,8 +30,11 @@
 	},
 	"homepage": "https://github.com/sern-handler/cli#readme",
 	"dependencies": {
+		"colorette": "^2.0.16",
+		"execa": "^6.1.0",
 		"find-up": "6.3.0",
-		"inquirer": "8.2.2"
+		"ora": "^6.1.0",
+		"prompts": "2.4.2"
 	},
 	"devDependencies": {
 		"cz-conventional-changelog": "3.3.0",
