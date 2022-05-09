@@ -1,4 +1,3 @@
-import { findUp } from 'find-up';
 import prompts from 'prompts';
 import ora from 'ora';
 import { redBright, yellowBright } from 'colorette';
@@ -6,18 +5,20 @@ import { execa } from 'execa';
 import {
 	cmds_dir,
 	default_prefix,
-	intent,
 	lang,
 	main_dir,
-	token,
-	npmInit,
 	gitInit,
+	which_manager,
+	name,
 } from '../prompts/init.js';
+import { npm } from '../utilities/npm.js';
+import { cloneRepo, installDeps } from '../utilities/install.js';
+import { editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
-// TODO make this functional and better!
 export async function init({ flags }) {
 	if (flags?.includes('y')) {
+		// TODO make this functional
 		console.log("I see a flag there! Seems like you're lazy!\nBye!");
 		process.exit(0);
 	}
@@ -32,75 +33,48 @@ export async function init({ flags }) {
 		return process.exit(1);
 	}
 
-	const pkg = await findUp('package.json');
-	if (!pkg) {
-		console.log(`No ${redBright('package.json')} found!`);
-		const npm = await prompt([npmInit]);
-		if (!npm.npminit) {
-			console.log(
-				`${redBright('Failed')} to initialize Sern!` +
-					'\nMaybe you should run npm init?'
+	/**
+	 * TODO edit main_dir and cmds_dir according to user input as well as default_prefix
+	 * will need help @Allyedge
+	 */
+	const data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+
+	await cloneRepo(data.lang, data.name);
+	const git_init = await prompt([gitInit]);
+	if (!git_init.gitinit) {
+		console.log(`\nAlright\n`);
+	} else {
+		const spin = ora({
+			text: 'Initializing git...',
+			spinner: 'aesthetic',
+		}).start();
+		const exe = await execa('git', ['init', data.name]);
+		await wait(300);
+		if (!exe || exe?.failed) {
+			spin.fail(
+				`${redBright('Failed')} to initialize git!` +
+					'\nMaybe you should run git init?'
 			);
 			return process.exit(1);
-		} else {
-			const spin = ora({
-				text: 'Initializing npm...',
-				spinner: 'aesthetic',
-			}).start();
-			const exee = await execa('npm', ['init', '-y']).catch(
-				() => null
-			); /* .stdout.pipe(process.stdout) */
-			await wait(300);
-			if (!exee || exee?.failed) {
-				spin.fail(
-					`${redBright('Failed')} to initialize npm!` +
-						'\nMaybe you should run npm init?'
-				);
-				return process.exit(1);
-			} else spin.succeed('Npm initialized!');
-		}
+		} else spin.succeed('Git initialized!');
 	}
-	const git = await findUp('.git/config');
-	if (!git) {
-		console.log(`No ${redBright('Git Repository')} found!`);
-		const git_init = await prompt([gitInit]);
-		if (!git_init.gitinit) {
-			console.log(
-				'Maybe you should run git init?\n' + `Alright Moving on...`
-			);
-		} else {
-			const spin = ora({
-				text: 'Initializing git...',
-				spinner: 'aesthetic',
-			}).start();
-			const exe = await execa('git', [
-				'init',
-			]); /* .stdout.pipe(process.stdout) */
-			await wait(300);
-			if (!exe || exe?.failed) {
-				spin.fail(
-					`${redBright('Failed')} to initialize git!` +
-						'\nMaybe you should run git init?'
-				);
-				return process.exit(1);
-			} else spin.succeed('Git initialized!');
-			return;
-		}
-	}
+	await execa('cd', { cwd: `./${data.name}` });
 
-	const data = await prompt([
-		lang,
-		main_dir,
-		cmds_dir,
-		default_prefix,
-		token,
-		intent,
-	]);
-	console.log(data);
+	const pm = await npm();
+	let choice = '';
+	if (pm === 'both') {
+		const chosen = await prompt([which_manager]);
+		choice = chosen.manager;
+	} else choice = pm;
+	await installDeps(choice, data.name);
+	await editMain(data.name);
 }
 
 /**
- * @param {number} ms
+ * Wait for a specified number of milliseconds, then return a promise that resolves to undefined.
+ * @param {number} ms - The number of milliseconds to wait.
+ * @returns A function that takes a single argument, ms, and returns a promise that resolves after ms
+ * milliseconds.
  */
 async function wait(ms) {
 	const wait = (await import('util')).promisify(setTimeout);
