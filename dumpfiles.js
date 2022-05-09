@@ -1,4 +1,4 @@
-//! message for sern devs: ignore this!!!
+//! message for Sern developers. Please ignore this file.
 
 const SpinnerName = [
 	'dots',
