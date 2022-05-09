@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { init } from './commands/init.js';
-import help from './commands/help.js';
+import { help } from './commands/help.js';
 
 const regex = /(?<=--|-)\w+/gm;
 const flags = process.argv.slice(2).join(' ').match(regex);
