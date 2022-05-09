@@ -25,7 +25,7 @@ export async function init({ flags }) {
 	}
 
 	const node = await execa('node', ['--version']);
-	if ((/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm).test(node.stdout)) {
+	if (/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm.test(node.stdout)) {
 		console.log(
 			yellowBright(
 				`\nYou are using Node ${node.stdout}\nPlease upgrade to Node 16.10.x or higher!\n`

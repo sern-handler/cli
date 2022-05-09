@@ -68,10 +68,12 @@ export const token = {
 	type: 'password',
 	validate: (/** @type {string} */ token) => {
 		if (token === 'no') return true;
-		return (/(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i).test(token)
+		return /(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i.test(
+			token
+		)
 			? true
-			: 'Invalid token'
-	}
+			: 'Invalid token';
+	},
 };
 
 export const main_dir = {
