@@ -13,6 +13,12 @@ export async function editMain(name) {
 	});
 
 	const output = JSON.parse(await readFile(pjLocation, 'utf8'));
+	if (!output) throw new Error("Can't read file.");
+
+	output.name = name;
+
+	const result = () => writeFile(pjLocation, JSON.stringify(output, null, 2));
+	return result();
 	if (!output) throw new Error("Can't read your package.json.");
 
 	output.name = name;

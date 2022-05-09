@@ -29,14 +29,21 @@ export const lang = {
 		{
 			title: 'JavaScript',
 			description: 'JS',
+			value: 'javascript',
 		},
 		{
 			title: 'TypeScript',
 			description: 'TS',
+			value: 'typescript',
+			selected: true,
 		},
 	],
 };
 
+/**
+ * 	@deprecated
+ *  ! Will be removed !
+ */
 export const intent = {
 	message: 'What intents do you want to keep?',
 	type: 'multiselect',
@@ -56,13 +63,15 @@ export const default_prefix = {
 };
 
 export const token = {
-	message: 'What is your bot token?',
+	message: 'What is your bot token? Type "no" to skip',
 	name: 'token',
 	type: 'password',
-	validate: (/** @type {string} */ token) =>
-		(/(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i).test(token)
+	validate: (/** @type {string} */ token) => {
+		if (token === 'no') return true;
+		return (/(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i).test(token)
 			? true
-			: 'Invalid token',
+			: 'Invalid token'
+	}
 };
 
 export const main_dir = {
@@ -90,12 +99,37 @@ export const npmInit = {
 	message: `Do you want to ${blueBright('me')} to initialize npm?`,
 	initial: true,
 };
-/**
- * @type {import('prompts').PromptObject}
- */
 export const gitInit = {
 	name: 'gitinit',
 	type: 'confirm',
 	message: `Do you want to ${blueBright('me')} to initialize git?`,
 	initial: true,
+};
+
+export const which_manager = {
+	message: `Which manager do you want to use?`,
+	name: 'manager',
+	type: 'select',
+	choices: [
+		{
+			title: 'NPM',
+			description: 'Default Package Manager',
+			selected: true,
+			value: 'npm',
+		},
+		{
+			title: 'Yarn',
+			description: 'Yarn Package Manager',
+			value: 'yarn',
+		},
+	],
+};
+
+/**
+ * @type {import('prompts').PromptObject}
+ */
+export const name = {
+	message: 'What is your project name?',
+	name: 'name',
+	type: 'text',
 };
