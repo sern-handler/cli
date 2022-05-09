@@ -19,4 +19,9 @@ export async function editMain(name) {
 
 	const result = () => writeFile(pjLocation, JSON.stringify(output, null, 2));
 	return result();
+	if (!output) throw new Error("Can't read your package.json.");
+
+	output.name = name;
+
+	return writeFile(pjLocation, JSON.stringify(output, null, 2));
 }

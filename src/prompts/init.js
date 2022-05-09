@@ -1,8 +1,6 @@
 import { blueBright } from 'colorette';
 
-/**
- * @deprecated
- */
+// TODO refactor the intents stuff and add more questions
 const Intents = [
 	'DIRECT_MESSAGES',
 	'DIRECT_MESSAGE_REACTIONS',
@@ -24,7 +22,7 @@ const Intents = [
 ].map((i, j) => ({ title: i, value: j, short: `${j}` })); //! bad way
 
 export const lang = {
-	message: 'What language you want the project to be in?',
+	message: 'What language do you want the project to be in?',
 	name: 'lang',
 	type: 'select',
 	choices: [
@@ -57,7 +55,7 @@ export const intent = {
 
 export const default_prefix = {
 	message:
-		'What is the default prefix for your bot? Type "none" if it is completely based on Application Commands',
+		'What is the default prefix for your bot? Type "none" if it is completely Application-Command based',
 
 	name: 'prefix',
 	type: 'text',
@@ -68,15 +66,12 @@ export const token = {
 	message: 'What is your bot token? Type "no" to skip',
 	name: 'token',
 	type: 'password',
-
 	validate: (/** @type {string} */ token) => {
 		if (token === 'no') return true;
-		return token.match(
-			/(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i
-		)?.length
+		return (/(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i).test(token)
 			? true
-			: 'Invalid token';
-	},
+			: 'Invalid token'
+	}
 };
 
 export const main_dir = {
@@ -95,13 +90,15 @@ export const cmds_dir = {
 		dir === 'src' ? 'You can not use src as a directory' : true,
 };
 
-export const projectInit = {
-	name: 'projectinit',
+/**
+ * @type {import('prompts').PromptObject}
+ */
+export const npmInit = {
+	name: 'npm_init',
 	type: 'confirm',
-	message: `Do you want to ${blueBright('me')} to initialize project?`,
+	message: `Do you want to ${blueBright('me')} to initialize npm?`,
 	initial: true,
 };
-
 export const gitInit = {
 	name: 'gitinit',
 	type: 'confirm',
