@@ -8,7 +8,7 @@ import { findUp } from 'find-up';
 export async function editMain(name) {
 	const pjLocation = await findUp('package.json');
 	const output = JSON.parse(await readFile(pjLocation, 'utf8'));
-	if (!output) throw new Error("Can't read file.");
+	if (!output) throw new Error("Can't read your package.json.");
 
 	output.main = name;
 
