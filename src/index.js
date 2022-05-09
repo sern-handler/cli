@@ -2,9 +2,9 @@
 
 import { init } from './commands/init.js';
 const regex = /(?<=--|-)\w+/gm;
-const flags = process.argv.slice(2).join(' ').match(regex);
-
 const rawArgs = process.argv.slice(2);
+const flags = rawArgs.join(' ').match(regex);
+
 const args = rawArgs
 	.join(' ')
 	.trim()

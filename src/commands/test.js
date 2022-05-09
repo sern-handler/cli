@@ -12,6 +12,5 @@ export async function editMain(name) {
 
 	output.main = name;
 
-	const result = () => writeFile(pjLocation, JSON.stringify(output, null, 2));
-	return result();
+	return writeFile(pjLocation, JSON.stringify(output, null, 2));
 }
