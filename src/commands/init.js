@@ -22,8 +22,7 @@ export async function init({ flags }) {
 		process.exit(0);
 	}
 	const node = await execa('node', ['--version']);
-
-	if (node.stdout.match(/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm)?.length) {
+	if ((/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm).test(node.stdout)) {
 		console.log(
 			yellowBright(
 				`\nYou are using Node ${node.stdout}\nPlease upgrade to Node 16.10.x or higher!\n`
