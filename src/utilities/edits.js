@@ -1,7 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
 
-
 /**
  * It takes a string, finds the package.json file in the directory of the string, and changes the name
  * of the package.json file to the string.
