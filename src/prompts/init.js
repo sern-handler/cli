@@ -93,7 +93,9 @@ export const npmInit = {
 	message: `Do you want to ${blueBright('me')} to initialize npm?`,
 	initial: true,
 };
-
+/**
+ * @type {import('prompts').PromptObject}
+ */
 export const gitInit = {
 	name: 'gitinit',
 	type: 'confirm',
