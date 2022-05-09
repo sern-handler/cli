@@ -1,6 +1,8 @@
 import { blueBright } from 'colorette';
 
-// TODO refactor the intents stuff and add more questions
+/**
+ * @deprecated
+ */
 const Intents = [
 	'DIRECT_MESSAGES',
 	'DIRECT_MESSAGE_REACTIONS',
@@ -29,14 +31,21 @@ export const lang = {
 		{
 			title: 'JavaScript',
 			description: 'JS',
+			value: 'javascript',
 		},
 		{
 			title: 'TypeScript',
 			description: 'TS',
+			value: 'typescript',
+			selected: true,
 		},
 	],
 };
 
+/**
+ * 	@deprecated
+ *  ! Will be removed !
+ */
 export const intent = {
 	message: 'What intents do you want to keep?',
 	type: 'multiselect',
@@ -56,16 +65,18 @@ export const default_prefix = {
 };
 
 export const token = {
-	message: 'What is your bot token?',
+	message: 'What is your bot token? Type "no" to skip',
 	name: 'token',
 	type: 'password',
 
-	validate: (/** @type {string} */ token) =>
-		token.match(
+	validate: (/** @type {string} */ token) => {
+		if (token === 'no') return true;
+		return token.match(
 			/(?<mfaToken>mfa\.[a-z0-9_-]{20,})|(?<basicToken>[a-z0-9_-]{23,28}\.[a-z0-9_-]{6,7}\.[a-z0-9_-]{27})/i
 		)?.length
 			? true
-			: 'Invalid token',
+			: 'Invalid token';
+	},
 };
 
 export const main_dir = {
@@ -84,13 +95,10 @@ export const cmds_dir = {
 		dir === 'src' ? 'You can not use src as a directory' : true,
 };
 
-/**
- * @type {import('prompts').PromptObject}
- */
-export const npmInit = {
-	name: 'npminit',
+export const projectInit = {
+	name: 'projectinit',
 	type: 'confirm',
-	message: `Do you want to ${blueBright('me')} to initialize npm?`,
+	message: `Do you want to ${blueBright('me')} to initialize project?`,
 	initial: true,
 };
 
@@ -99,4 +107,32 @@ export const gitInit = {
 	type: 'confirm',
 	message: `Do you want to ${blueBright('me')} to initialize git?`,
 	initial: true,
+};
+
+export const which_manager = {
+	message: `Which manager do you want to use?`,
+	name: 'manager',
+	type: 'select',
+	choices: [
+		{
+			title: 'NPM',
+			description: 'Default Package Manager',
+			selected: true,
+			value: 'npm',
+		},
+		{
+			title: 'Yarn',
+			description: 'Yarn Package Manager',
+			value: 'yarn',
+		},
+	],
+};
+
+/**
+ * @type {import('prompts').PromptObject}
+ */
+export const name = {
+	message: 'What is your project name?',
+	name: 'name',
+	type: 'text',
 };
