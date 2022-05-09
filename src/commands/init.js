@@ -58,7 +58,6 @@ export async function init({ flags }) {
 			return process.exit(1);
 		} else spin.succeed('Git initialized!');
 	}
-	await execa('cd', { cwd: `./${data.name}` });
 
 	const pm = await npm();
 	let choice = '';
