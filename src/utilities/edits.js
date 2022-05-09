@@ -1,16 +1,22 @@
-//@ts-check
 import { readFile, writeFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
 
+
 /**
- * @param {string} name
+ * It takes a string, finds the package.json file in the directory of the string, and changes the name
+ * of the package.json file to the string.
+ * @param {string} name - The name of the project.
+ * @returns A promise.
  */
 export async function editMain(name) {
-	const pjLocation = await findUp('package.json');
+	const pjLocation = await findUp('package.json', {
+		cwd: process.cwd() + '/' + name,
+	});
+
 	const output = JSON.parse(await readFile(pjLocation, 'utf8'));
 	if (!output) throw new Error("Can't read your package.json.");
 
-	output.main = name;
+	output.name = name;
 
 	return writeFile(pjLocation, JSON.stringify(output, null, 2));
 }
