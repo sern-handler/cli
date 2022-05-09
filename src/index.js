@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { init } from './commands/init.js';
+import help from './commands/help.js';
+
 const regex = /(?<=--|-)\w+/gm;
 const flags = process.argv.slice(2).join(' ').match(regex);
 
@@ -12,7 +14,11 @@ const args = rawArgs
 	.filter((e) => !/(--|-)\w+/gm.test(e));
 
 const cmdName = args[0];
-const commands = new Map([['init', init]]);
+const commands = new Map([
+	['help', help],
+	['', help],
+	['init', init],
+]);
 
 const found = commands.get(cmdName);
 
