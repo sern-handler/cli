@@ -14,7 +14,7 @@ import {
 } from '../prompts/init.js';
 import { npm } from '../utilities/npm.js';
 import { cloneRepo, installDeps } from '../utilities/install.js';
-import { editMain } from '../utilities/edits.js';
+import { editDirs, editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
 // TODO make this functional and better!
@@ -34,39 +34,9 @@ export async function init({ flags }) {
 		process.exit(1);
 	}
 
-	const pkg = await findUp('package.json');
-	if (!pkg) {
-		console.log(`No ${redBright('package.json')} found!`);
-		const npm = await prompt([npmInit]);
-		if (!npm.npminit) {
-			console.log(
-				`${redBright('Failed')} to initialize Sern!` +
-					'\nMaybe you should run npm init?'
-			);
-			process.exit(1);
-		}
-		const spin = ora({
-			text: 'Initializing npm...',
-			spinner: 'aesthetic',
-		}).start();
-		const exee = await execa('npm', ['init', '-y']).catch(
-			() => null
-		); /* .stdout.pipe(process.stdout) */
-		await wait(300);
-		if (!exee || exee?.failed) {
-			spin.fail(
-				`${redBright('Failed')} to initialize npm!` +
-					'\nMaybe you should run npm init?'
-			);
-			process.exit(1);
-		}
-		spin.succeed('Npm initialized!');
-	}
-	/**
-	 * TODO edit main_dir and cmds_dir according to user input as well as default_prefix
-	 * will need help @Allyedge
-	 */
 	const data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+
+	if (Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
 	const git_init = await prompt([gitInit]);
@@ -95,8 +65,9 @@ export async function init({ flags }) {
 		const chosen = await prompt([which_manager]);
 		choice = chosen.manager;
 	} else choice = pm;
-	await installDeps(choice, data.name);
+	// await installDeps(choice, data.name);
 	await editMain(data.name);
+	await editDirs(data.main_dir, data.cmds_dir, data.name);
 }
 
 /**

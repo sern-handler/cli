@@ -86,4 +86,8 @@ export const name = {
 	message: 'What is your project name?',
 	name: 'name',
 	type: 'text',
+	validate: (name) =>
+		name.match('^(?:@[a-z0-9-*~][a-z0-9-*._~]*/)?[a-z0-9-~][a-z0-9-._~]*$')
+			? true
+			: 'Invalid name',
 };

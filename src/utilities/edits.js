@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, rename, writeFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
 
 /**
@@ -13,15 +13,62 @@ export async function editMain(name) {
 	});
 
 	const output = JSON.parse(await readFile(pjLocation, 'utf8'));
-	if (!output) throw new Error("Can't read file.");
-
-	output.name = name;
-
-	const result = () => writeFile(pjLocation, JSON.stringify(output, null, 2));
-	return result();
 	if (!output) throw new Error("Can't read your package.json.");
 
 	output.name = name;
 
 	return writeFile(pjLocation, JSON.stringify(output, null, 2));
+}
+
+export async function editDirs(
+	srcName,
+	cmds_dirName,
+	name,
+	lang = 'typescript'
+) {
+	const path = await findUp('src', {
+		cwd: process.cwd() + '/' + name,
+		type: 'directory',
+	});
+
+	const ext = lang === 'typescript' ? 'ts' : 'js';
+
+	const newMainDir = path?.replace('src', srcName);
+	await rename(path, newMainDir);
+
+	const cmdsPath = await findUp('commands', {
+		cwd: process.cwd() + '/' + name + '/' + srcName,
+		type: 'directory',
+	});
+
+	const index = await findUp(`index.${ext}`, {
+		cwd: process.cwd() + '/' + name + '/' + srcName,
+	});
+
+	const newCmdsPath = cmdsPath?.replace('commands', cmds_dirName);
+	await rename(cmdsPath, newCmdsPath);
+
+	const tsconfig = await findUp('tsconfig.json', {
+		cwd: process.cwd() + '/' + name,
+	});
+	if (tsconfig) {
+		const output = JSON.parse(await readFile(tsconfig, 'utf8'));
+		if (!output) throw new Error("Can't read your tsconfig.json.");
+		output.compilerOptions.rootDir = srcName;
+
+		writeFile(tsconfig, JSON.stringify(output, null, 2));
+	}
+
+	const output = await readFile(index, 'utf8');
+
+	const oldfold = ext === 'ts' ? 'dist' : 'src';
+	const newfold = ext === 'ts' ? 'dist' : srcName;
+
+	const regex = new RegExp(`commands: '${oldfold}/commands'`);
+	const edit = output.replace(
+		regex,
+		`commands: '${newfold}/${cmds_dirName}'`
+	);
+
+	return writeFile(index, edit);
 }
