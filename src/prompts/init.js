@@ -22,7 +22,6 @@ export const lang = {
 export const default_prefix = {
 	message:
 		'What is the default prefix for your bot? Type "none" if it is completely Application-Command based',
-
 	name: 'prefix',
 	type: 'text',
 	initial: '!',
@@ -53,6 +52,7 @@ export const npmInit = {
 	message: `Do you want to ${blueBright('me')} to initialize npm?`,
 	initial: true,
 };
+
 export const gitInit = {
 	name: 'gitinit',
 	type: 'confirm',

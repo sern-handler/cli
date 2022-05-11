@@ -51,6 +51,7 @@ export async function editDirs(
 	const tsconfig = await findUp('tsconfig.json', {
 		cwd: process.cwd() + '/' + name,
 	});
+
 	if (tsconfig) {
 		const output = JSON.parse(await readFile(tsconfig, 'utf8'));
 		if (!output) throw new Error("Can't read your tsconfig.json.");
