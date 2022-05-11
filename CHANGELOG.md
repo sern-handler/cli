@@ -8,9 +8,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### Features
 
 * added help command ([ca23d17](https://github.com/sern-handler/cli/commit/ca23d17670663b62e23849e2350deef208bfc100))
-* cli is now functional ([65f38f3](https://github.com/sern-handler/cli/commit/65f38f3eb2b4e8e2bd136b9bd8f37f1966be1661))
 * cli is now functional ([5021d28](https://github.com/sern-handler/cli/commit/5021d28bca6ebe1cb4a548f5e595b1220f222c98))
-* rebase changes ([cae3c59](https://github.com/sern-handler/cli/commit/cae3c597c3da6aa836fb9c70b8555814e8fc5db0))
 
 
 ### Bug Fixes
