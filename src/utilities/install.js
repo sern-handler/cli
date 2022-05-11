@@ -19,14 +19,18 @@ export async function installDeps(choice, name) {
 		cwd: process.cwd() + '/' + name,
 	});
 	if (!pkg) throw new Error('No package.json found!');
+
 	const output = JSON.parse(await readFile(pkg, 'utf8'));
 	if (!output) throw new Error("Can't read file.");
+
 	const deps = output.dependencies;
 	if (!deps) throw new Error("Can't find dependencies.");
+
 	const spin = ora({
 		text: `Installing dependencies...`,
 		spinner: 'aesthetic',
 	}).start();
+
 	const result = await execa(choice, ['install'], {
 		cwd: process.cwd() + '/' + name,
 	}).catch(() => null);
@@ -64,11 +68,14 @@ export async function cloneRepo(lang, name) {
  * @param {string} dest - The destination folder where the files will be copied to.
  */
 function copyRecursiveSync(src, dest) {
-	var exists = fs.existsSync(src);
-	var stats = exists && fs.statSync(src);
-	var isDirectory = exists && stats.isDirectory();
+	const exists = fs.existsSync(src);
+
+	const stats = exists && fs.statSync(src);
+
+	const isDirectory = exists && stats.isDirectory();
 	if (isDirectory) {
 		fs.mkdirSync(dest);
+
 		fs.readdirSync(src).forEach(function (childItemName) {
 			copyRecursiveSync(
 				path.join(src, childItemName),
