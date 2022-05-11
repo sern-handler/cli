@@ -65,7 +65,7 @@ export async function init({ flags }) {
 		const chosen = await prompt([which_manager]);
 		choice = chosen.manager;
 	} else choice = pm;
-	// await installDeps(choice, data.name);
+	await installDeps(choice, data.name);
 	await editMain(data.name);
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
 }
