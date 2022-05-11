@@ -63,10 +63,18 @@ const initProject = async (isDefault) => {
 
 	await cloneRepo(data.lang, data.name);
 
-	const git_init = await prompt([gitInit]);
+	let git_init;
 
-	if (!git_init.gitinit) {
-		console.log(`\nAlright\n`);
+	if (!isDefault) {
+		git_init = await prompt([gitInit]);
+	} else {
+		git_init = {
+			gitInit: true,
+		};
+	}
+
+	if (!git_init.gitInit) {
+		console.log(`\Skipping git init...\n`);
 	} else {
 		const spin = ora({
 			text: 'Initializing git...',
@@ -88,7 +96,13 @@ const initProject = async (isDefault) => {
 		spin.succeed('Git initialized!');
 	}
 
-	const pm = await npm();
+	let pm;
+
+	if (!isDefault) {
+		pm = await npm();
+	} else {
+		pm = 'npm';
+	}
 
 	let choice = '';
 
