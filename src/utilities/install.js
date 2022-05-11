@@ -46,7 +46,6 @@ export async function installDeps(choice, name) {
  * @param {string} name - The name of the project
  */
 export async function cloneRepo(lang, name) {
-  
 	const isCached = fs.existsSync(
 		path.join(os.homedir(), '.degit/github/sern-handler/templates')
 	);
