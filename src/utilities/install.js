@@ -1,10 +1,12 @@
 import { execa } from 'execa';
 import { redBright } from 'colorette';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { findUp } from 'find-up';
 import ora from 'ora';
+import degit from 'degit';
 
 /**
  * It installs dependencies from a package.json file
@@ -44,14 +46,18 @@ export async function installDeps(choice, name) {
  * @param {string} name - The name of the project
  */
 export async function cloneRepo(lang, name) {
-	await execa('git', [
-		'clone',
-		`https://github.com/sern-handler/templates.git`, // ? See the idea of @Allyedge having templates built in cli
-	]);
+	const isCached = fs.existsSync(
+		path.join(os.homedir(), '.degit/github/sern-handler/templates')
+	);
+	const emitter = degit('sern-handler/templates/templates', {
+		cache: isCached,
+		force: true,
+	});
 
-	copyRecursiveSync(`templates/templates/${lang}`, name);
+	await emitter.clone('templates');
 
-	fs.rmSync(`templates/`, { recursive: true, force: true });
+	copyRecursiveSync(`templates/${lang}`, name);
+	fs.rmSync('templates', { recursive: true, force: true });
 }
 
 /**

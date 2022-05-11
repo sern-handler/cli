@@ -1,4 +1,3 @@
-import { findUp } from 'find-up';
 import prompts from 'prompts';
 import ora from 'ora';
 import { redBright, yellowBright } from 'colorette';
@@ -17,7 +16,6 @@ import { cloneRepo, installDeps } from '../utilities/install.js';
 import { editDirs, editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
-// TODO make this functional and better!
 export async function init({ flags }) {
 	let isDefault = false;
 
