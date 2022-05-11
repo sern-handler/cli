@@ -49,7 +49,7 @@ export const cmds_dir = {
 export const npmInit = {
 	name: 'npm_init',
 	type: 'confirm',
-	message: `Do you want to ${blueBright('me')} to initialize npm?`,
+	message: `Do you want ${blueBright('me')} to initialize npm?`,
 	initial: true,
 };
 
