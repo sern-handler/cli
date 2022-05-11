@@ -38,6 +38,10 @@ export async function init({ flags }) {
 	initProject(isDefault);
 }
 
+/**
+ * Initialize a new project, either with prompts or with default values.
+ * @param {boolean} isDefault - Whether or not to use default values.
+ */
 const initProject = async (isDefault) => {
 	let data;
 
