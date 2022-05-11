@@ -17,10 +17,10 @@ import { editDirs, editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
 export async function init({ flags }) {
+	let isDefault = false;
+
 	if (flags?.includes('y')) {
-		// TODO for @Allyedge: make this functional
-		console.log("I see the -y flag there! Seems like you're lazy!\nBye!");
-		process.exit(0);
+		isDefault = true;
 	}
 
 	const node = await execa('node', ['--version']);
@@ -35,9 +35,27 @@ export async function init({ flags }) {
 		process.exit(1);
 	}
 
-	const data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+	initProject(isDefault);
+}
 
-	if (Object.keys(data).length < 5) process.exit(1);
+const initProject = async (isDefault) => {
+	let data;
+
+	if (!isDefault) {
+		data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+	} else {
+		const projectName = await prompt([name]);
+
+		data = {
+			name: projectName.name,
+			lang: 'typescript',
+			main_dir: 'src',
+			cmds_dir: 'commands',
+			default_prefix: '!',
+		};
+	}
+
+	if (!isDefault && Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
 
@@ -83,7 +101,7 @@ export async function init({ flags }) {
 	await editMain(data.name);
 
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
-}
+};
 
 /**
  * Wait for a specified number of milliseconds, then return a promise that resolves to undefined.
