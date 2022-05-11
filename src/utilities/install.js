@@ -16,18 +16,26 @@ export async function installDeps(choice, name) {
 	const pkg = await findUp('package.json', {
 		cwd: process.cwd() + '/' + name,
 	});
+
 	if (!pkg) throw new Error('No package.json found!');
+
 	const output = JSON.parse(await readFile(pkg, 'utf8'));
+
 	if (!output) throw new Error("Can't read file.");
+
 	const deps = output.dependencies;
+
 	if (!deps) throw new Error("Can't find dependencies.");
+
 	const spin = ora({
 		text: `Installing dependencies...`,
 		spinner: 'aesthetic',
 	}).start();
+
 	const result = await execa(choice, ['install'], {
 		cwd: process.cwd() + '/' + name,
 	}).catch(() => null);
+
 	if (!result || result?.failed) {
 		spin.fail(`${redBright('Failed')} to install dependencies!`);
 		return process.exit(1);
@@ -44,7 +52,9 @@ export async function cloneRepo(lang, name) {
 		'clone',
 		`https://github.com/sern-handler/templates.git`, // ? See the idea of @Allyedge having templates built in cli
 	]);
+
 	copyRecursiveSync(`templates/templates/${lang}`, name);
+
 	fs.rmSync(`templates/`, { recursive: true, force: true });
 }
 
@@ -57,10 +67,14 @@ export async function cloneRepo(lang, name) {
  */
 function copyRecursiveSync(src, dest) {
 	var exists = fs.existsSync(src);
+
 	var stats = exists && fs.statSync(src);
+
 	var isDirectory = exists && stats.isDirectory();
+
 	if (isDirectory) {
 		fs.mkdirSync(dest);
+
 		fs.readdirSync(src).forEach(function (childItemName) {
 			copyRecursiveSync(
 				path.join(src, childItemName),

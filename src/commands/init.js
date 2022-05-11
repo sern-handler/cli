@@ -25,12 +25,14 @@ export async function init({ flags }) {
 	}
 
 	const node = await execa('node', ['--version']);
+
 	if (/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm.test(node.stdout)) {
 		console.log(
 			yellowBright(
 				`\nYou are using Node ${node.stdout}\nPlease upgrade to Node 16.10.x or higher!\n`
 			)
 		);
+
 		process.exit(1);
 	}
 
@@ -39,7 +41,9 @@ export async function init({ flags }) {
 	if (Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
+
 	const git_init = await prompt([gitInit]);
+
 	if (!git_init.gitinit) {
 		console.log(`\nAlright\n`);
 	} else {
@@ -47,8 +51,11 @@ export async function init({ flags }) {
 			text: 'Initializing git...',
 			spinner: 'aesthetic',
 		}).start();
+
 		const exe = await execa('git', ['init', data.name]);
+
 		await wait(300);
+
 		if (!exe || exe?.failed) {
 			spin.fail(
 				`${redBright('Failed')} to initialize git!` +
@@ -56,17 +63,23 @@ export async function init({ flags }) {
 			);
 			process.exit(1);
 		}
+
 		spin.succeed('Git initialized!');
 	}
 
 	const pm = await npm();
+
 	let choice = '';
+
 	if (pm === 'both') {
 		const chosen = await prompt([which_manager]);
 		choice = chosen.manager;
 	} else choice = pm;
+
 	await installDeps(choice, data.name);
+
 	await editMain(data.name);
+
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
 }
 
