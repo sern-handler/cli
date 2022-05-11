@@ -5,6 +5,7 @@ import path from 'path';
 import { readFile } from 'fs/promises';
 import { findUp } from 'find-up';
 import ora from 'ora';
+import degit from 'degit';
 
 /**
  * It installs dependencies from a package.json file
@@ -40,12 +41,15 @@ export async function installDeps(choice, name) {
  * @param {string} name - The name of the project
  */
 export async function cloneRepo(lang, name) {
-	await execa('git', [
-		'clone',
-		`https://github.com/sern-handler/templates.git`, // ? See the idea of @Allyedge having templates built in cli
-	]);
-	copyRecursiveSync(`templates/templates/${lang}`, name);
-	fs.rmSync(`templates/`, { recursive: true, force: true });
+	const emitter = degit('sern-handler/templates/templates', {
+		cache: true,
+		force: true,
+	});
+
+	await emitter.clone('templates');
+
+	copyRecursiveSync(`templates/${lang}`, name);
+	fs.rmSync('templates', { recursive: true, force: true });
 }
 
 /**
