@@ -50,7 +50,24 @@ export async function init({ flags }) {
 		await npm();
 	}
 
-	if (Object.keys(data).length < 5) process.exit(1);
+const initProject = async (isDefault) => {
+	let data;
+
+	if (!isDefault) {
+		data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+	} else {
+		const projectName = await prompt([name]);
+
+		data = {
+			name: projectName.name,
+			lang: 'typescript',
+			main_dir: 'src',
+			cmds_dir: 'commands',
+			default_prefix: '!',
+		};
+	}
+
+	if (!isDefault && Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
 
@@ -66,7 +83,7 @@ export async function init({ flags }) {
 	await installDeps(choice, data.name);
 	await editMain(data.name);
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
-}
+};
 
 /**
  * It initializes git
