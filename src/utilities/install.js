@@ -1,6 +1,7 @@
 import { execa } from 'execa';
 import { redBright } from 'colorette';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { findUp } from 'find-up';
@@ -41,8 +42,11 @@ export async function installDeps(choice, name) {
  * @param {string} name - The name of the project
  */
 export async function cloneRepo(lang, name) {
+	const isCached = fs.existsSync(
+		path.join(os.homedir(), '.degit/github/sern-handler/templates')
+	);
 	const emitter = degit('sern-handler/templates/templates', {
-		cache: true,
+		cached: isCached,
 		force: true,
 	});
 
