@@ -46,7 +46,7 @@ export async function cloneRepo(lang, name) {
 		path.join(os.homedir(), '.degit/github/sern-handler/templates')
 	);
 	const emitter = degit('sern-handler/templates/templates', {
-		cached: isCached,
+		cache: isCached,
 		force: true,
 	});
 
