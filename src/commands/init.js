@@ -1,4 +1,3 @@
-import { findUp } from 'find-up';
 import prompts from 'prompts';
 import ora from 'ora';
 import { redBright, yellowBright } from 'colorette';
