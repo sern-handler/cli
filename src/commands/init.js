@@ -65,7 +65,13 @@ const initProject = async (isDefault) => {
 
 	let git_init;
 
-	isDefault ? git_init.gitInit = true : git_init = await prompt([gitInit])
+	if (!isDefault) {
+		git_init = await prompt([gitInit]);
+	} else {
+		git_init = {
+			gitInit: true,
+		};
+	}
 
 	if (!git_init.gitInit) {
 		console.log(`\Skipping git init...\n`);
@@ -91,7 +97,12 @@ const initProject = async (isDefault) => {
 	}
 
 	let pm;
-	isDefault ? pm = 'npm' : await npm()
+
+	if (!isDefault) {
+		pm = await npm();
+	} else {
+		pm = 'npm';
+	}
 
 	let choice = '';
 
