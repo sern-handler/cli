@@ -43,13 +43,7 @@ export async function init({ flags }) {
 
 	let git_init;
 
-	if (!isDefault) {
-		git_init = await prompt([gitInit]);
-	} else {
-		git_init = {
-			gitInit: true,
-		};
-	}
+	isDefault ? git_init.gitInit = true : git_init = await prompt([gitInit])
 
 	if (!git_init.gitInit) {
 		console.log(`\Skipping git init...\n`);
