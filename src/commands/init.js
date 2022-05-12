@@ -59,13 +59,15 @@ const initProject = async (isDefault) => {
 		};
 	}
 
-	if (!isDefault && Object.keys(data).length < 5) process.exit(1);
+	if (Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
 
-	let git_init;
+	let git_init = {};
 
-	isDefault ? git_init.gitInit = true : git_init = await prompt([gitInit])
+	isDefault
+		? (git_init.gitInit = true)
+		: (git_init = await prompt([gitInit]));
 
 	if (!git_init.gitInit) {
 		console.log(`\Skipping git init...\n`);
@@ -91,7 +93,7 @@ const initProject = async (isDefault) => {
 	}
 
 	let pm;
-	isDefault ? pm = 'npm' : await npm()
+	isDefault ? (pm = 'npm') : await npm();
 
 	let choice = '';
 
