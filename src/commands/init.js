@@ -9,6 +9,7 @@ import {
 	main_dir,
 	gitInit,
 	which_manager,
+	skip_install_dep,
 	name,
 } from '../prompts/init.js';
 import { npm } from '../utilities/npm.js';
@@ -61,7 +62,10 @@ export async function init({ flags }) {
 	if (pm === 'both') {
 		const chosen = await prompt([which_manager]);
 		choice = chosen.manager;
-	} else choice = pm;
+	} else {
+		const chosen = await prompt([skip_install_dep]);
+		choice = chosen.skip_install_dep ? 'npm' : 'skip';
+	}
 
 	await installDeps(choice, data.name);
 	await editMain(data.name);
