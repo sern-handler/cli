@@ -50,12 +50,16 @@ export async function init({ flags }) {
 		await npm();
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Initialize a new project, either with prompts or with default values.
 	 * @param {boolean} isDefault - Whether or not to use default values.
 	 */
 	const initProject = async (isDefault) => {
 		let data;
+=======
+	if (Object.keys(data).length < 5) process.exit(1);
+>>>>>>> bf00a9f (refactor: remove unnecessary isDefault checks)
 
 		if (!isDefault) {
 			data = await prompt([
@@ -120,6 +124,7 @@ export async function init({ flags }) {
 		spin.succeed('Git initialized!');
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Wait for a specified number of milliseconds, then return a promise that resolves to undefined.
 	 * @param {number} ms - The number of milliseconds to wait.
@@ -130,4 +135,32 @@ export async function init({ flags }) {
 		const wait = (await import('util')).promisify(setTimeout);
 		return wait(ms);
 	}
+=======
+	let pm;
+	isDefault ? (pm = 'npm') : await npm();
+
+	let choice = '';
+
+	if (pm === 'both') {
+		const chosen = await prompt([which_manager]);
+		choice = chosen.manager;
+	} else choice = pm;
+
+	await installDeps(choice, data.name);
+
+	await editMain(data.name);
+
+	await editDirs(data.main_dir, data.cmds_dir, data.name);
+};
+
+/**
+ * Wait for a specified number of milliseconds, then return a promise that resolves to undefined.
+ * @param {number} ms - The number of milliseconds to wait.
+ * @returns A function that takes a single argument, ms, and returns a promise that resolves after ms
+ * milliseconds.
+ */
+async function wait(ms) {
+	const wait = (await import('util')).promisify(setTimeout);
+	return wait(ms);
+>>>>>>> bf00a9f (refactor: remove unnecessary isDefault checks)
 }
