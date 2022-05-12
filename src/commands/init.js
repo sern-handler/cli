@@ -17,14 +17,8 @@ import { editDirs, editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
 export async function init({ flags }) {
-	let isDefault = false;
-
-	if (flags?.includes('y')) {
-		isDefault = true;
-	}
-
+	// * Check if node version is valid
 	const node = await execa('node', ['--version']);
-
 	if (/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm.test(node.stdout)) {
 		console.log(
 			yellowBright(
@@ -35,21 +29,14 @@ export async function init({ flags }) {
 		process.exit(1);
 	}
 
-	initProject(isDefault);
-}
-
-/**
- * Initialize a new project, either with prompts or with default values.
- * @param {boolean} isDefault - Whether or not to use default values.
- */
-const initProject = async (isDefault) => {
 	let data;
+	let git_init;
+	let pm;
 
-	if (!isDefault) {
-		data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
-	} else {
+	if (flags?.includes('y')) {
 		const projectName = await prompt([name]);
-
+		git_init = true;
+		pm = 'npm';
 		data = {
 			name: projectName.name,
 			lang: 'typescript',
@@ -57,43 +44,17 @@ const initProject = async (isDefault) => {
 			cmds_dir: 'commands',
 			default_prefix: '!',
 		};
+	} else {
+		data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+		git_init = (await prompt([gitInit])).gitinit;
+		await npm();
 	}
 
 	if (Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
 
-	let git_init = {};
-
-	isDefault
-		? (git_init.gitInit = true)
-		: (git_init = await prompt([gitInit]));
-
-	if (!git_init.gitInit) {
-		console.log(`\Skipping git init...\n`);
-	} else {
-		const spin = ora({
-			text: 'Initializing git...',
-			spinner: 'aesthetic',
-		}).start();
-
-		const exe = await execa('git', ['init', data.name]);
-
-		await wait(300);
-
-		if (!exe || exe?.failed) {
-			spin.fail(
-				`${redBright('Failed')} to initialize git!` +
-					'\nMaybe you should run git init?'
-			);
-			process.exit(1);
-		}
-
-		spin.succeed('Git initialized!');
-	}
-
-	let pm;
-	isDefault ? (pm = 'npm') : await npm();
+	git_init ? await git(data) : console.log(`Skipping git init...\n`);
 
 	let choice = '';
 
@@ -103,11 +64,33 @@ const initProject = async (isDefault) => {
 	} else choice = pm;
 
 	await installDeps(choice, data.name);
-
 	await editMain(data.name);
-
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
-};
+}
+
+/**
+ * It initializes git
+ */
+async function git(data) {
+	const spin = ora({
+		text: 'Initializing git...',
+		spinner: 'aesthetic',
+	}).start();
+
+	const exe = await execa('git', ['init', data.name]);
+
+	await wait(300);
+
+	if (!exe || exe?.failed) {
+		spin.fail(
+			`${redBright('Failed')} to initialize git!` +
+				'\nMaybe you should run git init?'
+		);
+		process.exit(1);
+	}
+
+	spin.succeed('Git initialized!');
+}
 
 /**
  * Wait for a specified number of milliseconds, then return a promise that resolves to undefined.
