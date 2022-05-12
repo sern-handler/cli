@@ -69,12 +69,7 @@ export async function init({ flags }) {
 	}
 
 	let pm;
-
-	if (!isDefault) {
-		pm = await npm();
-	} else {
-		pm = 'npm';
-	}
+	isDefault ? pm = 'npm' : await npm()
 
 	let choice = '';
 
