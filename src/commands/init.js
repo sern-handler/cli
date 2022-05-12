@@ -64,7 +64,7 @@ export async function init({ flags }) {
 		choice = chosen.manager;
 	} else {
 		const chosen = await prompt([skip_install_dep]);
-		choice = chosen.skip_install_dep ? 'npm' : 'skip';
+		choice = chosen.skip_install_dep ? pm : 'skip';
 	}
 
 	await installDeps(choice, data.name);
