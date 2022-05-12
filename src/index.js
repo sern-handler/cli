@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { init } from './commands/init.js';
-import { help } from './commands/help.js';
+import init from './commands/init.js';
+import help from './commands/help.js';
+import version from './commands/version.js';
 
 const regex = /(?<=--|-)\w+/gm;
 const rawArgs = process.argv.slice(2);
@@ -19,6 +20,7 @@ const commands = new Map([
 	['help', help],
 	['', help],
 	['init', init],
+        ['version', version]
 ]);
 
 const found = commands.get(cmdName);
