@@ -17,11 +17,16 @@ npm install @sern/cli@latest
 yarn add @sern/cli@latest
 ```
 
+```sh
+pnpm add @sern/cli@latest
+```
+
 ## Getting Started
 
-When you install the CLI, you can use our commands with **sern** prefix. Usage is simple;
+When you install the CLI, you can use our commands with **sern** prefix.
 
 `sern <command> (opt)<flag>`
+
 
 ## Setting Up Your Project
 
