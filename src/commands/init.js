@@ -50,16 +50,12 @@ export async function init({ flags }) {
 		await npm();
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Initialize a new project, either with prompts or with default values.
 	 * @param {boolean} isDefault - Whether or not to use default values.
 	 */
 	const initProject = async (isDefault) => {
 		let data;
-=======
-	if (Object.keys(data).length < 5) process.exit(1);
->>>>>>> bf00a9f (refactor: remove unnecessary isDefault checks)
 
 		if (!isDefault) {
 			data = await prompt([
@@ -72,6 +68,7 @@ export async function init({ flags }) {
 		} else {
 			const projectName = await prompt([name]);
 
+<<<<<<< HEAD
 			data = {
 				name: projectName.name,
 				lang: 'typescript',
@@ -138,6 +135,9 @@ export async function init({ flags }) {
 =======
 	let pm;
 	isDefault ? (pm = 'npm') : await npm();
+=======
+	git_init ? await git(data) : console.log(`Skipping git init...\n`);
+>>>>>>> 4bca6db (refactor(init): cleaned up code and made a simple flow)
 
 	let choice = '';
 
@@ -147,11 +147,33 @@ export async function init({ flags }) {
 	} else choice = pm;
 
 	await installDeps(choice, data.name);
-
 	await editMain(data.name);
-
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
-};
+}
+
+/**
+ * It initializes git
+ */
+async function git(data) {
+	const spin = ora({
+		text: 'Initializing git...',
+		spinner: 'aesthetic',
+	}).start();
+
+	const exe = await execa('git', ['init', data.name]);
+
+	await wait(300);
+
+	if (!exe || exe?.failed) {
+		spin.fail(
+			`${redBright('Failed')} to initialize git!` +
+				'\nMaybe you should run git init?'
+		);
+		process.exit(1);
+	}
+
+	spin.succeed('Git initialized!');
+}
 
 /**
  * Wait for a specified number of milliseconds, then return a promise that resolves to undefined.
