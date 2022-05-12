@@ -76,6 +76,11 @@ export const which_manager = {
 			description: 'Yarn Package Manager',
 			value: 'yarn',
 		},
+		{
+			title: 'Skip',
+			description: 'Skip selection',
+			value: 'skip',
+		},
 	],
 };
 
