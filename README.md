@@ -10,15 +10,15 @@ Our CLI allows you to setup and manage Discord bot project without writing a sin
 ## Installation
 
 ```sh
-npm install @sern/cli@latest
+npm install -g @sern/cli@latest
 ```
 
 ```sh
-yarn add @sern/cli@latest
+yarn add -g @sern/cli@latest
 ```
 
 ```sh
-pnpm add @sern/cli@latest
+pnpm add -g @sern/cli@latest
 ```
 
 ## Getting Started
