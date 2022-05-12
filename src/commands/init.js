@@ -16,7 +16,7 @@ import { cloneRepo, installDeps } from '../utilities/install.js';
 import { editDirs, editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
-export async function init({ flags }) {
+export default async function init({ flags }) {
 	if (flags?.includes('y')) {
 		// TODO for @Allyedge: make this functional
 		console.log("I see the -y flag there! Seems like you're lazy!\nBye!");
