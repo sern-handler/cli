@@ -20,7 +20,8 @@ const commands = new Map([
 	['help', help],
 	['', help],
 	['init', init],
-        ['version', version]
+        ['version', version],
+        ['v', version]
 ]);
 
 const found = commands.get(cmdName);
