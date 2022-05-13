@@ -151,8 +151,10 @@ export async function init({ flags }) {
 	await editDirs(data.main_dir, data.cmds_dir, data.name);
 }
 
+
 /**
  * It initializes git
+ * @param data - The data object that contains the name of the project.
  */
 async function git(data) {
 	const spin = ora({
