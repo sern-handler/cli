@@ -47,7 +47,7 @@ export async function init({ flags }) {
 	} else {
 		data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
 		git_init = (await prompt([gitInit])).gitinit;
-		await npm();
+		pm = await npm();
 	}
 
 	if (Object.keys(data).length < 5) process.exit(1);
