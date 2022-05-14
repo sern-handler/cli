@@ -26,6 +26,10 @@ export async function installDeps(choice, name) {
 	const deps = output.dependencies;
 	if (!deps) throw new Error("Can't find dependencies.");
 
+	if (choice === 'skip') {
+		return console.log('Skipped.');
+	}
+
 	const spin = ora({
 		text: `Installing dependencies...`,
 		spinner: 'aesthetic',

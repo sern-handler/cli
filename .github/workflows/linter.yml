@@ -10,11 +10,6 @@ on:
     branches:
       - main
 
-# Down scope as necessary via https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
-permissions:
-  checks: write
-  contents: write
-
 jobs:
   run-linters:
     name: Run linters
@@ -33,12 +28,5 @@ jobs:
       - name: Install Node.js dependencies
         run: npm i
 
-      - name: Run linters
-        uses: wearerequired/lint-action@42567b31ed576cdd5a431d77ca5bc8822430d1d0 # tag=v1
-        with:
-          eslint: false
-          prettier: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          auto_fix: false
-          eslint_extensions: js
-          commit_message: "style(auto): fix code style issues with ${linter}"
+      - name: Run Prettier
+        run: npm run format
