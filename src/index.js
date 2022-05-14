@@ -13,7 +13,7 @@ const args = rawArgs
 	.split(/ +/)
 	.filter((e) => !/(--|-)\w+/gm.test(e));
 
-const cmdName = args[0];
+const cmdName = args[0] || '';
 
 const commands = new Map([
 	['help', help],
