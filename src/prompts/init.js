@@ -76,7 +76,19 @@ export const which_manager = {
 			description: 'Yarn Package Manager',
 			value: 'yarn',
 		},
+		{
+			title: 'Skip',
+			description: 'Skip selection',
+			value: 'skip',
+		},
 	],
+};
+
+export const skip_install_dep = {
+	name: 'skip_install_dep',
+	type: 'confirm',
+	message: `Do you want ${blueBright('me')} to install dependencies?`,
+	initial: false,
 };
 
 /**
