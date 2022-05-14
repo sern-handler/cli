@@ -11,7 +11,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"release": "standard-version",
 		"preview": "standard-version --dry-run",
-		"push": "git push --follow-tags"
+		"push": "git push --follow-tags",
+		"format": "prettier --check ."
 	},
 	"repository": {
 		"type": "git",
