@@ -9,13 +9,6 @@ on:
   pull_request_target:
     branches:
       - main
-permissions:
-  checks: write
-  contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   run-linters:
@@ -35,12 +28,5 @@ jobs:
       - name: Install Node.js dependencies
         run: npm i
 
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          continue_on_error: false
-          prettier: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          neutral_check_on_warning: true
-          eslint_extensions: js
-          commit_message: "style(auto): fix code style issues with ${linter}"
+      - name: Run Prettier
+        run: npm run format
