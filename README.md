@@ -27,7 +27,6 @@ When you install the CLI, you can use our commands with **sern** prefix.
 
 `sern <command> (opt)<flag>`
 
-
 ## Setting Up Your Project
 
 #### TODO

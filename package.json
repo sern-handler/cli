@@ -12,7 +12,8 @@
 		"release": "standard-version",
 		"preview": "standard-version --dry-run",
 		"push": "git push --follow-tags",
-		"format": "prettier --check ."
+		"format": "prettier --check .",
+		"fix": "prettier --write ."
 	},
 	"repository": {
 		"type": "git",
