@@ -1,9 +1,9 @@
 # Sern CLI
 
-Our CLI allows you to setup and manage Discord bot project without writing a single line of code!
+Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!
 
 😁 **User Friendly** <br>
-💦 **Easy-to-use** <br>
+💦 **Simple** <br>
 🌱 **Efficient** <br>
 💪 **Powerful** <br>
 
@@ -30,4 +30,4 @@ When you install the CLI, you can use our commands with **sern** prefix.
 
 ## Setting Up Your Project
 
-This will filled up later...
+#### TODO
