@@ -33,4 +33,4 @@ When you install the CLI, you can use our commands with **sern** prefix.
 
 ## Stats
 
-![Alt](https://repobeats.axiom.co/api/embed/5eb8cf0f79fecee29cc81cd2eca5f6321981304e.svg "Feel free to contribute")
+![Alt](https://repobeats.axiom.co/api/embed/5eb8cf0f79fecee29cc81cd2eca5f6321981304e.svg 'Feel free to contribute')
