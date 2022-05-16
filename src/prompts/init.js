@@ -9,6 +9,7 @@ export const lang = {
 			title: 'JavaScript',
 			description: 'JS',
 			value: 'javascript',
+			disabled: true,
 		},
 		{
 			title: 'TypeScript',
