@@ -71,7 +71,7 @@ export async function cloneRepo(lang, name) {
  * @param {string} src - The source path.
  * @param {string} dest - The destination folder where the files will be copied to.
  */
-function copyRecursiveSync(src, dest) {
+export function copyRecursiveSync(src, dest) {
 	const exists = fs.existsSync(src);
 
 	const stats = exists && fs.statSync(src);
