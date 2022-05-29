@@ -6,13 +6,13 @@ export const extraPrompt = {
 		{
 			title: 'Dockerfile (TypeScript)',
 			description: 'Dockerfile for TypeScript',
-			value: 'dockerfile-typescript',
+			value: 'Dockerfile-typescript',
 			selected: true,
 		},
 		{
 			title: 'Dockerfile (JavaScript)',
 			description: 'Dockerfile for JavaScript',
-			value: 'dockerfile-javascript',
+			value: 'Dockerfile-javascript',
 			disabled: true,
 		},
 	],
