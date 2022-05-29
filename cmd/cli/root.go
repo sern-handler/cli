@@ -20,6 +20,7 @@ func Execute() {
 	rootCmd.Flags().BoolP("help", "h", false, "Help for the Sern CLI.")
 	rootCmd.Flags().BoolP("version", "v", false, "The version of the Sern CLI.")
 	rootCmd.SetVersionTemplate("Sern CLI - Version {{.Version}}\n")
+	rootCmd.AddCommand(initCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
