@@ -2,6 +2,7 @@
 
 import { init } from './commands/init.js';
 import { help } from './commands/help.js';
+import { extra } from './commands/extra.js';
 
 const regex = /(?<=--|-)\w+/gm;
 const rawArgs = process.argv.slice(2);
@@ -19,6 +20,7 @@ const commands = new Map([
 	['help', help],
 	['', help],
 	['init', init],
+	['extra', extra],
 ]);
 
 const found = commands.get(cmdName);
