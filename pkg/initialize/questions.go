@@ -39,12 +39,6 @@ var questions = []*survey.Question{
 		},
 	},
 	{
-		Name: "git",
-		Prompt: &survey.Confirm{
-			Message: "Do you want to initialize a git repository?",
-		},
-	},
-	{
 		Name: "package",
 		Prompt: &survey.Select{
 			Message: "What package manager do you want to use?",
