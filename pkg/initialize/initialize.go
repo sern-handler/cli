@@ -13,7 +13,6 @@ func Initialize() {
 		Main     string
 		Commands string
 		Prefix   string
-		Git      bool
 		Package  string
 	}{}
 
@@ -26,4 +25,8 @@ func Initialize() {
 	}
 
 	cloneRepository(answers.Name, answers.Language)
+
+	renameFolders(answers.Name, answers.Main, answers.Commands)
+
+	installDependencies(answers.Name, answers.Package)
 }
