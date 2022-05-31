@@ -74,5 +74,14 @@ func Initialize() {
 		os.Exit(1)
 	}
 
+	err = renamePackageJson(answers.Name)
+
+	if err != nil {
+		color.Error.Prompt("Couldn't rename the package.json file, exiting.")
+		color.Warn.Prompt("The project was generated, but the package.json file wasn't updated.\n\nYou can still use the project, but you will have to update the package.json file manually.")
+
+		os.Exit(1)
+	}
+
 	color.Success.Prompt("Project successfully initialized.")
 }

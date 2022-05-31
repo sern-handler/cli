@@ -4,68 +4,10 @@ import (
 	"errors"
 	"os"
 	"os/exec"
-	"strings"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/gookit/color"
 	"github.com/sern-handler/cli/pkg/util"
 )
-
-func cloneRepository(name string, language string) error {
-	_, err := git.PlainClone("templates", false, &git.CloneOptions{
-		URL:      "https://github.com/sern-handler/templates",
-		Progress: os.Stdout,
-	})
-
-	if err != nil {
-		color.Error.Prompt("Couldn't install the template.")
-
-		return err
-	}
-
-	err = os.Rename("templates/templates/"+strings.ToLower(language), name)
-
-	if err != nil {
-		color.Error.Prompt("Couldn't rename the template to the project's name.")
-		color.Warn.Prompt("The project was generated, but it wasn't renamed.\n\nYou can still use the project, but you will have to rename it manually.")
-
-		return err
-	}
-
-	err = os.RemoveAll("templates")
-
-	if err != nil {
-		color.Error.Prompt("Couldn't remove the templates folder.")
-
-		return err
-	}
-
-	return nil
-}
-
-func renameFolders(name string, main string, commands string) error {
-	if main != "src" {
-		err := os.Rename(name+"/src", name+"/"+main)
-
-		if err != nil {
-			color.Warn.Prompt("Couldn't rename the main folder.")
-
-			return err
-		}
-	}
-
-	if commands != "commands" {
-		err := os.Rename(name+"/"+main+"/commands", name+"/"+main+"/"+commands)
-
-		if err != nil {
-			color.Warn.Prompt("Couldn't rename the commands folder.")
-
-			return err
-		}
-	}
-
-	return nil
-}
 
 func installDependencies(name string, packageManager string) error {
 	err := os.Chdir(name)
