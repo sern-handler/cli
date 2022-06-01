@@ -1,0 +1,37 @@
+{
+  "name": "@sern/cli",
+  "version": "1.0.0",
+  "description": "Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!",
+  "scripts": {
+    "postinstall": "go-npm install",
+    "preuninstall": "go-npm uninstall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sern-handler/cli.git"
+  },
+  "keywords": [
+    "sern",
+    "cli",
+    "discord",
+    "bot",
+    "discord.js"
+  ],
+  "author": "Allyedge",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sern-handler/cli/issues"
+  },
+  "homepage": "https://github.com/sern-handler/cli#readme",
+  "dependencies": {
+    "go-npm": "^0.1.9"
+  },
+  "bin": {
+    "sern": "./bin/sern"
+  },
+  "goBinary": {
+    "name": "command-name",
+    "path": "./bin",
+    "url": "https://github.com/sern-handler/cli/releases/download/v{{version}}/cli_{{version}}_{{platform}}_{{arch}}.tar.gz"
+  }
+}
