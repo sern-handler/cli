@@ -26,11 +26,8 @@
   "dependencies": {
     "go-npm": "^0.1.9"
   },
-  "bin": {
-    "sern": "./bin/sern"
-  },
   "goBinary": {
-    "name": "command-name",
+    "name": "sern",
     "path": "./bin",
     "url": "https://github.com/sern-handler/cli/releases/download/v{{version}}/cli_{{version}}_{{platform}}_{{arch}}.tar.gz"
   }
