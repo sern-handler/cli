@@ -14,7 +14,6 @@ func Initialize() {
 		Language string
 		Main     string
 		Commands string
-		Prefix   string
 		Package  string
 	}{}
 

@@ -14,7 +14,7 @@ var questions = []*survey.Question{
 		Name: "language",
 		Prompt: &survey.Select{
 			Message: "What language do you want to use?",
-			Options: []string{"TypeScript"},
+			Options: []string{"JavaScript", "TypeScript"},
 		},
 	},
 	{
@@ -29,13 +29,6 @@ var questions = []*survey.Question{
 		Prompt: &survey.Input{
 			Message: "What is your project's command directory?",
 			Default: "commands",
-		},
-	},
-	{
-		Name: "prefix",
-		Prompt: &survey.Input{
-			Message: "What is your project's command prefix?",
-			Default: "!",
 		},
 	},
 	{
