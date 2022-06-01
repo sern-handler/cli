@@ -2,9 +2,12 @@ name: goreleaser
 
 on:
   push:
-    # run only against tags
-    tags:
-      - "*"
+    branches:
+      - main
+      - go_rewrite
+  pull_request_target:
+    branches:
+      - main
 
 permissions:
   contents: write
