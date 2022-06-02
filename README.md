@@ -1,11 +1,18 @@
 # Sern CLI
 
+[![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)](https://github.com/sern-handler/cli)
+[![Build](https://img.shields.io/github/workflow/status/sern-handler/cli/goreleaser?style=for-the-badge)](https://github.com/sern-handler/cli)
+
 Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!
 
 😁 **User Friendly** <br>
 💦 **Simple** <br>
 🌱 **Efficient** <br>
 💪 **Powerful** <br>
+
+## License
+
+[![GitHub License](https://img.shields.io/github/license/sern-handler/cli?style=for-the-badge)](https://github.com/sern-handler/cli)
 
 ## Installation
 
@@ -29,7 +36,21 @@ When you install the CLI, you can use our commands with **sern** prefix.
 
 ## Setting Up Your Project
 
-#### TODO
+To create a new project, you can simply run the following command:
+
+```sh
+sern init
+```
+
+The `init` command will ask you some questions and at the end it will generate a new project.
+
+## Help
+
+If you need help, you can always run the following command:
+
+```sh
+sern help
+```
 
 ## Stats
 
