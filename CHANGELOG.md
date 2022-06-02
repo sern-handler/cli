@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 0.1.1 (2022-06-02)
+
+The `go-npm` package was replaced by one of its forks, `@gzuidhof/go-npm`.
+
+`@gzuidhof/go-npm` has updated dependencies, and it uses `esbuild`, which is great.
+
+### Changes
+
+- Replace `go-npm` with `@gzuidhof/go-npm`.
+
 ## 0.1.0 (2022-06-02)
 
 This is the CLI's initial release.

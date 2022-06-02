@@ -1,6 +1,6 @@
 {
   "name": "@sern/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!",
   "scripts": {
     "postinstall": "go-npm install",
@@ -9,6 +9,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sern-handler/cli.git"
+  },
+  "dependencies": {
+    "@gzuidhof/go-npm": "^0.1.13"
   },
   "keywords": [
     "sern",
@@ -21,14 +24,11 @@
     "Allyedge",
     "EvolutionX-10"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/sern-handler/cli/issues"
   },
   "homepage": "https://github.com/sern-handler/cli#readme",
-  "dependencies": {
-    "go-npm": "^0.1.9"
-  },
   "goBinary": {
     "name": "sern",
     "path": "./bin",
