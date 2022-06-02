@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - go_rewrite
-      - actions
 
 permissions:
   contents: write
