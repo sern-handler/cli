@@ -2,6 +2,7 @@
 
 [![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)](https://github.com/sern-handler/cli)
 [![Build](https://img.shields.io/github/workflow/status/sern-handler/cli/goreleaser?style=for-the-badge)](https://github.com/sern-handler/cli)
+[![NPM](https://img.shields.io/npm/dt/@sern/cli?style=for-the-badge)](https://npmjs.com/@sern/cli)
 
 Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!
 
