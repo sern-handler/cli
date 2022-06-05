@@ -12,6 +12,3 @@ checksum:
   algorithm: sha256
 signs:
   - artifacts: checksum
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
-release:
-  draft: true
