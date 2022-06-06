@@ -1,9 +1,15 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
 ## 0.1.2 (2022-06-04)
 
-- Sign builds to prevent anti virus softwares detect it as a virus 
+The `extra` command was added. It basically helps developers to add things like Dockerfile to their projects with ease.
+
+### Features
+
+- `extra` command
+
 ## 0.1.1 (2022-06-02)
 
 The `go-npm` package was replaced by one of its forks, `@gzuidhof/go-npm`.
