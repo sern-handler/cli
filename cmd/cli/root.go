@@ -10,7 +10,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:     "sern",
 	Short:   "A powerful CLI tool for Sern.",
-	Version: "0.1.1",
+	Version: "0.1.2",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
