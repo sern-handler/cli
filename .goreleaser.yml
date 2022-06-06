@@ -7,8 +7,3 @@ builds:
     goarch:
       - amd64
     main: ./cmd
-checksum:
-  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
-  algorithm: sha256
-signs:
-  - artifacts: checksum
