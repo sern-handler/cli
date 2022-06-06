@@ -12,7 +12,7 @@ var rootCmd = &cobra.Command{
 	Short:   "A powerful CLI tool for Sern.",
 	Version: "0.1.1",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Sern CLI")
+		cmd.Help()
 	},
 }
 
@@ -21,6 +21,7 @@ func Execute() {
 	rootCmd.Flags().BoolP("version", "v", false, "The version of the Sern CLI.")
 	rootCmd.SetVersionTemplate("Sern CLI - Version {{.Version}}\n")
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(extraCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

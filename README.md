@@ -7,6 +7,7 @@
 Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!
 
 😁 **User Friendly** <br>
+🔥 **Fast** <br>
 💦 **Simple** <br>
 🌱 **Efficient** <br>
 💪 **Powerful** <br>

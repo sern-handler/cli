@@ -1,6 +1,6 @@
 {
   "name": "@sern/cli",
-  "version": "0.1.2",
+  "version": "0.1.1",
   "description": "Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!",
   "scripts": {
     "postinstall": "go-npm install",
