@@ -4,6 +4,13 @@ import { init } from './commands/init.js';
 import { help } from './commands/help.js';
 import { extra } from './commands/extra.js';
 
+// import { Command } from 'commander';
+// const program = new Command()
+// program
+// 	.name("sern")
+// 	.version()
+// 	.option('--first')
+// 	.option('-s, --separator <char>');
 const regex = /(?<=--|-)\w+/gm;
 const rawArgs = process.argv.slice(2);
 const flags = rawArgs.join(' ').match(regex);
