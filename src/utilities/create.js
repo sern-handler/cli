@@ -10,7 +10,9 @@ const extraFolder = fileURLToPath(extraURL);
 export async function create(name, lang, location, no_ext) {
 	const file = `${name}.${lang}.sern`;
 
-	const target = no_ext ? `${location}/${name}` : `${location}/${name}.${lang}`;
+	const target = no_ext
+		? `${location}/${name}`
+		: `${location}/${name}.${lang}`;
 
 	return createFile(file, target);
 }
