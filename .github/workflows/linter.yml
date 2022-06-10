@@ -5,10 +5,10 @@ on:
   # but only for the main branch
   push:
     branches:
-      - main
+      - js-archive
   pull_request_target:
     branches:
-      - main
+      - js-archive
 
 jobs:
   run-linters:
