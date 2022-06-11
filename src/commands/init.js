@@ -69,7 +69,7 @@ export async function init(flags, options) {
 
 	await installDeps(choice, data.name);
 	await editMain(data.name);
-	await editDirs(data.main_dir, data.cmds_dir, data.name);
+	await editDirs(data.main_dir, data.cmds_dir, data.name, data.lang);
 }
 
 /**

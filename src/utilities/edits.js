@@ -70,6 +70,6 @@ export async function editDirs(
 		regex,
 		`commands: '${newfold}/${cmds_dirName}'`
 	);
-
+	// TODO(@jacoobes): edit prefix as well in index.ts/js
 	return writeFile(index, edit);
 }

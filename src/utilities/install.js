@@ -52,11 +52,11 @@ export async function installDeps(choice, name) {
  * @param {string} subDirs - path of sub-directory of location, if any
  */
 export async function cloneRepo(lang, name) {
-	const isCached = fs.existsSync(
+	const isCached = fs.existsSync( //! @deprecated will be removed in future versions
 		path.join(os.homedir(), '.degit/github/sern-handler/templates')
 	);
 	const emitter = degit('sern-handler/templates/templates', {
-		cache: isCached,
+		cache: false,
 		force: true,
 	});
 
