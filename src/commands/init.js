@@ -12,12 +12,13 @@ import {
 	skip_install_dep,
 	name,
 } from '../prompts/init.js';
+
 import { npm } from '../utilities/npm.js';
 import { cloneRepo, installDeps } from '../utilities/install.js';
 import { editDirs, editMain } from '../utilities/edits.js';
 const { prompt } = prompts;
 
-export async function init({ flags }) {
+export async function init(flags, options) {
 	// * Check if node version is valid
 	const node = await execa('node', ['--version']);
 	if (/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm.test(node.stdout)) {
@@ -33,8 +34,7 @@ export async function init({ flags }) {
 	let data;
 	let git_init;
 	let pm;
-
-	if (flags?.includes('y')) {
+	if (flags.y) {
 		const projectName = await prompt([name]);
 		git_init = true;
 		pm = 'npm';
@@ -69,7 +69,7 @@ export async function init({ flags }) {
 
 	await installDeps(choice, data.name);
 	await editMain(data.name);
-	await editDirs(data.main_dir, data.cmds_dir, data.name);
+	await editDirs(data.main_dir, data.cmds_dir, data.name, data.lang);
 }
 
 /**

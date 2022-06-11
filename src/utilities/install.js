@@ -48,13 +48,15 @@ export async function installDeps(choice, name) {
  * Clone the repo, copy the files from the repo to the new project directory, and delete the repo
  * @param {string} lang - The language of the template
  * @param {string} name - The name of the project
+ * @param {string} location - Location of repository
+ * @param {string} subDirs - path of sub-directory of location, if any
  */
 export async function cloneRepo(lang, name) {
-	const isCached = fs.existsSync(
+	const isCached = fs.existsSync( //! @deprecated will be removed in future versions
 		path.join(os.homedir(), '.degit/github/sern-handler/templates')
 	);
 	const emitter = degit('sern-handler/templates/templates', {
-		cache: isCached,
+		cache: false,
 		force: true,
 	});
 

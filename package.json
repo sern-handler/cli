@@ -34,6 +34,7 @@
 	"homepage": "https://github.com/sern-handler/cli#readme",
 	"dependencies": {
 		"colorette": "^2.0.16",
+		"commander": "^9.3.0",
 		"degit": "^2.8.4",
 		"execa": "^6.1.0",
 		"find-up": "6.3.0",
@@ -41,7 +42,7 @@
 		"prompts": "2.4.2"
 	},
 	"devDependencies": {
-		"cz-conventional-changelog": "3.3.0",
+		"cz-conventional-changelog": "^3.0.1",
 		"eslint": "8.15.0",
 		"prettier": "2.6.2",
 		"standard-version": "9.5.0"

@@ -2,29 +2,26 @@
 
 import { init } from './commands/init.js';
 import { help } from './commands/help.js';
-import { extra } from './commands/extra.js';
 
-const regex = /(?<=--|-)\w+/gm;
-const rawArgs = process.argv.slice(2);
-const flags = rawArgs.join(' ').match(regex);
+import { Command } from 'commander';
+import { version } from './utilities/version.js';
+import { plugins } from './commands/plugins.js';
+export const program = new Command();
 
-const args = rawArgs
-	.join(' ')
-	.trim()
-	.split(/ +/)
-	.filter((e) => !/(--|-)\w+/gm.test(e));
+program.name('sern').description(help()).version(version());
 
-const cmdName = args[0] || '';
+program
+	.command(init.name)
+	.description('Quickest way to scaffold a new project')
+	.option('-y', 'Finishes setup as default')
+	.action(init);
 
-const commands = new Map([
-	['help', help],
-	['', help],
-	['init', init],
-	['extra', extra],
-]);
+program
+	.command(plugins.name)
+	.description(
+		'Install plugins from https://github.com/sern-handler/awesome-plugins'
+	)
+	.option('-n --name', 'Name of plugin')
+	.action(plugins);
 
-const found = commands.get(cmdName);
-
-if (found) {
-	await found({ args, flags });
-} else console.log('Unknown Command');
+program.parse();
