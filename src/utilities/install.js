@@ -51,7 +51,7 @@ export async function installDeps(choice, name) {
  * @param {string} location - Location of repository
  * @param {string} subDirs - path of sub-directory of location, if any
  */
-export async function cloneTemplatesRepo(lang, name) {
+export async function cloneRepo(lang, name) {
 	const isCached = fs.existsSync(
 		path.join(os.homedir(), '.degit/github/sern-handler/templates')
 	);
