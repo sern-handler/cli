@@ -1,12 +1,10 @@
 import { execa } from 'execa';
 import { redBright } from 'colorette';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { findUp } from 'find-up';
 import ora from 'ora';
-import degit from 'degit';
 
 /**
  * It installs dependencies from a package.json file
@@ -52,18 +50,12 @@ export async function installDeps(choice, name) {
  * @param {string} subDirs - path of sub-directory of location, if any
  */
 export async function cloneRepo(lang, name) {
-	const isCached = fs.existsSync( //! @deprecated will be removed in future versions
-		path.join(os.homedir(), '.degit/github/sern-handler/templates')
-	);
-	const emitter = degit('sern-handler/templates/templates', {
-		cache: false,
-		force: true,
-	});
-
-	await emitter.clone('templates');
-
-	copyRecursiveSync(`templates/${lang}`, name);
-	fs.rmSync('templates', { recursive: true, force: true });
+	await execa('git', [
+		'clone',
+		`https://github.com/sern-handler/templates.git`,
+	]);
+	copyRecursiveSync(`templates/templates/${lang}`, name);
+	fs.rmSync(`templates/`, { recursive: true, force: true });
 }
 
 /**

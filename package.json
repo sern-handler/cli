@@ -35,7 +35,6 @@
 	"dependencies": {
 		"colorette": "^2.0.16",
 		"commander": "^9.3.0",
-		"degit": "^2.8.4",
 		"execa": "^6.1.0",
 		"find-up": "6.3.0",
 		"ora": "^6.1.0",
