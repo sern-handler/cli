@@ -38,7 +38,7 @@ export async function installDeps(choice, name) {
 	}).catch(() => null);
 	if (!result || result?.failed) {
 		spin.fail(`${redBright('Failed')} to install dependencies!`);
-		return process.exit(1);
+		process.exit(1);
 	} else spin.succeed(`Dependencies installed!`);
 }
 
