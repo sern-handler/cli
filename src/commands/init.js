@@ -2,6 +2,7 @@ import prompts from 'prompts';
 import ora from 'ora';
 import { redBright, yellowBright } from 'colorette';
 import { execa } from 'execa';
+import { findUp } from 'find-up';
 import {
 	cmds_dir,
 	default_prefix,
@@ -16,6 +17,7 @@ import {
 import { npm } from '../utilities/npm.js';
 import { cloneRepo, installDeps } from '../utilities/install.js';
 import { editDirs, editMain } from '../utilities/edits.js';
+import { writeFile } from 'fs/promises';
 const { prompt } = prompts;
 
 export async function init(flags, options) {
@@ -34,6 +36,7 @@ export async function init(flags, options) {
 	let data;
 	let git_init;
 	let pm;
+
 	if (flags.y) {
 		const projectName = await prompt([name]);
 		git_init = true;
@@ -51,9 +54,29 @@ export async function init(flags, options) {
 		pm = await npm();
 	}
 
+	const config = {
+		language: data.lang,
+		paths: {
+			base: data.main_dir,
+			commands: data.cmds_dir,
+		},
+	};
+	const file = JSON.stringify(config, null, 2);
+
 	if (Object.keys(data).length < 5) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
+
+
+	const pkg = await findUp('package.json', {
+		cwd: process.cwd() + '/' + data.name,
+	});
+
+	if (!pkg) throw new Error('No package.json found! Clone Failed');
+
+	if (pkg) {
+		await writeFile(pkg.replace('package.json', 'sern.config.json'), file);
+	}
 
 	git_init ? await git(data) : console.log(`Skipping git init...\n`);
 
