@@ -67,7 +67,6 @@ export async function init(flags, options) {
 
 	await cloneRepo(data.lang, data.name);
 
-
 	const pkg = await findUp('package.json', {
 		cwd: process.cwd() + '/' + data.name,
 	});
