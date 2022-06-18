@@ -13,13 +13,12 @@ async function gimmechoices() {
 	return choices;
 }
 
-/**
- * @type {import('prompts').PromptObject}
- */
-export const pluginsQ = {
-	name: 'list',
-	type: 'autocompleteMultiselect',
-	message: 'What plugins do you want to install?',
-	choices: await gimmechoices(),
-	min: 1,
-};
+export async function pluginsQ() {
+	return {
+		name: 'list',
+		type: 'autocompleteMultiselect',
+		message: 'What plugins do you want to install?',
+		choices: await gimmechoices(),
+		min: 1,
+	};
+}

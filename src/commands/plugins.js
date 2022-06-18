@@ -12,7 +12,7 @@ export async function plugins(flags) {
 	/**
 	 * @type {string[]}
 	 */
-	const e = (await prompt([pluginsQ])).list;
+	const e = (await prompt([pluginsQ()])).list;
 
 	for await (const url of e) {
 		await download(url);
