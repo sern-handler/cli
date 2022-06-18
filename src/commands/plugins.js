@@ -2,6 +2,7 @@ import { pluginsQ } from '../prompts/plugin.js';
 import prompts from 'prompts';
 import axios from 'axios';
 import fs from 'fs';
+import { greenBright } from 'colorette';
 const { prompt } = prompts;
 /**
  * Installs plugins to project
@@ -16,6 +17,12 @@ export async function plugins(flags) {
 	for await (const url of e) {
 		await download(url);
 	}
+	const pluginNames = e.map((e) => e.split('/').pop());
+	console.log(
+		`Successfully downloaded plugin(s):\n${greenBright(
+			pluginNames.join('\n')
+		)}`
+	);
 }
 
 async function download(url) {
@@ -26,8 +33,7 @@ async function download(url) {
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
-	console.log('done');
 	const file = fs.writeFileSync(filedir, data);
-	console.log('downloaded');
+
 	return file;
 }
