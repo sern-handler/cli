@@ -2,6 +2,7 @@
 
 import { init } from './commands/init.js';
 import { help } from './commands/help.js';
+import { extra } from './commands/extra.js';
 
 import { Command } from 'commander';
 import { version } from './utilities/version.js';
@@ -23,5 +24,10 @@ program
 	)
 	.option('-n --name', 'Name of plugin')
 	.action(plugins);
+
+program
+	.command(extra.name)
+	.description('Easy way to add extra things in your sern project')
+	.action(extra);
 
 program.parse();

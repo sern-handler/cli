@@ -13,7 +13,6 @@ export const extraPrompt = {
 			title: 'Dockerfile (JavaScript)',
 			description: 'Dockerfile for JavaScript',
 			value: 'Dockerfile-javascript',
-			disabled: true,
 		},
 	],
 };
