@@ -12,7 +12,8 @@ export async function plugins(flags) {
 	/**
 	 * @type {string[]}
 	 */
-	const e = (await prompt([pluginsQ()])).list;
+	const e = (await prompt([await pluginsQ()])).list;
+	if (!e) process.exit(1);
 
 	for await (const url of e) {
 		await download(url);
@@ -28,8 +29,8 @@ export async function plugins(flags) {
 async function download(url) {
 	const res = await axios.get(url);
 	const data = res.data;
-	const dir = `${process.cwd()}\\src\\plugins`;
-	const filedir = `${process.cwd()}\\src\\plugins\\${url.split('/').pop()}`;
+	const dir = `${process.cwd()}/src/plugins`;
+	const filedir = `${process.cwd()}/src/plugins/${url.split('/').pop()}`;
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
