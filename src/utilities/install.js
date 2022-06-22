@@ -8,8 +8,8 @@ import ora from 'ora';
 
 /**
  * It installs dependencies from a package.json file
- * @param choice - The package manager to use.
- * @param name - The name of the project
+ * @param {'skip' | 'npm' | 'yarn'} choice - The package manager to use.
+ * @param {string} name - The name of the project
  * @returns a promise.
  */
 export async function installDeps(choice, name) {
@@ -46,8 +46,6 @@ export async function installDeps(choice, name) {
  * Clone the repo, copy the files from the repo to the new project directory, and delete the repo
  * @param {string} lang - The language of the template
  * @param {string} name - The name of the project
- * @param {string} location - Location of repository
- * @param {string} subDirs - path of sub-directory of location, if any
  */
 export async function cloneRepo(lang, name) {
 	await execa('git', [

@@ -19,7 +19,7 @@ import { editDirs, editMain } from '../utilities/edits.js';
 import { writeFile } from 'fs/promises';
 const { prompt } = prompts;
 
-export async function init(flags, options) {
+export async function init(flags) {
 	// * Check if node version is valid
 	const node = await execa('node', ['--version']);
 	if (/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm.test(node.stdout)) {
@@ -77,7 +77,7 @@ export async function init(flags, options) {
 
 	git_init ? await git(data) : console.log(`Skipping git init...\n`);
 
-	let choice = '';
+	let choice;
 
 	if (pm === 'both') {
 		const chosen = await prompt([which_manager]);

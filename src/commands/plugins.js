@@ -4,11 +4,11 @@ import axios from 'axios';
 import fs from 'fs';
 import { greenBright } from 'colorette';
 const { prompt } = prompts;
+
 /**
  * Installs plugins to project
- * @param flags
  */
-export async function plugins(flags) {
+export async function plugins() {
 	/**
 	 * @type {string[]}
 	 */
@@ -26,8 +26,12 @@ export async function plugins(flags) {
 	);
 }
 
+/**
+ * @param {string} url 
+ * @returns File
+ */
 async function download(url) {
-	const res = await axios.get(url);
+	const res = await axios.default.get(url);
 	const data = res.data;
 	const dir = `${process.cwd()}/src/plugins`;
 	const filedir = `${process.cwd()}/src/plugins/${url.split('/').pop()}`;

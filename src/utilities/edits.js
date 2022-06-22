@@ -20,6 +20,15 @@ export async function editMain(name) {
 	return writeFile(pjLocation, JSON.stringify(output, null, 2));
 }
 
+/**
+ * It renames the `src` and `commands` directories, and edits the `index.ts` file to reflect the
+ * changes
+ * @param {string} srcName - The name of the folder that will contain your main files.
+ * @param {string} cmds_dirName - The name of the directory where your commands will be stored.
+ * @param {string} name - The name of the folder you want to edit.
+ * @param {'javascript' | 'typescript'} lang - The language you want to use.
+ * @returns void
+ */
 export async function editDirs(
 	srcName,
 	cmds_dirName,
