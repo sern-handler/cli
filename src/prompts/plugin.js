@@ -5,11 +5,15 @@ async function gimmechoices() {
 		(await getLang()) === 'typescript' ? 'TypeScript' : 'JavaScript';
 	const link = `https://api.github.com/repos/sern-handler/awesome-plugins/contents/${lang}`;
 
-	const data = (await axios.get(link)).data;
-	const choices = data.map((e) => ({
-		title: e.name,
-		value: e.download_url,
-	}));
+	const resp = await axios.default.get(link).catch(() => null);
+	if (!resp) return { title: 'No plugins found!', value: '', disabled: true };
+	const { data } = resp;
+	const choices = data.map(
+		(/** @type {{ name: string; download_url: string; }} */ e) => ({
+			title: e.name,
+			value: e.download_url,
+		})
+	);
 	return choices;
 }
 
