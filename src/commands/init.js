@@ -1,6 +1,6 @@
 import prompts from 'prompts';
 import ora from 'ora';
-import { redBright, yellowBright } from 'colorette';
+import { greenBright, redBright, yellowBright } from 'colorette';
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import {
@@ -92,6 +92,9 @@ export async function init(flags, options) {
 	await installDeps(choice, data.name);
 	await editMain(data.name);
 	await editDirs(data.main_dir, data.cmds_dir, data.name, data.lang);
+
+	console.log(`${greenBright('Success, project was initialised!')}`)
+	process.exit(0);
 }
 
 /**
