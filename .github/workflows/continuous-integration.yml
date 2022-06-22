@@ -1,4 +1,4 @@
-name: Lint
+name: Continuous Integration
 
 on:
   # Trigger the workflow on push or pull request,
@@ -24,9 +24,15 @@ jobs:
         with:
           node-version: 17
 
-      # ESLint and Prettier must be in `package.json`
+      # Prettier must be in `package.json`
       - name: Install Node.js dependencies
         run: npm i
 
       - name: Run Prettier
         run: npm run format
+
+      - name: Link Project
+        run: npm link
+
+      - name: Test Sern
+        run: sern
