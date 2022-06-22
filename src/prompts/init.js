@@ -18,14 +18,6 @@ export const lang = {
 	],
 };
 
-export const default_prefix = {
-	message:
-		'What is the default prefix for your bot? Type "none" if it is completely Application-Command based',
-	name: 'prefix',
-	type: 'text',
-	initial: '!',
-};
-
 export const main_dir = {
 	message: 'What is the main directory of your project?',
 	name: 'main_dir',

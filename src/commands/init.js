@@ -5,7 +5,6 @@ import { execa } from 'execa';
 import { findUp } from 'find-up';
 import {
 	cmds_dir,
-	default_prefix,
 	lang,
 	main_dir,
 	gitInit,
@@ -46,10 +45,9 @@ export async function init(flags, options) {
 			lang: 'typescript',
 			main_dir: 'src',
 			cmds_dir: 'commands',
-			default_prefix: '!',
 		};
 	} else {
-		data = await prompt([name, lang, main_dir, cmds_dir, default_prefix]);
+		data = await prompt([name, lang, main_dir, cmds_dir]);
 		git_init = (await prompt([gitInit])).gitinit;
 		pm = await npm();
 	}
@@ -63,7 +61,7 @@ export async function init(flags, options) {
 	};
 	const file = JSON.stringify(config, null, 2);
 
-	if (Object.keys(data).length < 5) process.exit(1);
+	if (Object.keys(data).length < 4) process.exit(1);
 
 	await cloneRepo(data.lang, data.name);
 
@@ -93,7 +91,7 @@ export async function init(flags, options) {
 	await editMain(data.name);
 	await editDirs(data.main_dir, data.cmds_dir, data.name, data.lang);
 
-	console.log(`${greenBright('Success, project was initialised!')}`)
+	console.log(`${greenBright('Success, project was initialised!')}`);
 	process.exit(0);
 }
 
