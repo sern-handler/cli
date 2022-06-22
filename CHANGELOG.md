@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/sern-handler/cli/compare/v0.1.3...v0.2.0) (2022-06-22)
+
+
+### Features
+
+* add `sern.config.json` ([#38](https://github.com/sern-handler/cli/issues/38)) ([3eb6383](https://github.com/sern-handler/cli/commit/3eb63835d9f6ff3f3426e017ea87344c00bb13a4))
+* add basic type checking ([eb85a7a](https://github.com/sern-handler/cli/commit/eb85a7a8f2f6252f719fd396d42cded2d9eb0918))
+* add commander and start plugins installer ([#36](https://github.com/sern-handler/cli/issues/36)) ([b2e6236](https://github.com/sern-handler/cli/commit/b2e6236dde6f4848dde6fc23a6222415824bb294))
+* enable extra command & jsdockerfile ([#43](https://github.com/sern-handler/cli/issues/43)) ([7cf62c0](https://github.com/sern-handler/cli/commit/7cf62c03083b8ebbb8a6a63fd8efe592344d5230))
+* plugin command!!! ([#45](https://github.com/sern-handler/cli/issues/45)) ([895a489](https://github.com/sern-handler/cli/commit/895a48910e32813f8aa25f57302a4123fc631c2c))
+
 ### [0.1.3](https://github.com/sern-handler/cli/compare/v0.1.2...v0.1.3) (2022-06-10)
 
 
