@@ -27,7 +27,7 @@ export async function plugins() {
 }
 
 /**
- * @param {string} url 
+ * @param {string} url
  * @returns File
  */
 async function download(url) {

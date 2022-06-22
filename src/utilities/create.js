@@ -7,7 +7,6 @@ const templates = new URL('./templates/', root);
 const extraURL = new URL('./extra/', templates);
 const extraFolder = fileURLToPath(extraURL);
 
-
 /**
  * It creates a file with the name `name.lang.sern` in the `location` directory
  * @param {string} name - The name of the file.
