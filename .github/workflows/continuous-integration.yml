@@ -11,8 +11,8 @@ on:
       - main
 
 jobs:
-  continuous-integration:
-    name: Continuous Integration
+  Lint:
+    name: Linting
     runs-on: ubuntu-latest
 
     steps:
@@ -30,6 +30,19 @@ jobs:
 
       - name: Run Prettier
         run: npm run format
+
+  Test:
+    name: Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@eeb10cff27034e7acf239c5d29f62154018672fd # tag=v3
+        with:
+          node-version: 17
 
       - name: Link Project
         run: npm link
