@@ -11,8 +11,8 @@ on:
       - main
 
 jobs:
-  run-linters:
-    name: Run linters
+  continuous-integration:
+    name: Continuous Integration
     runs-on: ubuntu-latest
 
     steps:
@@ -35,4 +35,4 @@ jobs:
         run: npm link
 
       - name: Test Sern
-        run: sern
+        run: sern help
