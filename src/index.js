@@ -9,7 +9,11 @@ import { version } from './utilities/version.js';
 import { plugins } from './commands/plugins.js';
 export const program = new Command();
 
-program.name('sern').description(help()).version(version());
+program
+	.name('sern')
+	.description(help())
+	.version(version())
+	.exitOverride(() => process.exit(0));
 
 program
 	.command(init.name)
