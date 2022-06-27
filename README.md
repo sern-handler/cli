@@ -53,7 +53,7 @@ Adding the `-y` flag sets up project as default.
 ## Installing Plugins
 
 Sern runs on your plugins. Contribute to the [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
-`sern plugins (-n | --name) "Name of plugin"`
+Run `sern plugins` to see all installable options
 
 ## Stats
 
