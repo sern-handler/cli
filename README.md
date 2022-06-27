@@ -48,7 +48,7 @@ Commands:
 ## Setting Up Your Project
 
 Run `sern init (-y)` for an interactive setup on a brand new project using our framework. <br>
-Adding the `-y` flag sets up project as default.
+Adding the `-y` flag sets up project as default. ( **Note** : the default initiates a typescript project)
 
 ## Installing Plugins
 
