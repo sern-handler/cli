@@ -25,11 +25,35 @@ pnpm add -g @sern/cli@latest
 
 When you install the CLI, you can use our commands with **sern** prefix.
 
-`sern <command> (opt)<flag>`
+```
+Usage: sern [options] [command]
+
+Welcome to Sern!
+If you're new to Sern, run sern init for an interactive setup to your new bot project!
+
+If you have any ideas, suggestions, bug reports, kindly join our support server: https://discord.gg/xzK5fUKT4r
+
+Options:
+  -V, --version      output the version number
+  -h, --help         display help for command
+
+Commands:
+  init [options]     Quickest way to scaffold a new project
+  plugins [options]  Install plugins from https://github.com/sern-handler/awesome-plugins
+  extra              Easy way to add extra things in your sern project
+  help [command]     display help for command
+
+```
 
 ## Setting Up Your Project
 
-#### TODO
+Run `sern init (-y)` for an interactive setup on a brand new project using our framework. <br>
+Adding the `-y` flag sets up project as default. ( **Note** : the default initiates a typescript project)
+
+## Installing Plugins
+
+Sern runs on your plugins. Contribute to the [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
+Run `sern plugins` to see all installable options
 
 ## Stats
 
