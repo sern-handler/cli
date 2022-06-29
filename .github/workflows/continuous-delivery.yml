@@ -1,13 +1,13 @@
 name: Continuous Delivery
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   Publish:
-    name: Publishing
+    name: Publishing Dev
     runs-on: ubuntu-latest
 
     steps:
@@ -30,6 +30,6 @@ jobs:
         run: sern
 
       - name: Publish to npm
-        run: npm publish
+        run: npm publish --tag dev
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
