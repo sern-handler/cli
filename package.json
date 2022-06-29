@@ -42,6 +42,7 @@
 		"prompts": "2.4.2"
 	},
 	"devDependencies": {
+		"@favware/npm-deprecate": "^1.0.4",
 		"@types/prompts": "^2.0.14",
 		"cz-conventional-changelog": "3.0.1",
 		"eslint": "8.18.0",

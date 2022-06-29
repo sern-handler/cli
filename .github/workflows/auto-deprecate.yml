@@ -23,6 +23,6 @@ jobs:
       - name: Install Node.js dependencies
         run: npm i
       - name: Deprecate versions
-        run: npm deprecate @sern/cli@dev "This is a deprecated version of @sern/cli@dev. Please use the latest dev version."
+        run: npm-deprecate --name "*dev*" --package "@sern/cli" --message "This is a deprecated version of @sern/cli@dev. Please use the latest dev version."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
