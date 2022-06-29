@@ -30,6 +30,8 @@ jobs:
         run: sern
 
       - name: Publish to npm
-        run: npm publish --tag dev
+        run: |
+          npm version --preid "dev.$(git rev-parse --verify --short HEAD)"
+          npm publish --tag dev
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
