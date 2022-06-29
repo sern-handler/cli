@@ -31,7 +31,7 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm run release -- --release-as "dev.$(git rev-parse --verify --short HEAD)"
+          npm version premajor --preid "dev.$(git rev-parse --verify --short HEAD)"
           npm publish --tag dev
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
