@@ -1,0 +1,5 @@
+renovate.json
+tsconfig.json
+.prettierignore
+.prettierrc
+.github/

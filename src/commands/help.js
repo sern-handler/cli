@@ -8,7 +8,7 @@ export function help() {
  |___/\\___|_|  |_| |_|
                      
  Welcome!
- If you're new to ${cyanBright('Sern')}, run ${yellowBright(
+ If you're new to ${cyanBright('sern')}, run ${yellowBright(
 		'sern init'
 	)} for an interactive setup to your new bot project!
  

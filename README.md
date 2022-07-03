@@ -1,4 +1,4 @@
-# Sern CLI
+# sern CLI
 
 Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!
 
@@ -28,8 +28,8 @@ When you install the CLI, you can use our commands with **sern** prefix.
 ```
 Usage: sern [options] [command]
 
-Welcome to Sern!
-If you're new to Sern, run sern init for an interactive setup to your new bot project!
+Welcome to sern!
+If you're new to sern, run sern init for an interactive setup to your new bot project!
 
 If you have any ideas, suggestions, bug reports, kindly join our support server: https://discord.gg/xzK5fUKT4r
 
@@ -52,7 +52,7 @@ Adding the `-y` flag sets up project as default. ( **Note** : the default initia
 
 ## Installing Plugins
 
-Sern runs on your plugins. Contribute to the [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
+sern runs on your plugins. Contribute to the [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
 Run `sern plugins` to see all installable options
 
 ## Stats

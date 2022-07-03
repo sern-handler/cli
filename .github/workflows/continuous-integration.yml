@@ -50,5 +50,5 @@ jobs:
       - name: Link Project
         run: npm link
 
-      - name: Test Sern
+      - name: Test sern
         run: sern
