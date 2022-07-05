@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/sern-handler/cli/compare/v0.2.0...v0.2.1) (2022-07-05)
+
+
+### Features
+
+* making sern help message look better, adding ascii art ([#50](https://github.com/sern-handler/cli/issues/50)) ([9bd2b0f](https://github.com/sern-handler/cli/commit/9bd2b0f38be835a31fceeabdf60487a1424cdf7e))
+
+
+### Bug Fixes
+
+* avoid crashing of cli when no plugin found ([#47](https://github.com/sern-handler/cli/issues/47)) ([8c45327](https://github.com/sern-handler/cli/commit/8c45327094b2560f7b5c813a1c1925920bd46038))
+
 ## [0.2.0](https://github.com/sern-handler/cli/compare/v0.1.3...v0.2.0) (2022-06-22)
 
 
