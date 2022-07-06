@@ -31,7 +31,7 @@
 	"bugs": {
 		"url": "https://github.com/sern-handler/cli/issues"
 	},
-	"homepage": "https://github.com/sern-handler/cli#readme",
+	"homepage": "https://sern-handler.js.org",
 	"dependencies": {
 		"axios": "^0.27.2",
 		"colorette": "^2.0.16",
