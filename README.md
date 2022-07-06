@@ -54,7 +54,3 @@ Adding the `-y` flag sets up project as default. ( **Note** : the default initia
 
 sern runs on your plugins. Contribute to the [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
 Run `sern plugins` to see all installable options
-
-## Stats
-
-![Alt](https://repobeats.axiom.co/api/embed/5eb8cf0f79fecee29cc81cd2eca5f6321981304e.svg 'Feel free to contribute')
