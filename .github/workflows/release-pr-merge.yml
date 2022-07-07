@@ -6,8 +6,8 @@ on:
       - "closed"
 
 jobs:
-  if_merged:
+  Merged:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - run: echo {{ github.event.pull_request.sender }}
+      - run: echo ${{ github.event.pull_request.sender }}
