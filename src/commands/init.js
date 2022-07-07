@@ -67,11 +67,10 @@ export async function init(flags) {
 
 	const file = JSON.stringify(config, null, 2);
 
-	if (
-		(Object.keys(data).length < 4 && !flags.sync) ||
-		(Object.keys(data).length < 3 && flags.sync)
-	)
-		process.exit(1);
+	const requiredData = flags.sync ? 3 : 4;
+	const receivedData = Object.keys(data).length;
+
+	if (receivedData < requiredData) process.exit(1);
 
 	if (!flags.sync) await cloneRepo(data.lang, data.name);
 
