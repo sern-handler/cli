@@ -19,6 +19,7 @@ program
 	.command(init.name)
 	.description('Quickest way to scaffold a new project')
 	.option('-y', 'Finishes setup as default')
+	.option('-s, --sync', 'Syncs the project and generates sern.config.json')
 	.action(init);
 
 program

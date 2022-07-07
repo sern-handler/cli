@@ -19,6 +19,9 @@ import { editDirs, editMain } from '../utilities/edits.js';
 import { writeFile } from 'fs/promises';
 const { prompt } = prompts;
 
+/**
+ * @param {{ y: string; sync: string; }} flags
+ */
 export async function init(flags) {
 	// * Check if node version is valid
 	const node = await execa('node', ['--version']);
@@ -46,6 +49,8 @@ export async function init(flags) {
 			main_dir: 'src',
 			cmds_dir: 'commands',
 		};
+	} else if (flags.sync) {
+		data = await prompt([lang, main_dir, cmds_dir]);
 	} else {
 		data = await prompt([name, lang, main_dir, cmds_dir]);
 		git_init = (await prompt([gitInit])).gitinit;
@@ -59,20 +64,30 @@ export async function init(flags) {
 			commands: data.cmds_dir,
 		},
 	};
+
 	const file = JSON.stringify(config, null, 2);
 
-	if (Object.keys(data).length < 4) process.exit(1);
+	if (
+		(Object.keys(data).length < 4 && !flags.sync) ||
+		(Object.keys(data).length < 3 && flags.sync)
+	)
+		process.exit(1);
 
-	await cloneRepo(data.lang, data.name);
+	if (!flags.sync) await cloneRepo(data.lang, data.name);
 
 	const pkg = await findUp('package.json', {
 		cwd: process.cwd() + '/' + data.name,
 	});
 
-	if (!pkg) throw new Error('No package.json found! Clone Failed');
+	if (!pkg) throw new Error('No package.json found!');
 
 	if (pkg) {
 		await writeFile(pkg.replace('package.json', 'sern.config.json'), file);
+	}
+
+	if (flags.sync) {
+		console.log('Project was successfully synced!');
+		process.exit(0);
 	}
 
 	git_init ? await git(data) : console.log(`Skipping git init...\n`);
