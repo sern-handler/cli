@@ -8,5 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v3
+        id: release
         with:
           release-type: node
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+        if: ${{ steps.release.outputs.release_created }}
+      - uses: actions/setup-node@eeb10cff27034e7acf239c5d29f62154018672fd # tag=v3
+        with:
+          node-version: 17
+          registry-url: 'https://registry.npmjs.org'
+
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm i
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm link
+        if: ${{ steps.release.outputs.release_created }}
+      - run: sern
+        if: ${{ steps.release.outputs.release_created }}
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
