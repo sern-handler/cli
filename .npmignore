@@ -2,4 +2,5 @@ renovate.json
 tsconfig.json
 .prettierignore
 .prettierrc
+.gitattributes
 .github/
