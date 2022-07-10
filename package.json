@@ -30,25 +30,18 @@
 	},
 	"homepage": "https://sern-handler.js.org",
 	"dependencies": {
-		"axios": "^0.27.2",
 		"colorette": "^2.0.16",
 		"commander": "^9.3.0",
 		"execa": "^6.1.0",
 		"find-up": "6.3.0",
 		"ora": "^6.1.0",
-		"prompts": "2.4.2"
+		"prompts": "2.4.2",
+		"undici": "^5.6.1"
 	},
 	"devDependencies": {
 		"@favware/npm-deprecate": "1.0.4",
 		"@types/prompts": "2.0.14",
-		"cz-conventional-changelog": "3.3.0",
-		"eslint": "8.19.0",
 		"prettier": "2.7.1"
-	},
-	"config": {
-		"commitizen": {
-			"path": "./node_modules/cz-conventional-changelog"
-		}
 	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org/",
