@@ -1,13 +1,17 @@
-import axios from 'axios';
+import { fetch } from 'undici';
 import { getLang } from '../utilities/getLang.js';
 async function gimmechoices() {
 	const lang =
-		(await getLang()) === 'typescript' ? 'TypeScript' : 'JavaScript';
+		(await getLang().catch(() => null)) === 'typescript'
+			? 'TypeScript'
+			: 'JavaScript';
 	const link = `https://api.github.com/repos/sern-handler/awesome-plugins/contents/${lang}`;
 
-	const resp = await axios.default.get(link).catch(() => null);
+	const resp = await fetch(link).catch(() => null);
+
 	if (!resp) return { title: 'No plugins found!', value: '', disabled: true };
-	const { data } = resp;
+
+	const data = await resp.json();
 	const choices = data.map(
 		(/** @type {{ name: string; download_url: string; }} */ e) => ({
 			title: e.name,
