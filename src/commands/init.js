@@ -25,10 +25,10 @@ const { prompt } = prompts;
 export async function init(flags) {
 	// * Check if node version is valid
 	const { version } = process;
-	const [ major, minor ] = version.split('.');
+	const [major, minor] = version.split('.');
 	const majorNum = parseInt(major.slice(1));
 	const minorNum = parseInt(minor);
-	
+
 	if (majorNum < 16 || (majorNum === 16 && minorNum < 10)) {
 		console.log(
 			yellowBright(
