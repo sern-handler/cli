@@ -69,9 +69,9 @@ export async function init(flags) {
 
 	const requiredData = flags.sync !== undefined ? 3 : 4;
 	const receivedData = Object.keys(data).length;
-	const hasRequiredData = receivedData < requiredData;
+	const incompleteDataCondition = receivedData < requiredData;
 
-	if (hasRequiredData) process.exit(1);
+	if (incompleteDataCondition) process.exit(1);
 
 	if (!flags.sync) await cloneRepo(data.lang, data.name);
 
