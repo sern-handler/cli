@@ -25,7 +25,6 @@ const { prompt } = prompts;
 export async function init(flags) {
 	// * Check if node version is valid
 	const { version } = process;
-	console.log(version.split('.'));
 	const [ major, minor ] = version.split('.');
 	const majorNum = parseInt(major.slice(1));
 	const minorNum = parseInt(minor);
