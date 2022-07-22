@@ -24,11 +24,15 @@ const { prompt } = prompts;
  */
 export async function init(flags) {
 	// * Check if node version is valid
-	const node = await execa('node', ['--version']);
-	if (/v1(([0-6]\.[2-9])|([0-5]\.[0-9]))/gm.test(node.stdout)) {
+	const { version } = process;
+	const [major, minor] = version.split('.');
+	const majorNum = parseInt(major.slice(1));
+	const minorNum = parseInt(minor);
+
+	if (majorNum < 16 || (majorNum === 16 && minorNum < 10)) {
 		console.log(
 			yellowBright(
-				`\nYou are using Node ${node.stdout}\nPlease upgrade to Node 16.10.x or higher!\n`
+				`\nYou are using Node ${version}\nPlease upgrade to Node 16.10.x or higher!\n`
 			)
 		);
 
