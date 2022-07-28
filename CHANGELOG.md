@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.2](https://github.com/sern-handler/cli/compare/v0.4.1...v0.4.2) (2022-07-28)
+
+
+### Features
+
+* switch to undici ([#58](https://github.com/sern-handler/cli/issues/58)) ([c4f8e45](https://github.com/sern-handler/cli/commit/c4f8e45bdc0af5a3bbd394d2b9f852f4a946114c))
+
 ## [0.4.1](https://github.com/sern-handler/cli/compare/v0.4.0...v0.4.1) (2022-07-07)
 
 
