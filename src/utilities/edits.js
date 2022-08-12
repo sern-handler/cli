@@ -66,7 +66,7 @@ export async function editDirs(
 		if (!output) throw new Error("Can't read your tsconfig.json.");
 		output.compilerOptions.rootDir = srcName;
 
-		writeFile(tsconfig, JSON.stringify(output, null, 2));
+		await writeFile(tsconfig, JSON.stringify(output, null, 2));
 	}
 
 	const output = await readFile(index, 'utf8');
