@@ -11,6 +11,11 @@ export const lang = {
 			value: 'javascript',
 		},
 		{
+			title: 'JavaScript (ESM)',
+			description: 'JS',
+			value: 'javascript-esm',
+		},
+		{
 			title: 'TypeScript',
 			description: 'TS - (Recommended)',
 			value: 'typescript',
