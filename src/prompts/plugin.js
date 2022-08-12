@@ -1,5 +1,6 @@
 import { fetch } from 'undici';
 import { getLang } from '../utilities/getLang.js';
+
 async function gimmechoices() {
 	const lang =
 		(await getLang().catch(() => null)) === 'typescript'
@@ -12,13 +13,12 @@ async function gimmechoices() {
 	if (!resp) return { title: 'No plugins found!', value: '', disabled: true };
 
 	const data = await resp.json();
-	const choices = data.map(
+	return data.map(
 		(/** @type {{ name: string; download_url: string; }} */ e) => ({
 			title: e.name,
 			value: e.download_url,
 		})
 	);
-	return choices;
 }
 
 export async function pluginsQ() {
