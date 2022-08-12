@@ -1,6 +1,6 @@
 import prompts from 'prompts';
 import ora from 'ora';
-import { greenBright, redBright, yellowBright } from 'colorette';
+import { greenBright, redBright } from 'colorette';
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import {
@@ -23,21 +23,6 @@ const { prompt } = prompts;
  * @param {{ y: string; sync: string; }} flags
  */
 export async function init(flags) {
-	// * Check if node version is valid
-	const { version } = process;
-	const [major, minor] = version.split('.');
-	const majorNum = parseInt(major.slice(1));
-	const minorNum = parseInt(minor);
-
-	if (majorNum < 16 || (majorNum === 16 && minorNum < 10)) {
-		console.log(
-			yellowBright(
-				`\nYou are using Node ${version}\nPlease upgrade to Node 16.10.x or higher!\n`
-			)
-		);
-
-		process.exit(1);
-	}
 
 	let data;
 	let git_init;
