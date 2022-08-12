@@ -43,6 +43,9 @@
 		"@types/prompts": "2.0.14",
 		"prettier": "2.7.1"
 	},
+	"engines": {
+		"node": ">= 16.10.x"
+	},
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org/",
 		"access": "public"

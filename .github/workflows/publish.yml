@@ -6,14 +6,6 @@ on:
       prNumber:
         description: The number of the PR that is being deployed
         required: true
-      version:
-        type: choice
-        description: The version that cli should be bumped to
-        options:
-          - major
-          - minor
-          - patch
-        required: true
 
 jobs:
   Publish:
@@ -42,8 +34,7 @@ jobs:
       - name: Publish to npm
         run: |
           TAG=$(echo 'pr-${{ github.event.inputs.prNumber }}')
-          VERSION=$(echo '${{github.event.inputs.version}}')
-          npm version ${VERSION} --preid "${TAG}.$(git rev-parse --verify --short HEAD)" --git-tag-version=false
+          npm version premajor --preid "${TAG}.$(git rev-parse --verify --short HEAD)" --git-tag-version=false
           npm publish --tag ${TAG}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
