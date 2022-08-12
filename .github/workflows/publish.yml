@@ -34,7 +34,6 @@ jobs:
       - name: Publish to npm
         run: |
           TAG=$(echo 'pr-${{ github.event.inputs.prNumber }}')
-          VERSION=$(echo '${{github.event.inputs.version}}')
           npm version premajor --preid "${TAG}.$(git rev-parse --verify --short HEAD)" --git-tag-version=false
           npm publish --tag ${TAG}
         env:
