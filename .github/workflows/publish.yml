@@ -2,6 +2,10 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      prNumber:
+        description: The number of the PR that is being deployed
+        required: true
 
 jobs:
   Publish:
@@ -28,6 +32,9 @@ jobs:
         run: sern
 
       - name: Publish to npm
-        run: npm publish
+        run: |
+          TAG=$(echo 'pr-${{ github.event.inputs.prNumber }}')
+          npm version premajor --preid "${TAG}.$(git rev-parse --verify --short HEAD)" --git-tag-version=false
+          npm publish --tag ${TAG}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
