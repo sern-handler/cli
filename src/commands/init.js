@@ -45,15 +45,14 @@ export async function init(flags) {
 		git_init = (await prompt([gitInit])).gitinit;
 		pm = await npm();
 	}
-
+	const language = data.lang === 'javascript-esm' ? 'javascript' : data.lang;
 	const config = {
-		language: data.lang,
+		language,
 		paths: {
 			base: data.main_dir,
 			commands: data.cmds_dir,
 		},
 	};
-
 	const file = JSON.stringify(config, null, 2);
 
 	const requiredData = flags.sync !== undefined ? 3 : 4;
