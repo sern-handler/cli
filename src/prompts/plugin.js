@@ -2,13 +2,11 @@ import { fetch } from 'undici';
 import { getLang } from '../utilities/getLang.js';
 
 function upperCase(string) {
-	if(string === null) {
+	if (string === null) {
 		console.error('Lang property not found!');
 		process.exit(0);
 	}
-	return string === 'typescript'
-		? 'TypeScript'
-		: 'JavaScript';
+	return string === 'typescript' ? 'TypeScript' : 'JavaScript';
 }
 
 async function gimmechoices() {

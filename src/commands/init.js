@@ -23,7 +23,6 @@ const { prompt } = prompts;
  * @param {{ y: string; sync: string; }} flags
  */
 export async function init(flags) {
-
 	let data;
 	let git_init;
 	let pm;
