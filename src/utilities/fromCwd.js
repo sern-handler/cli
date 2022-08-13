@@ -1,10 +1,8 @@
 import path from 'path';
 
-
 /**
- * @param {any[]} dir
+ * @param {string[]} dir
  */
 export function fromCwd(...dir) {
-	return path.join(process.cwd(), ...dir)
+	return path.join(...[process.cwd(), ...dir]);
 }
-
