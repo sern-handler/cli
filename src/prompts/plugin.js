@@ -2,10 +2,9 @@ import { fetch } from 'undici';
 import { getLang } from '../utilities/getLang.js';
 
 async function gimmechoices() {
-	const lang =
-		(await getLang().catch(() => null)) === 'typescript'
-			? 'TypeScript'
-			: 'JavaScript';
+	const lang = (await getLang().catch(() => null)).toUpperCase() ?? (() =>
+		(console.error('Lang property not found!'), process.exit(0))
+	)();
 	const link = `https://api.github.com/repos/sern-handler/awesome-plugins/contents/${lang}`;
 
 	const resp = await fetch(link).catch(() => null);
