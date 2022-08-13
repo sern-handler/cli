@@ -44,6 +44,5 @@ async function download(url) {
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
-	const file = fs.writeFileSync(filedir, data);
-	return file;
+	fs.writeFileSync(filedir, data);
 }
