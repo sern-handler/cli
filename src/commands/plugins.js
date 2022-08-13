@@ -3,6 +3,7 @@ import prompts from 'prompts';
 import { fetch } from 'undici';
 import fs from 'fs';
 import { greenBright } from 'colorette';
+import { fromCwd } from '../utilities/fromCwd.js';
 const { prompt } = prompts;
 
 /**
@@ -37,12 +38,11 @@ async function download(url) {
 
 	if (!data) throw new Error('Download failed! Kindly contact developers');
 
-	const dir = `${process.cwd()}/src/plugins`;
+	const dir = `${fromCwd('/src/plugins')}`;
 	const filedir = `${process.cwd()}/src/plugins/${url.split('/').pop()}`;
 
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
-	const file = fs.writeFileSync(filedir, data);
-	return file;
+	fs.writeFileSync(filedir, data);
 }

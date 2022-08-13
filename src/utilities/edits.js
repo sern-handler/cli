@@ -1,5 +1,6 @@
 import { readFile, rename, writeFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
+import { fromCwd } from './fromCwd.js';
 
 /**
  * It takes a string, finds the package.json file in the directory of the string, and changes the name
@@ -9,7 +10,7 @@ import { findUp } from 'find-up';
  */
 export async function editMain(name) {
 	const pjLocation = await findUp('package.json', {
-		cwd: process.cwd() + '/' + name,
+		cwd: fromCwd('/' + name),
 	});
 
 	const output = JSON.parse(await readFile(pjLocation, 'utf8'));
@@ -36,7 +37,7 @@ export async function editDirs(
 	lang = 'typescript'
 ) {
 	const path = await findUp('src', {
-		cwd: process.cwd() + '/' + name,
+		cwd: fromCwd(name),
 		type: 'directory',
 	});
 
@@ -46,12 +47,12 @@ export async function editDirs(
 	await rename(path, newMainDir);
 
 	const cmdsPath = await findUp('commands', {
-		cwd: process.cwd() + '/' + name + '/' + srcName,
+		cwd: fromCwd(name, srcName),
 		type: 'directory',
 	});
 
 	const index = await findUp(`index.${ext}`, {
-		cwd: process.cwd() + '/' + name + '/' + srcName,
+		cwd: fromCwd(name, srcName),
 	});
 
 	const newCmdsPath = cmdsPath?.replace('commands', cmds_dirName);
@@ -66,7 +67,7 @@ export async function editDirs(
 		if (!output) throw new Error("Can't read your tsconfig.json.");
 		output.compilerOptions.rootDir = srcName;
 
-		writeFile(tsconfig, JSON.stringify(output, null, 2));
+		await writeFile(tsconfig, JSON.stringify(output, null, 2));
 	}
 
 	const output = await readFile(index, 'utf8');
