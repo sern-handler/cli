@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import { init } from './commands/init.js';
-import { help } from './commands/help.js';
 import { extra } from './commands/extra.js';
+import { help } from './commands/help.js';
+import { init } from './commands/init.js';
 
 import { Command } from 'commander';
-import { version } from './utilities/version.js';
 import { plugins } from './commands/plugins.js';
+import { version } from './utilities/version.js';
 export const program = new Command();
 
 program

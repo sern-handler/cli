@@ -1,8 +1,8 @@
-import { pluginsQ } from '../prompts/plugin.js';
+import { greenBright } from 'colorette';
+import fs from 'fs';
 import prompt from 'prompts';
 import { fetch } from 'undici';
-import fs from 'fs';
-import { greenBright } from 'colorette';
+import { pluginsQ } from '../prompts/plugin.js';
 import { fromCwd } from '../utilities/fromCwd.js';
 
 /**

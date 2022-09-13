@@ -1,6 +1,6 @@
-import { URL, fileURLToPath } from 'url';
-import { resolve, dirname } from 'node:path';
-import { readFile, mkdir, writeFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath, URL } from 'url';
 const root = new URL('../../', import.meta.url);
 
 const templates = new URL('./templates/', root);

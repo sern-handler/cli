@@ -1,5 +1,5 @@
-import { readFile, rename, writeFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
+import { readFile, rename, writeFile } from 'node:fs/promises';
 import { fromCwd } from './fromCwd.js';
 
 /**
