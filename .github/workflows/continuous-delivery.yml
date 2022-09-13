@@ -24,7 +24,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Node.js dependencies
-        run: npm i
+        run: npm i && npm run build
 
       - name: Link Project
         run: npm link
