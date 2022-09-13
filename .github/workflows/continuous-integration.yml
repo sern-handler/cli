@@ -45,7 +45,7 @@ jobs:
           node-version: 17
 
       - name: Install Node.js dependencies
-        run: npm i
+        run: npm i && npm build
 
       - name: Link Project
         run: npm link
