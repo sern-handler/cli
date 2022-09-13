@@ -1,4 +1,6 @@
-export const extraPrompt = {
+import type { PromptObject } from 'prompts';
+
+export const extraPrompt: PromptObject = {
 	message: 'What extra feature do you want to add?',
 	name: 'extra',
 	type: 'select',

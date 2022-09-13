@@ -1,6 +1,7 @@
 import { blueBright } from 'colorette';
+import type { PromptObject } from 'prompts';
 
-export const lang = {
+export const lang: PromptObject = {
 	message: 'What language do you want the project to be in?',
 	name: 'lang',
 	type: 'select',
@@ -23,40 +24,37 @@ export const lang = {
 	],
 };
 
-export const main_dir = {
+export const main_dir: PromptObject = {
 	message: 'What is the main directory of your project?',
 	name: 'main_dir',
 	type: 'text',
 	initial: 'src',
 };
 
-export const cmds_dir = {
+export const cmds_dir: PromptObject = {
 	message: 'What is the directory of your commands?',
 	name: 'cmds_dir',
 	type: 'text',
 	initial: 'commands',
-	validate: (/** @type {string} */ dir) =>
+	validate: (dir: string) =>
 		dir === 'src' ? 'You can not use src as a directory' : true,
 };
 
-/**
- * @type {import('prompts').PromptObject}
- */
-export const npmInit = {
+export const npmInit: PromptObject = {
 	name: 'npm_init',
 	type: 'confirm',
 	message: `Do you want ${blueBright('me')} to initialize npm?`,
 	initial: true,
 };
 
-export const gitInit = {
+export const gitInit: PromptObject = {
 	name: 'gitinit',
 	type: 'confirm',
 	message: `Do you want to ${blueBright('me')} to initialize git?`,
 	initial: true,
 };
 
-export const which_manager = {
+export const which_manager: PromptObject = {
 	message: `Which manager do you want to use?`,
 	name: 'manager',
 	type: 'select',
@@ -80,21 +78,18 @@ export const which_manager = {
 	],
 };
 
-export const skip_install_dep = {
+export const skip_install_dep: PromptObject = {
 	name: 'skip_install_dep',
 	type: 'confirm',
 	message: `Do you want ${blueBright('me')} to install dependencies?`,
 	initial: false,
 };
 
-/**
- * @type {import('prompts').PromptObject}
- */
-export const name = {
+export const name: PromptObject = {
 	message: 'What is your project name?',
 	name: 'name',
 	type: 'text',
-	validate: (/**@type {string}*/ name) =>
+	validate: (name: string) =>
 		name.match('^(?:@[a-z0-9-*~][a-z0-9-*._~]*/)?[a-z0-9-~][a-z0-9-._~]*$')
 			? true
 			: 'Invalid name',

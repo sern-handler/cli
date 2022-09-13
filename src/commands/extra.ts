@@ -1,7 +1,6 @@
-import prompts from 'prompts';
+import prompt from 'prompts';
 import { extraPrompt } from '../prompts/extra.js';
 import { create } from '../utilities/create.js';
-const { prompt } = prompts;
 
 export async function extra() {
 	const extra = await prompt([extraPrompt]);
