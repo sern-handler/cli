@@ -1,19 +1,15 @@
 import { pluginsQ } from '../prompts/plugin.js';
-import prompts from 'prompts';
+import prompt from 'prompts';
 import { fetch } from 'undici';
 import fs from 'fs';
 import { greenBright } from 'colorette';
 import { fromCwd } from '../utilities/fromCwd.js';
-const { prompt } = prompts;
 
 /**
  * Installs plugins to project
  */
 export async function plugins() {
-	/**
-	 * @type {string[]}
-	 */
-	const e = (await prompt([await pluginsQ()])).list;
+	const e: string[] = (await prompt([await pluginsQ()])).list;
 	if (!e) process.exit(1);
 
 	for await (const url of e) {
@@ -27,11 +23,7 @@ export async function plugins() {
 	);
 }
 
-/**
- * @param {string} url
- * @returns File
- */
-async function download(url) {
+async function download(url: string) {
 	const data = await fetch(url, { method: 'GET' })
 		.then((res) => res.text())
 		.catch(() => null);

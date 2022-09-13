@@ -1,17 +1,18 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
+		"target": "ESNext",
 		"module": "ESNext",
-		"moduleResolution": "NodeNext",
-		"lib": ["es2017", "dom"],
-		"allowJs": true,
-		"checkJs": true,
-		"noEmit": true,
-		"strict": false,
-		"noImplicitThis": true,
-		"alwaysStrict": true,
+		"moduleResolution": "Node",
+		"outDir": "dist",
+		"rootDir": "src",
+		"declaration": true,
+		"declarationMap": true,
+		"strict": true,
 		"esModuleInterop": true,
-		"resolveJsonModule": true
-	},
-	"include": ["test", "src"]
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"importsNotUsedAsValues": "error",
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	}
 }

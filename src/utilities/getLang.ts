@@ -3,9 +3,9 @@ import { readFile } from 'node:fs/promises';
 
 /**
  * It finds the sern.config.json file, reads it, and returns the language property
- * @returns {Promise<string>} The language of the project.
+ * @returns The language of the project.
  */
-export async function getLang() {
+export async function getLang(): Promise<'typescript' | 'javascript'> {
 	const sernLocation = await findUp('sern.config.json');
 
 	if (!sernLocation) throw new Error("Can't find sern.config.json");

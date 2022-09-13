@@ -1,18 +1,18 @@
-import { execa } from 'execa';
 import { redBright } from 'colorette';
-import fs from 'fs';
-import path from 'path';
-import { readFile } from 'fs/promises';
+import { execa } from 'execa';
 import { findUp } from 'find-up';
+import fs from 'fs';
+import { readFile } from 'fs/promises';
 import ora from 'ora';
+import path from 'path';
+import type { PackageManagerChoice } from './types';
 
 /**
  * It installs dependencies from a package.json file
- * @param {'skip' | 'npm' | 'yarn'} choice - The package manager to use.
- * @param {string} name - The name of the project
- * @returns a promise.
+ * @param choice - The package manager to use.
+ * @param name - The name of the project
  */
-export async function installDeps(choice, name) {
+export async function installDeps(choice: PackageManagerChoice, name: string) {
 	const pkg = await findUp('package.json', {
 		cwd: process.cwd() + '/' + name,
 	});
@@ -44,10 +44,10 @@ export async function installDeps(choice, name) {
 
 /**
  * Clone the repo, copy the files from the repo to the new project directory, and delete the repo
- * @param {string} lang - The language of the template
- * @param {string} name - The name of the project
+ * @param lang - The language of the template
+ * @param name - The name of the project
  */
-export async function cloneRepo(lang, name) {
+export async function cloneRepo(lang: string, name: string) {
 	await execa('git', [
 		'clone',
 		`https://github.com/sern-handler/templates.git`,
@@ -60,13 +60,13 @@ export async function cloneRepo(lang, name) {
  * If the source is a directory, create the destination directory and then recursively copy the
  * contents of the source directory to the destination directory. If the source is not a directory,
  * copy the source file to the destination file
- * @param {string} src - The source path.
- * @param {string} dest - The destination folder where the files will be copied to.
+ * @param src - The source path.
+ * @param dest - The destination folder where the files will be copied to.
  */
-export function copyRecursiveSync(src, dest) {
+export function copyRecursiveSync(src: string, dest: string) {
 	const exists = fs.existsSync(src);
 
-	const stats = exists && fs.statSync(src);
+	const stats = (exists && fs.statSync(src)) as fs.Stats;
 
 	const isDirectory = exists && stats.isDirectory();
 	if (isDirectory) {
@@ -82,8 +82,3 @@ export function copyRecursiveSync(src, dest) {
 		fs.copyFileSync(src, dest);
 	}
 }
-
-// async function wait(ms) {
-// 	const wait = (await import('util')).promisify(setTimeout);
-// 	return wait(ms);
-// }
