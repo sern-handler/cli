@@ -11,7 +11,7 @@ export function help() {
  If you're new to ${cyanBright('sern')}, run ${magentaBright(
 		'sern init'
 	)} for an interactive setup to your new bot project!
- 
+
  ${green(
 		`If you have any ideas, suggestions, bug reports, kindly join our support server: https://discord.gg/xzK5fUKT4r`
  )}`;
