@@ -1,6 +1,9 @@
-# sern CLI
+<div align="center">
+  <img src="https://raw.githubusercontent.com/sern-handler/.github/main/cli.png" width="900px">
+</div>
 
-Our CLI allows you to setup and manage Discord bot projects without writing a single line of code!
+
+# Features 
 
 😁 **User Friendly** <br>
 💦 **Simple** <br>
