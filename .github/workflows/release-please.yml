@@ -20,7 +20,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
         if: ${{ steps.release.outputs.release_created }}
-      - run: npm i
+      - run: npm i && npm run build
         if: ${{ steps.release.outputs.release_created }}
       - run: npm link
         if: ${{ steps.release.outputs.release_created }}
