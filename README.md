@@ -2,8 +2,7 @@
   <img src="https://raw.githubusercontent.com/sern-handler/.github/main/cli.png" width="900px">
 </div>
 
-
-# Features 
+# Features
 
 😁 **User Friendly** <br>
 💦 **Simple** <br>
