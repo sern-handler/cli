@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0](https://github.com/sern-handler/cli/compare/v0.4.2...v0.5.0) (2022-09-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* re-write to TypeScript
+
+### Features
+
+* add engine for node version & remove manual version check ([#72](https://github.com/sern-handler/cli/issues/72)) ([2009d1f](https://github.com/sern-handler/cli/commit/2009d1fdca9a383d219304fd3cb48a622355b7dc))
+* adds the esm template option + refactors ([#73](https://github.com/sern-handler/cli/issues/73)) ([9271da3](https://github.com/sern-handler/cli/commit/9271da30764f86225385e8ae6448b99d66687294))
+* re-write to TypeScript ([bed31c1](https://github.com/sern-handler/cli/commit/bed31c1f4995bbf7d8d0a483f562788172e29919))
+
+
+### Miscellaneous Chores
+
+* release 0.5.0 ([2018c43](https://github.com/sern-handler/cli/commit/2018c4381e665b9b0c5e70a203aa0dfd9fdd3cef))
+
 ## [0.4.2](https://github.com/sern-handler/cli/compare/v0.4.1...v0.4.2) (2022-07-28)
 
 
