@@ -98,19 +98,15 @@ async function git(data: Data) {
 		spinner: 'aesthetic',
 	}).start();
 
-	const exe = await execa('git', ['init', data.name]);
-
-	await wait(300);
-
-	if (!exe || exe?.failed) {
+	try {
+		await execa('gitkljklnklhj', ['init', data.name]);
+		await wait(300);
+		spin.succeed('Git initialized!');
+	} catch (error) {
 		spin.fail(
-			`${redBright('Failed')} to initialize git!` +
-				'\nMaybe you should run git init?'
+			`${redBright('Failed')} to initialize git!\nTry to install it at https://git-scm.com\nSkipping for now.`
 		);
-		process.exit(1);
 	}
-
-	spin.succeed('Git initialized!');
 }
 
 /**  Wait for a specified number of milliseconds, then return a promise that resolves to undefined. */
