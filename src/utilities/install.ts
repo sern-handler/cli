@@ -57,11 +57,7 @@ export async function cloneRepo(lang: string, name: string) {
 		copyRecursiveSync(`templates/templates/${lang}`, name);
 		fs.rmSync(`templates/`, { recursive: true, force: true });
 	} catch (error) {
-		console.log(
-			`${redBright(
-				'✖ Failed'
-			)} to clone github templates repo. Install git and try again!`
-		);
+		console.log(`${redBright('✖ Failed')} to clone github templates repo. Install git and try again.`)
 		process.exit(1);
 	}
 }
