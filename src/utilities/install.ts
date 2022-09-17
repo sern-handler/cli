@@ -49,7 +49,7 @@ export async function installDeps(choice: PackageManagerChoice, name: string) {
  */
 export async function cloneRepo(lang: string, name: string) {
 	try {
-		await execa('gitjhgbhljk', [
+		await execa('git', [
 			'clone',
 			`https://github.com/sern-handler/templates.git`,
 		]);
