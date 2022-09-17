@@ -99,7 +99,7 @@ async function git(data: Data) {
 	}).start();
 
 	try {
-		await execa('gitkljklnklhj', ['init', data.name]);
+		await execa('git', ['init', data.name]);
 		await wait(300);
 		spin.succeed('Git initialized!');
 	} catch (error) {
