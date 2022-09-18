@@ -1,4 +1,4 @@
-import { redBright } from 'colorette';
+import { bgYellow, green, redBright } from 'colorette';
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import fs from 'fs';
@@ -6,6 +6,8 @@ import { readFile } from 'fs/promises';
 import ora from 'ora';
 import path from 'path';
 import type { PackageManagerChoice } from './types';
+import * as zl from 'zip-lib'
+import Downloader from 'nodejs-file-downloader';
 
 /**
  * It installs dependencies from a package.json file
@@ -57,8 +59,25 @@ export async function cloneRepo(lang: string, name: string) {
 		copyRecursiveSync(`templates/templates/${lang}`, name);
 		fs.rmSync(`templates/`, { recursive: true, force: true });
 	} catch (error) {
-		console.log(`${redBright('✖ Failed')} to clone github templates repo. Install git and try again.`)
-		process.exit(1);
+		console.log(`${bgYellow('⚠ WARN')} Git not installed, so I'll try using a fallback way of downloading the template...`)
+		const downloader = new Downloader({
+			url: "https://github.com/sern-handler/templates/archive/refs/heads/main.zip",
+			directory: "."
+		});
+		try {
+			await downloader.download();
+		} catch (error) {
+			console.log(error);
+		}
+		console.log(`${green('√')} File downloaded, unzipping...`);
+		await zl.extract("./templates-main.zip", "./templates").then(function () {
+			console.log(`${green('√')} Unzipped succesfully!`);
+		}, function (err) {
+			console.log(`${redBright('Failed')} to unzip the template! ${err}`);
+			process.exit(1)
+		});
+		copyRecursiveSync(`./templates/templates-main/templates/${lang}`, `./${name}`);
+		fs.rmSync(`./templates/`, { recursive: true, force: true });
 	}
 }
 

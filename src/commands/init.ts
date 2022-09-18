@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { greenBright, redBright, underline } from 'colorette';
+=======
+import { green, greenBright, redBright } from 'colorette';
+>>>>>>> 7dc71c0 (feat: fallback way of downloading templates!)
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import ora from 'ora';
@@ -56,6 +60,8 @@ export async function init(flags: Flags) {
 
 	if (incompleteDataCondition) process.exit(1);
 
+	git_init ? await git(data) : console.log(`${green('»')} Skipping git init...`);
+
 	if (!flags.sync) await cloneRepo(data.lang, data.name);
 
 	const pkg = await findUp('package.json', {
@@ -70,8 +76,6 @@ export async function init(flags: Flags) {
 		console.log('Project was successfully synced!');
 		process.exit(0);
 	}
-
-	git_init ? await git(data) : console.log(`Skipping git init...\n`);
 
 	let choice: PackageManagerChoice;
 

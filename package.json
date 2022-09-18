@@ -1,56 +1,58 @@
 {
-	"name": "@sern/cli",
-	"version": "0.5.0",
-	"description": "Official CLI for @sern/handler",
-	"exports": "./dist/index.js",
-	"bin": {
-		"sern": "./dist/index.js"
-	},
-	"type": "module",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"format": "prettier --check .",
-		"fix": "prettier --write .",
-		"build": "tsc",
-		"watch": "tsc --watch"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sern-handler/cli.git"
-	},
-	"keywords": [
-		"cli",
-		"discord",
-		"discord.js",
-		"sern",
-		"sern-handler"
-	],
-	"author": "EvolutionX",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/sern-handler/cli/issues"
-	},
-	"homepage": "https://sern-handler.js.org",
-	"dependencies": {
-		"colorette": "^2.0.16",
-		"commander": "^9.3.0",
-		"execa": "^6.1.0",
-		"find-up": "6.3.0",
-		"ora": "^6.1.0",
-		"prompts": "2.4.2",
-		"undici": "^5.6.1"
-	},
-	"devDependencies": {
-		"@favware/npm-deprecate": "1.0.5",
-		"@types/prompts": "2.0.14",
-		"prettier": "2.7.1",
-		"typescript": "4.7.4"
-	},
-	"engines": {
-		"node": ">= 16.10.x"
-	},
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org/",
-		"access": "public"
-	}
+  "name": "@sern/cli",
+  "version": "0.5.0",
+  "description": "Official CLI for @sern/handler",
+  "exports": "./dist/index.js",
+  "bin": {
+    "sern": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --check .",
+    "fix": "prettier --write .",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sern-handler/cli.git"
+  },
+  "keywords": [
+    "cli",
+    "discord",
+    "discord.js",
+    "sern",
+    "sern-handler"
+  ],
+  "author": "EvolutionX",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sern-handler/cli/issues"
+  },
+  "homepage": "https://sern-handler.js.org",
+  "dependencies": {
+    "colorette": "^2.0.16",
+    "commander": "^9.3.0",
+    "execa": "^6.1.0",
+    "find-up": "6.3.0",
+    "nodejs-file-downloader": "^4.10.2",
+    "ora": "^6.1.0",
+    "prompts": "2.4.2",
+    "undici": "^5.6.1",
+    "zip-lib": "^0.7.3"
+  },
+  "devDependencies": {
+    "@favware/npm-deprecate": "1.0.5",
+    "@types/prompts": "2.0.14",
+    "prettier": "2.7.1",
+    "typescript": "4.7.4"
+  },
+  "engines": {
+    "node": ">= 16.10.x"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
 }
