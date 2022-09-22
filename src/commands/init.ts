@@ -1,4 +1,4 @@
-import { greenBright, redBright } from 'colorette';
+import { greenBright, redBright, underline } from 'colorette';
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import ora from 'ora';
@@ -104,7 +104,11 @@ async function git(data: Data) {
 		spin.succeed('Git initialized!');
 	} catch (error) {
 		spin.fail(
-			`${redBright('Failed')} to initialize git!\nTry to install it at https://git-scm.com\nSkipping for now.`
+			`${redBright(
+				'Failed'
+			)} to initialize git!\nTry to install it at ${underline(
+				'https://git-scm.com'
+			)}\nSkipping for now.`
 		);
 	}
 }
