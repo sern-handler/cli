@@ -60,7 +60,9 @@ export async function init(flags: Flags) {
 
 	if (incompleteDataCondition) process.exit(1);
 
-	git_init ? await git(data) : console.log(`${green('»')} Skipping git init...`);
+	git_init
+		? await git(data)
+		: console.log(`${green('»')} Skipping git init...`);
 
 	if (!flags.sync) await cloneRepo(data.lang, data.name);
 
@@ -108,7 +110,9 @@ async function git(data: Data) {
 		spin.succeed('Git initialized!');
 	} catch (error) {
 		spin.fail(
-			`${redBright('Failed')} to initialize git!\nTry to install it at https://git-scm.com\nSkipping for now.`
+			`${redBright(
+				'Failed'
+			)} to initialize git!\nTry to install it at https://git-scm.com\nSkipping for now.`
 		);
 	}
 }

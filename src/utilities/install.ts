@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises';
 import ora from 'ora';
 import path from 'path';
 import type { PackageManagerChoice } from './types';
-import * as zl from 'zip-lib'
+import * as zl from 'zip-lib';
 import Downloader from 'nodejs-file-downloader';
 
 /**
@@ -59,10 +59,14 @@ export async function cloneRepo(lang: string, name: string) {
 		copyRecursiveSync(`templates/templates/${lang}`, name);
 		fs.rmSync(`templates/`, { recursive: true, force: true });
 	} catch (error) {
-		console.log(`${bgYellow('⚠ WARN')} Git not installed, so I'll try using a fallback way of downloading the template...`)
+		console.log(
+			`${bgYellow(
+				'⚠ WARN'
+			)} Git not installed, so I'll try using a fallback way of downloading the template...`
+		);
 		const downloader = new Downloader({
-			url: "https://github.com/sern-handler/templates/archive/refs/heads/main.zip",
-			directory: "."
+			url: 'https://github.com/sern-handler/templates/archive/refs/heads/main.zip',
+			directory: '.',
 		});
 		try {
 			await downloader.download();
@@ -70,13 +74,21 @@ export async function cloneRepo(lang: string, name: string) {
 			console.log(error);
 		}
 		console.log(`${green('√')} File downloaded, unzipping...`);
-		await zl.extract("./templates-main.zip", "./templates").then(function () {
-			console.log(`${green('√')} Unzipped succesfully!`);
-		}, function (err) {
-			console.log(`${redBright('Failed')} to unzip the template! ${err}`);
-			process.exit(1)
-		});
-		copyRecursiveSync(`./templates/templates-main/templates/${lang}`, `./${name}`);
+		await zl.extract('./templates-main.zip', './templates').then(
+			function () {
+				console.log(`${green('√')} Unzipped succesfully!`);
+			},
+			function (err) {
+				console.log(
+					`${redBright('Failed')} to unzip the template! ${err}`
+				);
+				process.exit(1);
+			}
+		);
+		copyRecursiveSync(
+			`./templates/templates-main/templates/${lang}`,
+			`./${name}`
+		);
 		fs.rmSync(`./templates/`, { recursive: true, force: true });
 	}
 }
