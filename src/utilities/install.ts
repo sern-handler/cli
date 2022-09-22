@@ -36,6 +36,7 @@ export async function installDeps(choice: PackageManagerChoice, name: string) {
 	const result = await execa(choice, ['install'], {
 		cwd: process.cwd() + '/' + name,
 	}).catch(() => null);
+
 	if (!result || result?.failed) {
 		spin.fail(`${redBright('Failed')} to install dependencies!`);
 		process.exit(1);
@@ -48,12 +49,21 @@ export async function installDeps(choice: PackageManagerChoice, name: string) {
  * @param name - The name of the project
  */
 export async function cloneRepo(lang: string, name: string) {
-	await execa('git', [
-		'clone',
-		`https://github.com/sern-handler/templates.git`,
-	]);
-	copyRecursiveSync(`templates/templates/${lang}`, name);
-	fs.rmSync(`templates/`, { recursive: true, force: true });
+	try {
+		await execa('git', [
+			'clone',
+			`https://github.com/sern-handler/templates.git`,
+		]);
+		copyRecursiveSync(`templates/templates/${lang}`, name);
+		fs.rmSync(`templates/`, { recursive: true, force: true });
+	} catch (error) {
+		console.log(
+			`${redBright(
+				'✖ Failed'
+			)} to clone github templates repo. Install git and try again!`
+		);
+		process.exit(1);
+	}
 }
 
 /**
