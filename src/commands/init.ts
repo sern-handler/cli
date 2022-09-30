@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { greenBright, redBright, underline } from 'colorette';
-=======
 import { green, greenBright, redBright } from 'colorette';
->>>>>>> 7dc71c0 (feat: fallback way of downloading templates!)
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import ora from 'ora';
