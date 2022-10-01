@@ -56,6 +56,8 @@ export async function init(flags: Flags) {
 
 	if (incompleteDataCondition) process.exit(1);
 
+	git_init ? await git(data) : console.log(`Skipping git init...\n`);
+
 	if (!flags.sync) await cloneRepo(data.lang, data.name);
 
 	const pkg = await findUp('package.json', {
@@ -70,8 +72,6 @@ export async function init(flags: Flags) {
 		console.log('Project was successfully synced!');
 		process.exit(0);
 	}
-
-	git_init ? await git(data) : console.log(`Skipping git init...\n`);
 
 	let choice: PackageManagerChoice;
 

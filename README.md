@@ -33,7 +33,7 @@ Usage: sern [options] [command]
 Welcome to sern!
 If you're new to sern, run sern init for an interactive setup to your new bot project!
 
-If you have any ideas, suggestions, bug reports, kindly join our support server: https://discord.gg/xzK5fUKT4r
+If you have any ideas, suggestions, bug reports, kindly join our support server: https://sern-handler.js.org/
 
 Options:
   -V, --version      output the version number

@@ -1,11 +1,14 @@
-import { redBright } from 'colorette';
+import { bgYellowBright, greenBright, redBright } from 'colorette';
 import { execa } from 'execa';
 import { findUp } from 'find-up';
 import fs from 'fs';
-import { readFile } from 'fs/promises';
+import { readFile, mkdir } from 'fs/promises';
 import ora from 'ora';
 import path from 'path';
 import type { PackageManagerChoice } from './types';
+import Downloader from 'nodejs-file-downloader'
+import extract from 'extract-zip';
+import fse from 'fs-extra'
 
 /**
  * It installs dependencies from a package.json file
@@ -54,41 +57,24 @@ export async function cloneRepo(lang: string, name: string) {
 			'clone',
 			`https://github.com/sern-handler/templates.git`,
 		]);
-		copyRecursiveSync(`templates/templates/${lang}`, name);
+		fse.copySync(`templates/templates/${lang}`, name);
 		fs.rmSync(`templates/`, { recursive: true, force: true });
 	} catch (error) {
-		console.log(
-			`${redBright(
-				'✖ Failed'
-			)} to clone github templates repo. Install git and try again!`
-		);
-		process.exit(1);
-	}
-}
-
-/**
- * If the source is a directory, create the destination directory and then recursively copy the
- * contents of the source directory to the destination directory. If the source is not a directory,
- * copy the source file to the destination file
- * @param src - The source path.
- * @param dest - The destination folder where the files will be copied to.
- */
-export function copyRecursiveSync(src: string, dest: string) {
-	const exists = fs.existsSync(src);
-
-	const stats = (exists && fs.statSync(src)) as fs.Stats;
-
-	const isDirectory = exists && stats.isDirectory();
-	if (isDirectory) {
-		fs.mkdirSync(dest);
-
-		fs.readdirSync(src).forEach(function (childItemName) {
-			copyRecursiveSync(
-				path.join(src, childItemName),
-				path.join(dest, childItemName)
-			);
-		});
-	} else {
-		fs.copyFileSync(src, dest);
+		console.log(`${bgYellowBright('⚠ WARN')}: Can't clone templates with git, so using a fallback way.`)
+		const downloader = new Downloader({url: 'https://github.com/sern-handler/templates/archive/refs/heads/main.zip', directory: '.'})
+		try {
+			await downloader.download()
+			console.log(`${greenBright('√')} File downloaded successfully!`)
+		} catch (error) {
+			throw error
+		}
+		try {
+			await extract('./templates-main.zip', { dir: path.resolve('./templates') })
+		} catch (error) {
+			throw error
+		}
+		fse.copySync(`templates/templates-main/templates/${lang}`, name);
+		fs.rmSync(`templates/`, { recursive: true, force: true });
+		fs.rmSync(`templates-main.zip`, { recursive: true, force: true });
 	}
 }
