@@ -1,7 +1,7 @@
 import { execa } from 'execa';
 
 /**
- * It checks if you have npm or yarn installed, and returns a string based on the result
+ * It checks if you have npm, yarn, or pnpm installed, and returns a string based on the result
  * @returns A promise that resolves to a string.
  */
 export async function npm() {
@@ -11,15 +11,22 @@ export async function npm() {
 	const yarn = await execa('yarn', ['-v']).catch(() => null);
 	const yarn_version = yarn?.stdout;
 
-	if (npm_version && !yarn_version) {
+	const pnpm = await execa('pnpm', ['-v']).catch(() => null);
+	const pnpm_version = pnpm?.stdout;
+
+	if (npm_version && !yarn_version && !pnpm_version) {
 		return 'npm';
 	}
 
-	if (!npm_version && yarn_version) {
+	if (yarn_version && !npm_version && !pnpm_version) {
 		return 'yarn';
 	}
 
-	if (npm_version && yarn_version) {
-		return 'both';
+	if (pnpm_version && !npm_version && !yarn_version) {
+		return 'pnpm';
+	}
+
+	if (npm_version && yarn_version && pnpm_version) {
+		return 'all';
 	}
 }

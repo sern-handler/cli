@@ -14,5 +14,5 @@ export function help() {
 
  ${green(
 		`If you have any ideas, suggestions, bug reports, kindly join our support server: https://discord.gg/xzK5fUKT4r`
- )}`;
+	)}`;
 }

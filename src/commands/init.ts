@@ -75,7 +75,7 @@ export async function init(flags: Flags) {
 
 	let choice: PackageManagerChoice;
 
-	if (pm === 'both') {
+	if (pm === 'all') {
 		choice = (await prompt([which_manager])).manager;
 	} else {
 		choice = (

@@ -1,1 +1,1 @@
-export type PackageManagerChoice = 'skip' | 'npm' | 'yarn';
+export type PackageManagerChoice = 'skip' | 'npm' | 'yarn' | 'pnpm';

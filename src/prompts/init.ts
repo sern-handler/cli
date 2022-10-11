@@ -71,6 +71,11 @@ export const which_manager: PromptObject = {
 			value: 'yarn',
 		},
 		{
+			title: 'PNPM',
+			description: 'PNPM Package Manager',
+			value: 'pnpm',
+		},
+		{
 			title: 'Skip',
 			description: 'Skip selection',
 			value: 'skip',
