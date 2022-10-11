@@ -16,7 +16,7 @@ npm install -g @sern/cli@latest
 ```
 
 ```sh
-yarn add -g @sern/cli@latest
+yarn global add @sern/cli@latest
 ```
 
 ```sh
