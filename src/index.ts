@@ -22,14 +22,15 @@ program
 	.option('-s, --sync', 'Syncs the project and generates sern.config.json')
 	.action(init);
 
-program
-	.command(plugins.name)
-	.description(
-		'Install plugins from https://github.com/sern-handler/awesome-plugins'
-	)
-	.option('-n --name', 'Name of plugin')
-	.action(plugins);
-
+const pluginCommand = program.command(plugins.name)
+pluginCommand
+    .description(
+	'Get plugins from https://github.com/sern-handler/awesome-plugins'
+    )
+    .option('-n --name', 'Name of plugin')
+    .option('-S --save', 'Save and keep plugins updated')
+    .action(plugins);
+    
 program
 	.command(extra.name)
 	.description('Easy way to add extra things in your sern project')

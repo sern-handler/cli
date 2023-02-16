@@ -8,7 +8,8 @@ import { fromCwd } from '../utilities/fromCwd.js';
 /**
  * Installs plugins to project
  */
-export async function plugins() {
+export async function plugins(options: PluginOptions) {
+    console.log(options)
 	const e: string[] = (await prompt([await pluginsQ()])).list;
 	if (!e) process.exit(1);
 
@@ -37,4 +38,10 @@ async function download(url: string) {
 		fs.mkdirSync(dir, { recursive: true });
 	}
 	fs.writeFileSync(filedir, data);
+}
+
+interface PluginOptions {
+    name?: string;
+    save: boolean
+
 }
