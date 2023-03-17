@@ -6,13 +6,13 @@ import { init } from './commands/init.js';
 
 import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
-import { version } from './utilities/version.js';
 export const program = new Command();
 
+const version: string = '[VI]{{inject}}[/VI]';
 program
 	.name('sern')
 	.description(help())
-	.version(version())
+	.version(`sern CLI v${version}`)
 	.exitOverride(() => process.exit(0));
 
 program
