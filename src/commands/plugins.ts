@@ -1,27 +1,56 @@
 import { greenBright } from 'colorette';
 import fs from 'fs';
 import prompt from 'prompts';
-import { fetch } from 'undici';
+import { fetch, type Response } from 'undici';
 import { pluginsQ } from '../prompts/plugin.js';
 import { fromCwd } from '../utilities/fromCwd.js';
 
 /**
  * Installs plugins to project
  */
+
+function dispatchSave() {
+
+}
+
+function dispatchInstall() {
+    
+}
+
 export async function plugins(options: PluginOptions) {
     console.log(options)
-	const e: string[] = (await prompt([await pluginsQ()])).list;
-	if (!e) process.exit(1);
+    if(options.save) {
+        dispatchSave()
+    }
+    //Download instead based on names given. Must be a full filename ie: (publish.ts)
+    if(options.name) {
+         
 
-	for await (const url of e) {
-		await download(url);
-	}
-	const pluginNames = e.map((e) => e.split('/').pop());
-	console.log(
-		`Successfully downloaded plugin(s):\n${greenBright(
-			pluginNames.join('\n')
-		)}`
-	);
+    }
+    const e: string[] = (await prompt([await pluginsQ()])).list;
+    if (!e) process.exit(1);
+
+    for await (const url of e) {
+    	await download(url);
+    }
+    const pluginNames = e.map((e) => e.split('/').pop());
+    console.log(
+    	`Successfully downloaded plugin(s):\n${greenBright(
+    		pluginNames.join('\n')
+    	)}`
+    );
+}
+
+async function downloa(url: string, path: string) {
+    const format = (res: Response) => res.text()
+    const data = await fetch(url, { method: 'GET' })
+        .then(format)
+        .catch(() => {
+            throw Error('Download failed! Kindly contact developers')
+        })
+    
+    const fullPath = fromCwd(path)
+    
 }
 
 async function download(url: string) {
@@ -41,7 +70,7 @@ async function download(url: string) {
 }
 
 interface PluginOptions {
-    name?: string;
-    save: boolean
+    name?: string[];
+    save: boolean 
 
 }

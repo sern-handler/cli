@@ -8,7 +8,13 @@ import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
 export const program = new Command();
 
+<<<<<<< Updated upstream
 const version: string = '[VI]{{inject}}[/VI]';
+=======
+import { createRequire } from 'module';
+export const requiree = createRequire(import.meta.url);
+
+>>>>>>> Stashed changes
 program
 	.name('sern')
 	.description(help())
@@ -27,7 +33,7 @@ pluginCommand
     .description(
 	'Get plugins from https://github.com/sern-handler/awesome-plugins'
     )
-    .option('-n --name', 'Name of plugin')
+    .option('-n --name <string...>', 'Name(s) of plugin to install')
     .option('-S --save', 'Save and keep plugins updated')
     .action(plugins);
     
