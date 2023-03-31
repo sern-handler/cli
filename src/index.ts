@@ -8,13 +8,8 @@ import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
 export const program = new Command();
 
-<<<<<<< Updated upstream
 const version: string = '[VI]{{inject}}[/VI]';
-=======
-import { createRequire } from 'module';
-export const requiree = createRequire(import.meta.url);
 
->>>>>>> Stashed changes
 program
 	.name('sern')
 	.description(help())
