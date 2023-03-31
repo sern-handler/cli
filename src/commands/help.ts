@@ -1,7 +1,6 @@
 import { cyanBright, green, magentaBright } from 'colorette';
 
-export function help() {
-	return `
+export const help = `
   ___  ___ _ __ _ __  
  / __|/ _ \\ '__| '_ \\ 
  \\__ \\  __/ |  | | | |
@@ -15,4 +14,3 @@ export function help() {
  ${green(
 		`If you have any ideas, suggestions, bug reports, kindly join our support server: https://sern.dev/discord`
  )}`;
-}

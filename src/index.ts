@@ -12,7 +12,7 @@ const version: string = '[VI]{{inject}}[/VI]';
 
 program
 	.name('sern')
-	.description(help())
+	.description(help)
 	.version(`sern CLI v${version}`)
 	.exitOverride(() => process.exit(0));
 

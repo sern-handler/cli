@@ -18,14 +18,14 @@ function dispatchInstall() {
 }
 
 export async function plugins(options: PluginOptions) {
-    console.log(options)
     if(options.save) {
         dispatchSave()
     }
-    //Download instead based on names given. Must be a full filename ie: (publish.ts)
+    //Download instead based on names given. Must be a full filename ie: (publish)
     if(options.name) {
-         
-
+       
+       const pluginSource = await downloa();      
+            
     }
     const e: string[] = (await prompt([await pluginsQ()])).list;
     if (!e) process.exit(1);
@@ -41,16 +41,13 @@ export async function plugins(options: PluginOptions) {
     );
 }
 
-async function downloa(url: string, path: string) {
-    const format = (res: Response) => res.text()
-    const data = await fetch(url, { method: 'GET' })
-        .then(format)
+async function downloa(url: string | URL) {
+    const formatText = (res: Response) => res.text()
+    return fetch(url, { method: 'GET' })
+        .then(formatText)
         .catch(() => {
             throw Error('Download failed! Kindly contact developers')
         })
-    
-    const fullPath = fromCwd(path)
-    
 }
 
 async function download(url: string) {
@@ -60,7 +57,7 @@ async function download(url: string) {
 
 	if (!data) throw new Error('Download failed! Kindly contact developers');
 
-	const dir = `${fromCwd('/src/plugins')}`;
+	const dir = fromCwd('/src/plugins');
 	const filedir = `${process.cwd()}/src/plugins/${url.split('/').pop()}`;
 
 	if (!fs.existsSync(dir)) {
