@@ -30,7 +30,7 @@
 	"bugs": {
 		"url": "https://github.com/sern-handler/cli/issues"
 	},
-	"homepage": "https://sern-handler.js.org",
+	"homepage": "https://sern.dev",
 	"dependencies": {
 		"colorette": "^2.0.16",
 		"commander": "^9.3.0",
