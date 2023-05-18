@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN tsc --build
+RUN tsc --build || npx tsc --build
 
-RUN node dist/index.js
+CMD node dist/index.js
