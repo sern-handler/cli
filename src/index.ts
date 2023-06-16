@@ -6,18 +6,21 @@ import { init } from './commands/init.js';
 
 import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
+import { yellowBright } from 'colorette';
 export const program = new Command();
 
 const version: string = '[VI]{{inject}}[/VI]';
 program
 	.name('sern')
 	.description(help())
-	.version(`sern CLI v${version}`)
+	.version(`sern CLI v${version}`, '-v, --version')
 	.exitOverride(() => process.exit(0));
 
 program
 	.command(init.name)
-	.description('Quickest way to scaffold a new project')
+	.description(
+		`Quickest way to scaffold a new project ${yellowBright('[DEPRECATED]')}`
+	)
 	.option('-y', 'Finishes setup as default')
 	.option('-s, --sync', 'Syncs the project and generates sern.config.json')
 	.action(init);
