@@ -21,8 +21,13 @@ import type { PackageManagerChoice } from '../utilities/types.js';
 
 /** @deprecated Use npm create instead */
 export async function init(flags: Flags) {
-
-	console.log(`${yellowBright('[WARN]:')} This command is deprecated, use ${greenBright('npm create @sern/bot')} instead`)
+	console.log(
+		`${yellowBright(
+			'[WARN]:'
+		)} This command is deprecated, use ${greenBright(
+			'npm create @sern/bot'
+		)} instead`
+	);
 
 	let data: PromptData;
 	let git_init = true; // the default;
