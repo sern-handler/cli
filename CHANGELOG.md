@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1](https://github.com/sern-handler/cli/compare/v0.5.0...v0.5.1) (2023-06-16)
+
+
+### Features
+
+* **init:** deprecate init and bump deps ([#102](https://github.com/sern-handler/cli/issues/102)) ([dce78c0](https://github.com/sern-handler/cli/commit/dce78c0945de6da79bf1e268f29651da0c44c1eb))
+* version injector ([#90](https://github.com/sern-handler/cli/issues/90)) ([58fa325](https://github.com/sern-handler/cli/commit/58fa3253f62da9fb66d1b2ae901b568367f065d0))
+
+
+### Bug Fixes
+
+* git not installed errors during init ([#79](https://github.com/sern-handler/cli/issues/79)) ([69287ab](https://github.com/sern-handler/cli/commit/69287ab1bd0c4960384144f90fea8ebded3b0cc5))
+
 ## [0.5.0](https://github.com/sern-handler/cli/compare/v0.4.2...v0.5.0) (2022-09-16)
 
 

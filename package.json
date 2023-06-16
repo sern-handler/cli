@@ -1,6 +1,6 @@
 {
 	"name": "@sern/cli",
-	"version": "0.6.0",
+	"version": "0.5.1",
 	"description": "Official CLI for @sern/handler",
 	"exports": "./dist/index.js",
 	"bin": {
