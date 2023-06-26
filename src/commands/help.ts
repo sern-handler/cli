@@ -9,7 +9,7 @@ export function help() {
 
  Welcome!
  If you're new to ${cyanBright('sern')}, run ${magentaBright(
-		'sern init'
+		'npm create @sern/bot'
 	)} for an interactive setup to your new bot project!
 
  ${green(

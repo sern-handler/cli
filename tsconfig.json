@@ -4,14 +4,14 @@
 		"module": "ESNext",
 		"moduleResolution": "Node",
 		"outDir": "dist",
-		"rootDir": "src",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationMap": true,
 		"strict": true,
 		"esModuleInterop": true,
 		"noImplicitAny": true,
 		"strictNullChecks": true,
-		"importsNotUsedAsValues": "error",
+		"verbatimModuleSyntax": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true
 	}
