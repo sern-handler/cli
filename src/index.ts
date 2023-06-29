@@ -3,6 +3,7 @@
 import { extra } from './commands/extra.js';
 import { help } from './commands/help.js';
 import { init } from './commands/init.js';
+import { publish } from './commands/publish.js';
 
 import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
@@ -37,5 +38,11 @@ program
 	.command(extra.name)
 	.description('Easy way to add extra things in your sern project')
 	.action(extra);
+
+program
+	.command(publish.name)
+	.description('New way to manage your slash commands')
+	.argument('<name>', 'name of the file without extension')
+	.action(publish);
 
 program.parse();
