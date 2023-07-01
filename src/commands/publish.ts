@@ -1,7 +1,7 @@
 import { findUp } from 'find-up';
 import { getConfig } from '../utilities/getConfig';
 import { fromCwd } from '../utilities/fromCwd';
-import { readFileSync } from 'fs';
+import { fork } from 'node:child_process'
 
 export async function publish(fileName: string) {
 	const { language, paths } = await getConfig();
@@ -10,7 +10,17 @@ export async function publish(fileName: string) {
 	const path = await findUp(`${fileName}.${ext}`, {
 		cwd: fromCwd(paths.base, paths.cmds_dir),
 	});
+        
+       // pass in args into the command.
+       const command = fork(
+           '../create-publish.js', 
+           [ '--loader', '../loader.mjs'], { 
+               env: {
+                all: 'T',
+                pattern: fileName
+               } 
+           })
 
-	if (!path) throw new Error(`Couldn't find ${fileName}.${ext}`);
-	const contents = readFileSync(path, 'utf8');
+       command.on('message', s => console.log(s.toString()))
+        
 }

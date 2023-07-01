@@ -42,6 +42,7 @@ program
 program
 	.command(publish.name)
 	.description('New way to manage your slash commands')
+        .option('-a, --all', 'Publish all commands')
 	.argument('<name>', 'name of the file without extension')
 	.action(publish);
 
