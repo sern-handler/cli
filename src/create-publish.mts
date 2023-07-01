@@ -1,7 +1,14 @@
-import { readdir, stat } from 'fs/promises'
-import { join, basename, extname } from 'node:path'
+/**
+  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
+  */
 
-const args = process.argv.slice(5);
+
+import { readdir, stat, mkdir } from 'fs/promises'
+import { join, basename, extname, resolve, } from 'node:path'
+import assert from 'node:assert'
+import { getConfig } from './utilities/getConfig';
+import { pathExistsSync } from 'find-up';
+const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
      const fullPath = join(dir, file);
      return {
@@ -49,5 +56,22 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
     }
 }
 
+//Where the actual script starts running
+assert(process.env.DISCORD_TOKEN, "Could not find token")
+assert(process.env.APP_ID, "Could not find application id")
+const { paths } = await getConfig()
+const filePaths = readPaths(resolve(paths.base, paths.cmds_dir), true)
 
+for await (const file of filePaths) {
+    let mod = await import(file).then(esm => esm.default)
+
+    if('default' in mod) {
+        mod = mod.default
+    }
+
+}
+const cacheDir = resolve('.sern', '/')
+if(!pathExistsSync(cacheDir)) {
+   await mkdir(cacheDir); 
+}
 
