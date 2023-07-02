@@ -13,7 +13,7 @@ export const program = new Command();
 const version: string = '[VI]{{inject}}[/VI]';
 program
 	.name('sern')
-	.description(help())
+	.description(help)
 	.version(`sern CLI v${version}`, '-v, --version')
 	.exitOverride(() => process.exit(0));
 
@@ -43,7 +43,7 @@ program
 	.command(publish.name)
 	.description('New way to manage your slash commands')
 	.option('-a, --all', 'Publish all commands')
-	.argument('<name>', 'name of the file without extension')
+	.argument('[pattern]', 'glob pattern that will locate all published files', '<<none>>')
 	.action(publish);
 
 program.parse();

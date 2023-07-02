@@ -2,11 +2,11 @@
  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
  */
 
-import { readdir, stat, mkdir } from 'fs/promises';
+import { readdir, stat, mkdir, writeFile } from 'fs/promises';
 import { join, basename, extname, resolve } from 'node:path';
-import assert from 'node:assert';
 import { getConfig } from './utilities/getConfig';
 import { pathExistsSync } from 'find-up';
+import { on } from 'node:events'
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
 	const fullPath = join(dir, file);
@@ -17,7 +17,9 @@ async function deriveFileInfo(dir: string, file: string) {
 	};
 }
 
-const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts'];
+
+
+const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', '.ts'];
 function createSkipCondition(base: string) {
 	return (type: 'file' | 'directory') => {
 		if (type === 'file') {
@@ -59,21 +61,65 @@ async function* readPaths(
 		throw err;
 	}
 }
+//recieved paths object
+const paths = await new Promise( (resolve) => {
+    process.once('message', resolve)
+});
+const publishAll = process.env.all === 'T'
+
+if(publishAll && process.env.pattern !== '<<none>>') {
+    console.warn('all flag and pattern flag are mutually exclusive');
+    console.warn('Will try to parse pattern only')
+}
+
+console.debug('all:', publishAll)
+console.debug('pattern:', process.env.pattern)
 
 //Where the actual script starts running
-assert(process.env.DISCORD_TOKEN, 'Could not find token');
-assert(process.env.APP_ID, 'Could not find application id');
-const { paths } = await getConfig();
-const filePaths = readPaths(resolve(paths.base, paths.cmds_dir), true);
+//assert(process.env.DISCORD_TOKEN, 'Could not find token');
+//assert(process.env.APP_ID, 'Could not find application id');
+//@ts-ignore - is it paths.commands or path.cmd_dir ?
+const filePaths = readPaths(resolve(paths.base, paths.commands), true);
+const modules = [];
+const publishable = 0b1110;
+for await (const absPath of filePaths) {
+    let mod = await import(absPath).then((esm) => esm.default);
+    if ('default' in mod) {
+	mod = mod.default;
+    }
+    try {
+       mod = mod.getInstance() 
+    } catch {}
 
-for await (const file of filePaths) {
-	let mod = await import(file).then((esm) => esm.default);
-
-	if ('default' in mod) {
-		mod = mod.default;
-	}
+    if((publishable & mod.type) != 0) {
+        //assign defaults 
+        const filename = basename(absPath)
+        const filenameNoExtension = filename.substring(0, filename.lastIndexOf('.'))
+        mod.name ??= filenameNoExtension
+        mod.description ??= ''
+        modules.push(mod)
+    };
+    
 }
-const cacheDir = resolve('.sern', '/');
+const cacheDir = resolve('./.sern');
 if (!pathExistsSync(cacheDir)) {
-	await mkdir(cacheDir);
+    console.log('Making .sern directory: ', cacheDir);
+    await mkdir(cacheDir);
 }
+const makePublishData = (module: Record<string, unknown>) => {
+    //todo: calculate API type
+    return { 
+        name: module.name,
+        description: module.description,
+        type: module.type 
+    }
+}
+
+//We can use these objects to publish to DAPI
+const publishableData = modules.map(makePublishData);
+
+await writeFile(resolve(cacheDir, 'commands.json'), JSON.stringify(publishableData), 'utf8')
+
+
+//need this to exit properly
+process.exit(0)

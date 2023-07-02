@@ -1,31 +1,25 @@
-import { findUp } from 'find-up';
 import { getConfig } from '../utilities/getConfig';
-import { fromCwd } from '../utilities/fromCwd';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'url';
 
-export async function publish(fileName: string) {
-	const { language, paths } = await getConfig();
-	const ext = language === 'javascript' ? 'js' : 'ts';
-
-	const path = await findUp(`${fileName}.${ext}`, {
-		cwd: fromCwd(paths.base, paths.cmds_dir),
-	});
-
+export async function publish(fileName: any, args: any) {
+    const { language, paths } = await getConfig();
+    const ext = language === 'javascript' ? 'js' : 'ts';
 	// pass in args into the command.
-	const root = new URL('../', import.meta.url);
-	const src = new URL('./dist/create-publish.js', root);
-
-	const command = fork(
-		fileURLToPath(src),
-		['--loader', '../loader.mjs'],
-		{
-			env: {
-				all: 'T',
-				pattern: fileName,
-			},
-		}
-	);
-
-	command.on('message', (s) => console.log(s.toString()));
+    const root = new URL('../', import.meta.url);
+    const src = new URL('./dist/create-publish.js', root);
+    const loader = new URL('./dist/loader.js', root);
+    const command = fork(
+	    fileURLToPath(src),
+	    [ext],
+	    {
+                execArgv: [ '--loader', loader.toString(), '--no-warnings'],
+		env: {
+		    all: args.all ? 'T' : 'F',
+		    pattern: fileName,
+		},
+	    }
+    );
+    //send paths object so we dont have to recalculate it in script
+    command.send(paths)
 }
