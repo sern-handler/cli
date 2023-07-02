@@ -2,6 +2,7 @@ import { findUp } from 'find-up';
 import { getConfig } from '../utilities/getConfig';
 import { fromCwd } from '../utilities/fromCwd';
 import { fork } from 'node:child_process';
+import { fileURLToPath } from 'url';
 
 export async function publish(fileName: string) {
 	const { language, paths } = await getConfig();
@@ -12,8 +13,11 @@ export async function publish(fileName: string) {
 	});
 
 	// pass in args into the command.
+	const root = new URL('../', import.meta.url);
+	const src = new URL('./dist/create-publish.js', root);
+
 	const command = fork(
-		'../create-publish.js',
+		fileURLToPath(src),
 		['--loader', '../loader.mjs'],
 		{
 			env: {
