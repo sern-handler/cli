@@ -109,8 +109,9 @@ interface Typeable {
 }
 function optionsTransformer(ops: Array<Typeable>) {
     return ops.map((el) => {
-        if('subcommand' in el) {
-            delete el.subcommand; 
+        if('command' in el) {
+            const { command, ...rest } = el
+            return rest; 
         }
         return el;
     });
@@ -147,7 +148,7 @@ const publishableData = modules.map(makePublishData);
 
 await writeFile(
     resolve(cacheDir, 'command-data.json'),
-    JSON.stringify(publishableData), 
+    JSON.stringify(publishableData,['name', 'type', 'description', 'options'] ), 
     'utf8'
 );
 
