@@ -4,9 +4,7 @@
 
 import { readdir, stat, mkdir, writeFile } from 'fs/promises';
 import { join, basename, extname, resolve } from 'node:path';
-import { getConfig } from './utilities/getConfig';
 import { pathExistsSync } from 'find-up';
-import { on } from 'node:events'
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
 	const fullPath = join(dir, file);
@@ -62,14 +60,13 @@ async function* readPaths(
 	}
 }
 //recieved paths object
-const paths = await new Promise( (resolve) => {
+const paths = await new Promise<Record<string,string>>( (resolve) => {
     process.once('message', resolve)
 });
 const publishAll = process.env.all === 'T'
 
 if(publishAll && process.env.pattern !== '<<none>>') {
-    console.warn('all flag and pattern flag are mutually exclusive');
-    console.warn('Will try to parse pattern only')
+    throw Error('--all flag and pattern argument are mutually exclusive');
 }
 
 console.debug('all:', publishAll)
@@ -78,7 +75,6 @@ console.debug('pattern:', process.env.pattern)
 //Where the actual script starts running
 //assert(process.env.DISCORD_TOKEN, 'Could not find token');
 //assert(process.env.APP_ID, 'Could not find application id');
-//@ts-ignore - is it paths.commands or path.cmd_dir ?
 const filePaths = readPaths(resolve(paths.base, paths.commands), true);
 const modules = [];
 const publishable = 0b1110;
@@ -106,19 +102,54 @@ if (!pathExistsSync(cacheDir)) {
     console.log('Making .sern directory: ', cacheDir);
     await mkdir(cacheDir);
 }
+
+
+interface Typeable {
+    type: number
+}
+function optionsTransformer(ops: Array<Typeable>) {
+    return ops.map((el) => {
+        if('subcommand' in el) {
+            delete el.subcommand; 
+        }
+        return el;
+    });
+}
+
+const intoApplicationType = (type: number) => {
+    if(type === 3) {
+        return 1;
+    }
+    return Math.log2(type);
+}
+
+const makeDescription = (type: number, desc: string) => {
+    if(type !== 1 && desc !== '') {
+        console.warn('Found context menu that has non empty description field. Implictly publishing with empty description')
+        return '';
+    }
+    return desc;
+}
+
 const makePublishData = (module: Record<string, unknown>) => {
-    //todo: calculate API type
+    const applicationType = intoApplicationType(module.type as number);
+
     return { 
         name: module.name,
-        description: module.description,
-        type: module.type 
+        type: applicationType,
+        description: makeDescription(applicationType, module.description as string),
+        options: optionsTransformer((module?.options ?? []) as Typeable[]),
     }
 }
 
 //We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
 
-await writeFile(resolve(cacheDir, 'commands.json'), JSON.stringify(publishableData), 'utf8')
+await writeFile(
+    resolve(cacheDir, 'command-data.json'),
+    JSON.stringify(publishableData), 
+    'utf8'
+);
 
 
 //need this to exit properly
