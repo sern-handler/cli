@@ -3,9 +3,7 @@ import { fork } from 'node:child_process';
 import { fileURLToPath } from 'url';
 
 export async function publish(fileName: string, args: any) {
-    const {
-        paths,
-    } = await getConfig();
+    const config =  await getConfig();
 	// pass in args into the command.
     const root = new URL('../', import.meta.url);
     const src = new URL('./dist/create-publish.js', root);
@@ -22,5 +20,5 @@ export async function publish(fileName: string, args: any) {
 	    }
     );
     //send paths object so we dont have to recalculate it in script
-    command.send(paths)
+    command.send(config)
 }

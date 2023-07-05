@@ -3,8 +3,10 @@
  */
 
 import { readdir, stat, mkdir, writeFile } from 'fs/promises';
-import { join, basename, extname, resolve } from 'node:path';
+import { join, basename, extname, resolve, relative } from 'node:path';
+import { fileURLToPath } from 'url'
 import { pathExistsSync } from 'find-up';
+import type { sernConfig } from './utilities/getConfig';
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
 	const fullPath = join(dir, file);
@@ -59,10 +61,12 @@ async function* readPaths(
 		throw err;
 	}
 }
-//recieved paths object
-const paths = await new Promise<Record<string,string>>( (resolve) => {
+//recieved sern config 
+const config = await new Promise<sernConfig>( (resolve) => {
     process.once('message', resolve)
-});
+}), { paths, rest = undefined } = config
+
+
 const publishAll = process.env.all === 'T'
 
 if(publishAll && process.env.pattern !== '<<none>>') {
@@ -93,6 +97,7 @@ for await (const absPath of filePaths) {
         const filenameNoExtension = filename.substring(0, filename.lastIndexOf('.'))
         mod.name ??= filenameNoExtension
         mod.description ??= ''
+        mod.absPath = absPath
         modules.push(mod)
     };
     
@@ -145,12 +150,35 @@ const makePublishData = (module: Record<string, unknown>) => {
 
 //We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
-
+const excludedKeys = new Set(['command', 'absPath'])
 await writeFile(
     resolve(cacheDir, 'command-data.json'),
-    JSON.stringify(publishableData, (key, value) => key === 'command' ? undefined : value ), 
+    JSON.stringify(
+        publishableData,
+        (key, value) => excludedKeys.has(key)  ? undefined : value 
+    ), 
     'utf8'
 );
+
+if(rest === undefined) {
+   console.log('First time running publish. (rest field in sern.config.json is undefined')
+   console.log('Will need to run publish again!')
+   const restData = modules.reduce((acc, module) => {
+       const modulePath = fileURLToPath(module.absPath)
+       acc[relative(resolve(paths.base), modulePath)] = {
+          dmPermission: null,
+          defaultMemberPermissions: null,
+          guildIds: []
+       }
+       return acc
+   }, {})
+   const newSernConfig = {
+     ...config,   
+     rest: restData
+   }
+   await writeFile(resolve('sern.config.json'), JSON.stringify(newSernConfig, null, 3), 'utf8') 
+   process.exit(0)
+}
 
 
 //need this to exit properly

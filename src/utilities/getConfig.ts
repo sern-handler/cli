@@ -14,10 +14,11 @@ export async function getConfig(): Promise<sernConfig> {
 	return output;
 }
 
-interface sernConfig {
+export interface sernConfig {
 	language: 'typescript' | 'javascript';
 	paths: {
 		base: string;
-		cmds_dir: string;
+		commands: string;
 	};
+        rest?: Record<string, unknown>[]
 }
