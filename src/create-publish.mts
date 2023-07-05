@@ -148,7 +148,7 @@ const publishableData = modules.map(makePublishData);
 
 await writeFile(
     resolve(cacheDir, 'command-data.json'),
-    JSON.stringify(publishableData,['name', 'type', 'description', 'options'] ), 
+    JSON.stringify(publishableData, (key, value) => key === 'command' ? undefined : value ), 
     'utf8'
 );
 
