@@ -90,7 +90,7 @@ for await (const absPath of filePaths) {
 	} catch {}
 
 	if ((publishable & mod.type) != 0) {
-		//assign defaults
+		// assign defaults
 		const filename = basename(absPath);
 		const filenameNoExtension = filename.substring(
 			0,
@@ -152,20 +152,22 @@ const makePublishData = (module: Record<string, unknown>) => {
 	};
 };
 
-//We can use these objects to publish to DAPI
+// We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
 const excludedKeys = new Set(['command', 'absPath']);
 await writeFile(
 	resolve(cacheDir, 'command-data.json'),
-	JSON.stringify(publishableData, (key, value) =>
-		excludedKeys.has(key) ? undefined : value
+	JSON.stringify(
+		publishableData,
+		(key, value) => (excludedKeys.has(key) ? undefined : value),
+		4
 	),
 	'utf8'
 );
 
 if (rest === undefined) {
 	console.log(
-		'First time running publish. (rest field in sern.config.json is undefined'
+		'First time running publish. (rest field in sern.config.json is undefined)'
 	);
 	console.log('Will need to run publish again!');
 	const restData = modules.reduce((acc, module) => {
@@ -177,17 +179,19 @@ if (rest === undefined) {
 		};
 		return acc;
 	}, {});
+
 	const newSernConfig = {
 		...config,
 		rest: restData,
 	};
+
 	await writeFile(
 		resolve('sern.config.json'),
-		JSON.stringify(newSernConfig, null, 3),
+		JSON.stringify(newSernConfig, null, 4),
 		'utf8'
 	);
 	process.exit(0);
 }
 
-//need this to exit properly
+// need this to exit properly
 process.exit(0);
