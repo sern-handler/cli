@@ -20,5 +20,5 @@ export interface sernConfig {
 		base: string;
 		commands: string;
 	};
-        rest?: Record<string, unknown>[]
+	rest?: Record<string, unknown>[];
 }

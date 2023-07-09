@@ -4,7 +4,7 @@
 
 import { readdir, stat, mkdir, writeFile } from 'fs/promises';
 import { join, basename, extname, resolve, relative } from 'node:path';
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from 'url';
 import { pathExistsSync } from 'find-up';
 import type { sernConfig } from './utilities/getConfig';
 const args = process.argv.slice(2);
@@ -16,8 +16,6 @@ async function deriveFileInfo(dir: string, file: string) {
 		base: basename(file),
 	};
 }
-
-
 
 const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', '.ts'];
 function createSkipCondition(base: string) {
@@ -61,20 +59,20 @@ async function* readPaths(
 		throw err;
 	}
 }
-//recieved sern config 
-const config = await new Promise<sernConfig>( (resolve) => {
-    process.once('message', resolve)
-}), { paths, rest = undefined } = config
+//recieved sern config
+const config = await new Promise<sernConfig>((resolve) => {
+		process.once('message', resolve);
+	}),
+	{ paths, rest = undefined } = config;
 
+const publishAll = process.env.all === 'T';
 
-const publishAll = process.env.all === 'T'
-
-if(publishAll && process.env.pattern !== '<<none>>') {
-    throw Error('--all flag and pattern argument are mutually exclusive');
+if (publishAll && process.env.pattern !== '<<none>>') {
+	throw Error('--all flag and pattern argument are mutually exclusive');
 }
 
-console.debug('all:', publishAll)
-console.debug('pattern:', process.env.pattern)
+console.debug('all:', publishAll);
+console.debug('pattern:', process.env.pattern);
 
 //Where the actual script starts running
 //assert(process.env.DISCORD_TOKEN, 'Could not find token');
@@ -83,103 +81,113 @@ const filePaths = readPaths(resolve(paths.base, paths.commands), true);
 const modules = [];
 const publishable = 0b1110;
 for await (const absPath of filePaths) {
-    let mod = await import(absPath).then((esm) => esm.default);
-    if ('default' in mod) {
-	mod = mod.default;
-    }
-    try {
-       mod = mod.getInstance() 
-    } catch {}
+	let mod = await import(absPath).then((esm) => esm.default);
+	if ('default' in mod) {
+		mod = mod.default;
+	}
+	try {
+		mod = mod.getInstance();
+	} catch {}
 
-    if((publishable & mod.type) != 0) {
-        //assign defaults 
-        const filename = basename(absPath)
-        const filenameNoExtension = filename.substring(0, filename.lastIndexOf('.'))
-        mod.name ??= filenameNoExtension
-        mod.description ??= ''
-        mod.absPath = absPath
-        modules.push(mod)
-    };
-    
+	if ((publishable & mod.type) != 0) {
+		//assign defaults
+		const filename = basename(absPath);
+		const filenameNoExtension = filename.substring(
+			0,
+			filename.lastIndexOf('.')
+		);
+		mod.name ??= filenameNoExtension;
+		mod.description ??= '';
+		mod.absPath = absPath;
+		modules.push(mod);
+	}
 }
 const cacheDir = resolve('./.sern');
 if (!pathExistsSync(cacheDir)) {
-    console.log('Making .sern directory: ', cacheDir);
-    await mkdir(cacheDir);
+	console.log('Making .sern directory: ', cacheDir);
+	await mkdir(cacheDir);
 }
-
 
 interface Typeable {
-    type: number
+	type: number;
 }
 function optionsTransformer(ops: Array<Typeable>) {
-    return ops.map((el) => {
-        if('command' in el) {
-            const { command, ...rest } = el
-            return rest; 
-        }
-        return el;
-    });
+	return ops.map((el) => {
+		if ('command' in el) {
+			const { command, ...rest } = el;
+			return rest;
+		}
+		return el;
+	});
 }
 
 const intoApplicationType = (type: number) => {
-    if(type === 3) {
-        return 1;
-    }
-    return Math.log2(type);
-}
+	if (type === 3) {
+		return 1;
+	}
+	return Math.log2(type);
+};
 
 const makeDescription = (type: number, desc: string) => {
-    if(type !== 1 && desc !== '') {
-        console.warn('Found context menu that has non empty description field. Implictly publishing with empty description')
-        return '';
-    }
-    return desc;
-}
+	if (type !== 1 && desc !== '') {
+		console.warn(
+			'Found context menu that has non empty description field. Implictly publishing with empty description'
+		);
+		return '';
+	}
+	return desc;
+};
 
 const makePublishData = (module: Record<string, unknown>) => {
-    const applicationType = intoApplicationType(module.type as number);
+	const applicationType = intoApplicationType(module.type as number);
 
-    return { 
-        name: module.name,
-        type: applicationType,
-        description: makeDescription(applicationType, module.description as string),
-        options: optionsTransformer((module?.options ?? []) as Typeable[]),
-    }
-}
+	return {
+		name: module.name,
+		type: applicationType,
+		description: makeDescription(
+			applicationType,
+			module.description as string
+		),
+		options: optionsTransformer((module?.options ?? []) as Typeable[]),
+	};
+};
 
 //We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
-const excludedKeys = new Set(['command', 'absPath'])
+const excludedKeys = new Set(['command', 'absPath']);
 await writeFile(
-    resolve(cacheDir, 'command-data.json'),
-    JSON.stringify(
-        publishableData,
-        (key, value) => excludedKeys.has(key)  ? undefined : value 
-    ), 
-    'utf8'
+	resolve(cacheDir, 'command-data.json'),
+	JSON.stringify(publishableData, (key, value) =>
+		excludedKeys.has(key) ? undefined : value
+	),
+	'utf8'
 );
 
-if(rest === undefined) {
-   console.log('First time running publish. (rest field in sern.config.json is undefined')
-   console.log('Will need to run publish again!')
-   const restData = modules.reduce((acc, module) => {
-       const modulePath = fileURLToPath(module.absPath)
-       acc[relative(resolve(paths.base), modulePath)] = {
-          dmPermission: null,
-          defaultMemberPermissions: null,
-          guildIds: []
-       }
-       return acc
-   }, {})
-   const newSernConfig = {
-     ...config,   
-     rest: restData
-   }
-   await writeFile(resolve('sern.config.json'), JSON.stringify(newSernConfig, null, 3), 'utf8') 
-   process.exit(0)
+if (rest === undefined) {
+	console.log(
+		'First time running publish. (rest field in sern.config.json is undefined'
+	);
+	console.log('Will need to run publish again!');
+	const restData = modules.reduce((acc, module) => {
+		const modulePath = fileURLToPath(module.absPath);
+		acc[relative(resolve(paths.base), modulePath)] = {
+			dmPermission: null,
+			defaultMemberPermissions: null,
+			guildIds: [],
+		};
+		return acc;
+	}, {});
+	const newSernConfig = {
+		...config,
+		rest: restData,
+	};
+	await writeFile(
+		resolve('sern.config.json'),
+		JSON.stringify(newSernConfig, null, 3),
+		'utf8'
+	);
+	process.exit(0);
 }
 
-
 //need this to exit properly
-process.exit(0)
+process.exit(0);

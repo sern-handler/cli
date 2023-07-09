@@ -43,7 +43,11 @@ program
 	.command(publish.name)
 	.description('New way to manage your slash commands')
 	.option('-a, --all', 'Publish all commands')
-	.argument('[pattern]', 'glob pattern that will locate all published files', '<<none>>')
+	.argument(
+		'[pattern]',
+		'glob pattern that will locate all published files',
+		'<<none>>'
+	)
 	.action(publish);
 
 program.parse();
