@@ -12,42 +12,44 @@ export const program = new Command();
 
 const version: string = '[VI]{{inject}}[/VI]';
 program
-	.name('sern')
-	.description(help)
-	.version(`sern CLI v${version}`, '-v, --version')
-	.exitOverride(() => process.exit(0));
+    .name('sern')
+    .description(help)
+    .version(`sern CLI v${version}`, '-v, --version')
+    .exitOverride(() => process.exit(0));
 
 program
-	.command(init.name)
-	.description(
-		`Quickest way to scaffold a new project ${yellowBright('[DEPRECATED]')}`
-	)
-	.option('-y', 'Finishes setup as default')
-	.option('-s, --sync', 'Syncs the project and generates sern.config.json')
-	.action(init);
+    .command(init.name)
+    .description(
+        `Quickest way to scaffold a new project ${yellowBright('[DEPRECATED]')}`
+    )
+    .option('-y', 'Finishes setup as default')
+    .option('-s, --sync', 'Syncs the project and generates sern.config.json')
+    .action(init);
 
 program
-	.command(plugins.name)
-	.description(
-		'Install plugins from https://github.com/sern-handler/awesome-plugins'
-	)
-	.option('-n --name', 'Name of plugin')
-	.action(plugins);
+    .command(plugins.name)
+    .description(
+        'Install plugins from https://github.com/sern-handler/awesome-plugins'
+    )
+    .option('-n --name', 'Name of plugin')
+    .action(plugins);
 
 program
-	.command(extra.name)
-	.description('Easy way to add extra things in your sern project')
-	.action(extra);
+    .command(extra.name)
+    .description('Easy way to add extra things in your sern project')
+    .action(extra);
 
 program
-	.command(publish.name)
-	.description('New way to manage your slash commands')
-	.option('-a, --all', 'Publish all commands')
-	.argument(
-		'[pattern]',
-		'glob pattern that will locate all published files',
-		'<<none>>'
-	)
-	.action(publish);
+    .command(publish.name)
+    .description('New way to manage your slash commands')
+    .option('-a, --all', 'Publish all commands')
+    .option('-t, --token [token]')
+    .option('--appId [applicationId]')
+    .argument(
+        '[pattern]',
+        'glob pattern that will locate all published files',
+        '<<none>>'
+    )
+    .action(publish);
 
 program.parse();

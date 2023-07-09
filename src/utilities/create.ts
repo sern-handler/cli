@@ -15,18 +15,18 @@ const extraFolder = fileURLToPath(extraURL);
  * @param  no_ext - If true, the file will be created without an extension.
  */
 export async function create(
-	name: string,
-	lang: string,
-	location: string,
-	no_ext: boolean
+    name: string,
+    lang: string,
+    location: string,
+    no_ext: boolean
 ) {
-	const file = `${name}.${lang}.sern`;
+    const file = `${name}.${lang}.sern`;
 
-	const target = no_ext
-		? `${location}/${name}`
-		: `${location}/${name}.${lang}`;
+    const target = no_ext
+        ? `${location}/${name}`
+        : `${location}/${name}.${lang}`;
 
-	return createFile(file, target);
+    return createFile(file, target);
 }
 
 /**
@@ -35,11 +35,11 @@ export async function create(
  * @param target - The location of the file to be created.
  */
 async function createFile(template: string, target: string) {
-	const location = `${extraFolder}${template}`;
+    const location = `${extraFolder}${template}`;
 
-	const file = await readFile(location, 'utf8');
+    const file = await readFile(location, 'utf8');
 
-	await writeFileRecursive(target, file);
+    await writeFileRecursive(target, file);
 }
 
 /**
@@ -49,10 +49,10 @@ async function createFile(template: string, target: string) {
  * @returns A promise that resolves to the result of the writeFile function.
  */
 async function writeFileRecursive(target: string, data: string) {
-	const resolvedTarget = resolve(target);
-	const dir = dirname(resolvedTarget);
+    const resolvedTarget = resolve(target);
+    const dir = dirname(resolvedTarget);
 
-	await mkdir(dir, { recursive: true });
+    await mkdir(dir, { recursive: true });
 
-	return writeFile(resolvedTarget, data);
+    return writeFile(resolvedTarget, data);
 }

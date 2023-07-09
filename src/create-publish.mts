@@ -2,73 +2,74 @@
  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
  */
 
-import { readdir, stat, mkdir, writeFile } from 'fs/promises';
+import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
 import { join, basename, extname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'url';
 import { pathExistsSync } from 'find-up';
+import { assert } from 'assert'
 import type { sernConfig } from './utilities/getConfig';
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
-	const fullPath = join(dir, file);
-	return {
-		fullPath,
-		fileStats: await stat(fullPath),
-		base: basename(file),
-	};
+    const fullPath = join(dir, file);
+    return {
+        fullPath,
+        fileStats: await stat(fullPath),
+        base: basename(file),
+    };
 }
 
 const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', '.ts'];
 function createSkipCondition(base: string) {
-	return (type: 'file' | 'directory') => {
-		if (type === 'file') {
-			return base[0] === '!' || !validExtensions.includes(extname(base));
-		}
-		return base[0] === '!';
-	};
+    return (type: 'file' | 'directory') => {
+        if (type === 'file') {
+            return base[0] === '!' || !validExtensions.includes(extname(base));
+        }
+        return base[0] === '!';
+    };
 }
 
 async function* readPaths(
-	dir: string,
-	shouldDebug: boolean
+    dir: string,
+    shouldDebug: boolean
 ): AsyncGenerator<string> {
-	try {
-		const files = await readdir(dir);
-		for (const file of files) {
-			const { fullPath, fileStats, base } = await deriveFileInfo(
-				dir,
-				file
-			);
-			const isSkippable = createSkipCondition(base);
-			if (fileStats.isDirectory()) {
-				//Todo: refactor so that i dont repeat myself for files (line 71)
-				if (isSkippable('directory')) {
-					if (shouldDebug)
-						console.info(`ignored directory: ${fullPath}`);
-				} else {
-					yield* readPaths(fullPath, shouldDebug);
-				}
-			} else {
-				if (isSkippable('file')) {
-					if (shouldDebug) console.info(`ignored: ${fullPath}`);
-				} else {
-					yield 'file:///' + fullPath;
-				}
-			}
-		}
-	} catch (err) {
-		throw err;
-	}
+    try {
+        const files = await readdir(dir);
+        for (const file of files) {
+            const { fullPath, fileStats, base } = await deriveFileInfo(
+                dir,
+                file
+            );
+            const isSkippable = createSkipCondition(base);
+            if (fileStats.isDirectory()) {
+                //Todo: refactor so that i dont repeat myself for files (line 71)
+                if (isSkippable('directory')) {
+                    if (shouldDebug)
+                        console.info(`ignored directory: ${fullPath}`);
+                } else {
+                    yield* readPaths(fullPath, shouldDebug);
+                }
+            } else {
+                if (isSkippable('file')) {
+                    if (shouldDebug) console.info(`ignored: ${fullPath}`);
+                } else {
+                    yield 'file:///' + fullPath;
+                }
+            }
+        }
+    } catch (err) {
+        throw err;
+    }
 }
 //recieved sern config
 const config = await new Promise<sernConfig>((resolve) => {
-		process.once('message', resolve);
-	}),
-	{ paths, rest = undefined } = config;
+        process.once('message', resolve);
+    }),
+    { paths, rest = undefined } = config;
 
 const publishAll = process.env.all === 'T';
 
 if (publishAll && process.env.pattern !== '<<none>>') {
-	throw Error('--all flag and pattern argument are mutually exclusive');
+    throw Error('--all flag and pattern argument are mutually exclusive');
 }
 
 console.debug('all:', publishAll);
@@ -81,117 +82,155 @@ const filePaths = readPaths(resolve(paths.base, paths.commands), true);
 const modules = [];
 const publishable = 0b1110;
 for await (const absPath of filePaths) {
-	let mod = await import(absPath).then((esm) => esm.default);
-	if ('default' in mod) {
-		mod = mod.default;
-	}
-	try {
-		mod = mod.getInstance();
-	} catch {}
+    let mod = await import(absPath).then((esm) => esm.default);
+    if ('default' in mod) {
+        mod = mod.default;
+    }
+    try {
+        mod = mod.getInstance();
+    } catch {}
 
-	if ((publishable & mod.type) != 0) {
-		// assign defaults
-		const filename = basename(absPath);
-		const filenameNoExtension = filename.substring(
-			0,
-			filename.lastIndexOf('.')
-		);
-		mod.name ??= filenameNoExtension;
-		mod.description ??= '';
-		mod.absPath = absPath;
-		modules.push(mod);
-	}
+    if ((publishable & mod.type) != 0) {
+        // assign defaults
+        const filename = basename(absPath);
+        const filenameNoExtension = filename.substring(
+            0,
+            filename.lastIndexOf('.')
+        );
+        mod.name ??= filenameNoExtension;
+        mod.description ??= '';
+        mod.absPath = absPath;
+        modules.push(mod);
+    }
 }
 const cacheDir = resolve('./.sern');
 if (!pathExistsSync(cacheDir)) {
-	console.log('Making .sern directory: ', cacheDir);
-	await mkdir(cacheDir);
+    console.log('Making .sern directory: ', cacheDir);
+    await mkdir(cacheDir);
 }
 
 interface Typeable {
-	type: number;
+    type: number;
 }
 function optionsTransformer(ops: Array<Typeable>) {
-	return ops.map((el) => {
-		if ('command' in el) {
-			const { command, ...rest } = el;
-			return rest;
-		}
-		return el;
-	});
+    return ops.map((el) => {
+        if ('command' in el) {
+            const { command, ...rest } = el;
+            return rest;
+        }
+        return el;
+    });
 }
 
 const intoApplicationType = (type: number) => {
-	if (type === 3) {
-		return 1;
-	}
-	return Math.log2(type);
+    if (type === 3) {
+        return 1;
+    }
+    return Math.log2(type);
 };
 
 const makeDescription = (type: number, desc: string) => {
-	if (type !== 1 && desc !== '') {
-		console.warn(
-			'Found context menu that has non empty description field. Implictly publishing with empty description'
-		);
-		return '';
-	}
-	return desc;
+    if (type !== 1 && desc !== '') {
+        console.warn(
+            'Found context menu that has non empty description field. Implictly publishing with empty description'
+        );
+        return '';
+    }
+    return desc;
 };
 
 const makePublishData = (module: Record<string, unknown>) => {
-	const applicationType = intoApplicationType(module.type as number);
+    const applicationType = intoApplicationType(module.type as number);
 
-	return {
-		name: module.name,
-		type: applicationType,
-		description: makeDescription(
-			applicationType,
-			module.description as string
-		),
-		options: optionsTransformer((module?.options ?? []) as Typeable[]),
-	};
+    return {
+        name: module.name as string,
+        type: applicationType,
+        description: makeDescription(
+            applicationType,
+            module.description as string
+        ),
+        absPath: module.absPath as string,
+        options: optionsTransformer((module?.options ?? []) as Typeable[]),
+    };
 };
 
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
 const excludedKeys = new Set(['command', 'absPath']);
 await writeFile(
-	resolve(cacheDir, 'command-data.json'),
-	JSON.stringify(
-		publishableData,
-		(key, value) => (excludedKeys.has(key) ? undefined : value),
-		4
-	),
-	'utf8'
+    resolve(cacheDir, 'command-data.json'),
+    JSON.stringify(
+        publishableData,
+        (key, value) => (excludedKeys.has(key) ? undefined : value),
+        4
+    ),
+    'utf8'
 );
 
 if (rest === undefined) {
-	console.log(
-		'First time running publish. (rest field in sern.config.json is undefined)'
-	);
-	console.log('Will need to run publish again!');
-	const restData = modules.reduce((acc, module) => {
-		const modulePath = fileURLToPath(module.absPath);
-		acc[relative(resolve(paths.base), modulePath)] = {
-			dmPermission: null,
-			defaultMemberPermissions: null,
-			guildIds: [],
-		};
-		return acc;
-	}, {});
+    console.log(
+        'First time running publish. (rest field in sern.config.json is undefined)'
+    );
+    console.log('Will need to run publish again!');
+    const restData = modules.reduce((acc, module) => {
+        const modulePath = fileURLToPath(module.absPath);
+        acc[relative(resolve(paths.base), modulePath)] = {
+            dmPermission: null,
+            defaultMemberPermissions: null,
+            guildIds: [],
+        };
+        return acc;
+    }, {});
 
-	const newSernConfig = {
-		...config,
-		rest: restData,
-	};
+    const newSernConfig = {
+        ...config,
+        rest: restData,
+    };
 
-	await writeFile(
-		resolve('sern.config.json'),
-		JSON.stringify(newSernConfig, null, 4),
-		'utf8'
-	);
-	process.exit(0);
+    await writeFile(
+        resolve('sern.config.json'),
+        JSON.stringify(newSernConfig, null, 4),
+        'utf8'
+    );
+    process.exit(0);
 }
+const dotenv = await import('dotenv')
+const dotenvPath = resolve('.env')
+
+interface TheoreticalEnv {
+    DISCORD_TOKEN: string
+    APPLICATION_ID: string,
+    [name: string]: string
+}
+
+const env = dotenv.parse<TheoreticalEnv>(await readFile(dotenvPath))
+
+
+assert(
+    env.DISCORD_TOKEN ?? process.env.token,
+    "Could not find a token for this bot in .env or commandline"
+)
+assert(
+    env.APPLICATION_ID ?? process.env.applicationId, 
+    "Could not find an application id for this bot in .env or commandline"
+)
+const token = env.DISCORD_TOKEN ?? process.env.token;
+const appid = env.APPLICATION_ID ?? process.env.applicationId;
+const baseURL = new URL('https://discord.com/api/v10/applications')
+
+/**
+  * a helper function to help determine if a commandModule needs to be updated
+  *
+  */
+function intersection (
+    fileData: (typeof publishableData)[],
+    apiCommandData: Record<string,unknown>[],
+    commandConfig: typeof rest
+) {
+        
+
+}
+
 
 // need this to exit properly
 process.exit(0);
