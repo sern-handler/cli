@@ -4,9 +4,8 @@
 
 import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
 import { join, basename, extname, resolve, relative } from 'node:path';
-import { fileURLToPath } from 'url';
 import { pathExistsSync } from 'find-up';
-import { assert } from 'assert'
+import assert from 'assert'
 import type { sernConfig } from './utilities/getConfig';
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
@@ -64,7 +63,7 @@ async function* readPaths(
 const config = await new Promise<sernConfig>((resolve) => {
         process.once('message', resolve);
     }),
-    { paths, rest = undefined } = config;
+    { paths } = config;
 
 const publishAll = process.env.all === 'T';
 
@@ -82,12 +81,15 @@ const filePaths = readPaths(resolve(paths.base, paths.commands), true);
 const modules = [];
 const publishable = 0b1110;
 for await (const absPath of filePaths) {
-    let mod = await import(absPath).then((esm) => esm.default);
+    let mod = await import(absPath)
+    let commandModule = mod.default;
+    const config = mod.config;
     if ('default' in mod) {
-        mod = mod.default;
+        commandModule = commandModule.default;
     }
+    
     try {
-        mod = mod.getInstance();
+        commandModule = commandModule.getInstance();
     } catch {}
 
     if ((publishable & mod.type) != 0) {
@@ -97,10 +99,10 @@ for await (const absPath of filePaths) {
             0,
             filename.lastIndexOf('.')
         );
-        mod.name ??= filenameNoExtension;
-        mod.description ??= '';
-        mod.absPath = absPath;
-        modules.push(mod);
+        commandModule.name ??= filenameNoExtension;
+        commandModule.description ??= '';
+        commandModule.absPath = absPath;
+        modules.push({ commandModule, config });
     }
 }
 const cacheDir = resolve('./.sern');
@@ -139,26 +141,45 @@ const makeDescription = (type: number, desc: string) => {
     return desc;
 };
 
-const makePublishData = (module: Record<string, unknown>) => {
+const makePublishData = ( { module, config }: Record<string, Record<string,unknown>>) => {
     const applicationType = intoApplicationType(module.type as number);
 
     return {
-        name: module.name as string,
-        type: applicationType,
-        description: makeDescription(
-            applicationType,
-            module.description as string
-        ),
-        absPath: module.absPath as string,
-        options: optionsTransformer((module?.options ?? []) as Typeable[]),
+        data: {
+            name: module.name as string,
+            type: applicationType,
+            description: makeDescription(
+                applicationType,
+                module.description as string
+            ),
+            absPath: module.absPath as string,
+            options: optionsTransformer((module?.options ?? []) as Typeable[]),
+        },
+        config 
     };
 };
+interface PublishableData {
+    name: string
+    type: number,
+    description: string
+    absPath: string,
+    options: Typeable[],
+}
+
+interface Config { 
+    guildIds?: string[]
+    
+}
+interface PublishableModule {
+    data: PublishableData,
+    config: Config
+}
 
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
 const excludedKeys = new Set(['command', 'absPath']);
 await writeFile(
-    resolve(cacheDir, 'command-data.json'),
+    resolve(cacheDir, 'command-data-local.json'),
     JSON.stringify(
         publishableData,
         (key, value) => (excludedKeys.has(key) ? undefined : value),
@@ -167,33 +188,7 @@ await writeFile(
     'utf8'
 );
 
-if (rest === undefined) {
-    console.log(
-        'First time running publish. (rest field in sern.config.json is undefined)'
-    );
-    console.log('Will need to run publish again!');
-    const restData = modules.reduce((acc, module) => {
-        const modulePath = fileURLToPath(module.absPath);
-        acc[relative(resolve(paths.base), modulePath)] = {
-            dmPermission: null,
-            defaultMemberPermissions: null,
-            guildIds: [],
-        };
-        return acc;
-    }, {});
 
-    const newSernConfig = {
-        ...config,
-        rest: restData,
-    };
-
-    await writeFile(
-        resolve('sern.config.json'),
-        JSON.stringify(newSernConfig, null, 4),
-        'utf8'
-    );
-    process.exit(0);
-}
 const dotenv = await import('dotenv')
 const dotenvPath = resolve('.env')
 
@@ -206,30 +201,48 @@ interface TheoreticalEnv {
 const env = dotenv.parse<TheoreticalEnv>(await readFile(dotenvPath))
 
 
+
+const token = env.DISCORD_TOKEN ?? process.env.token;
+const appid = env.APPLICATION_ID ?? process.env.applicationId;
+
 assert(
-    env.DISCORD_TOKEN ?? process.env.token,
+    token,
     "Could not find a token for this bot in .env or commandline"
 )
 assert(
-    env.APPLICATION_ID ?? process.env.applicationId, 
+    appid, 
     "Could not find an application id for this bot in .env or commandline"
 )
-const token = env.DISCORD_TOKEN ?? process.env.token;
-const appid = env.APPLICATION_ID ?? process.env.applicationId;
+
+
+
 const baseURL = new URL('https://discord.com/api/v10/applications')
 
-/**
-  * a helper function to help determine if a commandModule needs to be updated
-  *
-  */
-function intersection (
-    fileData: (typeof publishableData)[],
-    apiCommandData: Record<string,unknown>[],
-    commandConfig: typeof rest
-) {
-        
+//partition globally published and guilded commands
 
-}
+const globalURL = new URL(baseURL, `/${appid}/commands`);
+
+const [globalCommands, guildedCommands] = publishableData.reduce(
+    ([globals, guilded], module) => {
+        const isPublishableGlobally = !module.config || !Array.isArray(module.config.guildIds)
+        if(isPublishableGlobally) {
+            return [[module , ...globals], guilded];
+        } 
+        return [globals, [module, ...guilded]];
+
+    }, [[], []] as [PublishableModule[], PublishableModule[]])
+
+await Promise.all([
+    fetch(globalURL, { 
+        method: 'PUT', 
+        headers: {
+            'Authorization': `Bot ${token}`
+        },
+        body: JSON.stringify(globalCommands)
+    })
+
+
+])
 
 
 // need this to exit properly
