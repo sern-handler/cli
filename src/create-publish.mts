@@ -83,11 +83,15 @@ const publishable = 0b1110;
 for await (const absPath of filePaths) {
     let mod = await import(absPath)
     let commandModule = mod.default;
-    const config = mod.config;
+    let config = mod.config;
+    
     if ('default' in mod) {
         commandModule = commandModule.default;
     }
-    
+
+    if(typeof config === 'function') {
+        config = config(absPath, commandModule)
+    }
     try {
         commandModule = commandModule.getInstance();
     } catch {}
@@ -105,6 +109,10 @@ for await (const absPath of filePaths) {
         modules.push({ commandModule, config });
     }
 }
+
+
+
+
 const cacheDir = resolve('./.sern');
 if (!pathExistsSync(cacheDir)) {
     console.log('Making .sern directory: ', cacheDir);
@@ -220,7 +228,7 @@ const baseURL = new URL('https://discord.com/api/v10/applications')
 
 //partition globally published and guilded commands
 
-const globalURL = new URL(baseURL, `/${appid}/commands`);
+const globalURL = new URL(`/${appid}/commands`, baseURL);
 
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
@@ -231,19 +239,57 @@ const [globalCommands, guildedCommands] = publishableData.reduce(
         return [globals, [module, ...guilded]];
 
     }, [[], []] as [PublishableModule[], PublishableModule[]])
-
-await Promise.all([
-    fetch(globalURL, { 
+console.log('publishing global commands')
+const res = await fetch(globalURL, { 
         method: 'PUT', 
         headers: {
             'Authorization': `Bot ${token}`
         },
         body: JSON.stringify(globalCommands)
-    })
+})
+if(res.ok) {
+    console.log('All global commands published')
+} else {
+    throw Error("Failed to published global commands")
+}
 
+const guildIds = new Set<string>()
 
-])
-
+for(const { config, data } of guildedCommands) {
+     if(config.guildIds) {
+        for(const id of config.guildIds) {
+            !guildIds.has(id) && guildIds.add(id);
+            const guildCommandURL = new URL(`/${appid}/guilds/${id}/commands`, baseURL)
+            const guildCommands = await fetch(guildCommandURL, { headers: { 'Authorization': 'Bot '+ token } })
+                .then(res => res.json())
+                .catch((e) => { 
+                    console.warn(e);
+                    return null
+                });
+            if(!guildCommands) continue;
+            const guildCmd = guildCommands.find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
+	    if (guildCmd) {
+                const response = await fetch(new URL(`/${guildCmd.id}`, guildCommandURL),
+                    { method: 'PATCH', body: JSON.stringify(guildCmd), headers: { 'Authorization': 'Bot '+token } }
+                )
+                if(response.ok) {
+                    console.log('Edited ', data.name, ' for guild', id, ' correctly!')
+                } else {
+                    throw Error(`Something went wrong while trying to edit ${data.name} for ${id}`)
+                }
+	    } else {
+                const response = await fetch(new URL(guildCommandURL),
+                    { method: 'POST', body: JSON.stringify(guildCmd), headers: { 'Authorization': 'Bot '+token } }
+                )
+                if(response.ok) {
+                    console.log('Created ', data.name, ' for guild', id, ' correctly!')
+                } else {
+                    throw Error(`Something went wrong while trying to create ${data.name} for ${id}`)
+                }            
+            }
+        }
+     }
+}
 
 // need this to exit properly
 process.exit(0);
