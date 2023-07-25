@@ -291,7 +291,7 @@ for(const { config, data } of guildedCommands) {
                 }
 	    } else {
                 const response = await fetch(new URL(guildCommandURL),
-                    { method: 'POST', body: JSON.stringify(guildCmd), headers: { 'Authorization': 'Bot '+token } }
+                    { method: 'POST', body: JSON.stringify(data), headers: { 'Authorization': 'Bot '+token } }
                 )
                 if(response.ok) {
                     console.log('Created ', data.name, ' for guild', id, ' correctly!')
