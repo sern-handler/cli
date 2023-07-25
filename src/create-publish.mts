@@ -77,18 +77,18 @@ console.debug('pattern:', process.env.pattern);
 //Where the actual script starts running
 //assert(process.env.DISCORD_TOKEN, 'Could not find token');
 //assert(process.env.APP_ID, 'Could not find application id');
+console.log(resolve(paths.base, paths.commands))
 const filePaths = readPaths(resolve(paths.base, paths.commands), true);
+
 const modules = [];
 const publishable = 0b1110;
 for await (const absPath of filePaths) {
     let mod = await import(absPath)
     let commandModule = mod.default;
     let config = mod.config;
-    
-    if ('default' in mod) {
+    if ('default' in commandModule) {
         commandModule = commandModule.default;
     }
-
     if(typeof config === 'function') {
         config = config(absPath, commandModule)
     }
@@ -96,7 +96,8 @@ for await (const absPath of filePaths) {
         commandModule = commandModule.getInstance();
     } catch {}
 
-    if ((publishable & mod.type) != 0) {
+    if ((publishable & commandModule.type) != 0) {
+    
         // assign defaults
         const filename = basename(absPath);
         const filenameNoExtension = filename.substring(
@@ -149,19 +150,18 @@ const makeDescription = (type: number, desc: string) => {
     return desc;
 };
 
-const makePublishData = ( { module, config }: Record<string, Record<string,unknown>>) => {
-    const applicationType = intoApplicationType(module.type as number);
-
+const makePublishData = ( { commandModule, config }: Record<string, Record<string,unknown>>) => {
+    const applicationType = intoApplicationType(commandModule.type as number);
     return {
         data: {
-            name: module.name as string,
+            name: commandModule.name as string,
             type: applicationType,
             description: makeDescription(
                 applicationType,
-                module.description as string
+                commandModule.description as string
             ),
-            absPath: module.absPath as string,
-            options: optionsTransformer((module?.options ?? []) as Typeable[]),
+            absPath: commandModule.absPath as string,
+            options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
         },
         config 
     };
@@ -182,17 +182,14 @@ interface PublishableModule {
     data: PublishableData,
     config: Config
 }
-
+const publishablesIntoJson = (ps : PublishableModule[]) => 
+    JSON.stringify(ps.map(module => module.data), (key, value) => (excludedKeys.has(key) ? undefined : value), 4)
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
 const excludedKeys = new Set(['command', 'absPath']);
 await writeFile(
     resolve(cacheDir, 'command-data-local.json'),
-    JSON.stringify(
-        publishableData,
-        (key, value) => (excludedKeys.has(key) ? undefined : value),
-        4
-    ),
+    publishablesIntoJson(publishableData),
     'utf8'
 );
 
@@ -224,11 +221,11 @@ assert(
 
 
 
-const baseURL = new URL('https://discord.com/api/v10/applications')
+const baseURL = new URL('https://discord.com/api/v10/applications/')
 
 //partition globally published and guilded commands
 
-const globalURL = new URL(`/${appid}/commands`, baseURL);
+const globalURL = new URL(`${appid}/commands`, baseURL);
 
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
@@ -243,13 +240,22 @@ console.log('publishing global commands')
 const res = await fetch(globalURL, { 
         method: 'PUT', 
         headers: {
-            'Authorization': `Bot ${token}`
+            'Authorization': `Bot ${token}`,
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify(globalCommands)
+        body: publishablesIntoJson(globalCommands)
 })
 if(res.ok) {
     console.log('All global commands published')
 } else {
+    console.error('code: ', res.status)
+    console.error('errors:', await res.json()
+        .then(res => {
+            const errors = Object.values(res.errors)
+            //@ts-ignore
+            return errors.map(err => err?.name?._errors);
+        }))
+    console.error(res.statusText)
     throw Error("Failed to published global commands")
 }
 
@@ -259,13 +265,19 @@ for(const { config, data } of guildedCommands) {
      if(config.guildIds) {
         for(const id of config.guildIds) {
             !guildIds.has(id) && guildIds.add(id);
-            const guildCommandURL = new URL(`/${appid}/guilds/${id}/commands`, baseURL)
-            const guildCommands = await fetch(guildCommandURL, { headers: { 'Authorization': 'Bot '+ token } })
-                .then(res => res.json())
-                .catch((e) => { 
-                    console.warn(e);
-                    return null
-                });
+            const guildCommandURL = new URL(`${appid}/guilds/${id}/commands`, baseURL)
+            const guildCommands = await fetch(guildCommandURL,
+                { 
+                    headers: {
+                        'Authorization': 'Bot '+ token,  
+                        'Content-Type': 'application/json'
+                    } 
+                }
+            ).then(res => res.json())
+             .catch((e) => { 
+                console.warn(e);
+                return null
+            });
             if(!guildCommands) continue;
             const guildCmd = guildCommands.find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
 	    if (guildCmd) {
