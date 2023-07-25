@@ -6,7 +6,9 @@ import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
 import { join, basename, extname, resolve } from 'node:path';
 import { pathExistsSync } from 'find-up';
 import assert from 'assert'
+import * as Rest from './rest'
 import type { sernConfig } from './utilities/getConfig';
+import type { PublishableModule } from './create-publish.d.ts';
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
@@ -161,22 +163,7 @@ const makePublishData = ( { commandModule, config }: Record<string, Record<strin
         config 
     };
 };
-interface PublishableData {
-    name: string
-    type: number,
-    description: string
-    absPath: string,
-    options: Typeable[],
-}
 
-interface Config { 
-    guildIds?: string[]
-    
-}
-interface PublishableModule {
-    data: PublishableData,
-    config: Config
-}
 const publishablesIntoJson = (ps : PublishableModule[]) => 
     JSON.stringify(ps.map(module => module.data), (key, value) => (excludedKeys.has(key) ? undefined : value), 4)
 // We can use these objects to publish to DAPI
@@ -190,7 +177,6 @@ await writeFile(
 
 
 const dotenv = await import('dotenv')
-const dotenvPath = resolve('.env')
 
 interface TheoreticalEnv {
     DISCORD_TOKEN: string
@@ -198,7 +184,7 @@ interface TheoreticalEnv {
     [name: string]: string
 }
 
-const env = dotenv.parse<TheoreticalEnv>(await readFile(dotenvPath))
+const env = dotenv.parse<TheoreticalEnv>(await readFile(resolve('.env')))
 
 
 const token = env.DISCORD_TOKEN ?? process.env.token;
@@ -218,8 +204,7 @@ assert(
 const baseURL = new URL('https://discord.com/api/v10/applications/')
 
 //partition globally published and guilded commands
-
-const globalURL = new URL(`${appid}/commands`, baseURL);
+const rest = Rest.create(appid, token)
 
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
@@ -231,14 +216,9 @@ const [globalCommands, guildedCommands] = publishableData.reduce(
 
     }, [[], []] as [PublishableModule[], PublishableModule[]]);
 console.log('publishing global commands')
-const res = await fetch(globalURL, { 
-        method: 'PUT', 
-        headers: {
-            'Authorization': `Bot ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: publishablesIntoJson(globalCommands)
-})
+
+const res = await rest.updateGlobal(globalCommands);
+
 if(res.ok) {
     console.log('All global commands published')
 } else {
@@ -260,42 +240,23 @@ for(const { config, data } of guildedCommands) {
         for(const id of config.guildIds) {
             !guildIds.has(id) && guildIds.add(id);
             const guildCommandURL = new URL(`${appid}/guilds/${id}/commands`, baseURL)
-            console.log(guildCommandURL)
-            const guildCommands = await fetch(guildCommandURL,
-                { 
-                    headers: {
-                        'Authorization': 'Bot '+ token,  
-                        'Content-Type': 'application/json'
-                    } 
-                }
-            ).then(res => res.json())
-             .catch((e) => { 
-                console.warn(e);
-                return null
-            });
+            const guildCommands = await rest.getGuild(id)
+                .then(res => res.json())
+                .catch((e) => { 
+                    console.warn(e);
+                    return null
+                });
             if(!guildCommands) continue;
             const guildCmd = guildCommands.find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
 	    if (guildCmd) {
-                const editCommandUrl = new URL(guildCmd.id, guildCommandURL.href+'/')
-                const response = await fetch(editCommandUrl,
-                    { method: 'PATCH', body: JSON.stringify(guildCmd), headers: { 'Authorization': 'Bot '+token, 'Content-Type': 'application/json' }}
-                )
+                const response = await rest.editGuildCommand(id, guildCmd)
                 if(response.ok) {
                     console.log('Edited ', data.name, ' for guild', id, ' correctly!')
                 } else {
                     throw Error(`Something went wrong while trying to edit ${data.name} for ${id}`)
                 }
 	    } else {
-                const response = await fetch(guildCommandURL,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify(data),
-                        headers: { 
-                            'Authorization': 'Bot '+token,
-                            'Content-Type': 'application/json' 
-                        } 
-                    }
-                )
+                const response = await rest.createGuildCommand(guildCmd, id) 
                 if(response.ok) {
                     console.log('Created ', data.name, ' for guild', id, ' correctly!')
                 } else {
