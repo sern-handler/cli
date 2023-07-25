@@ -239,7 +239,6 @@ for(const { config, data } of guildedCommands) {
      if(config.guildIds) {
         for(const id of config.guildIds) {
             !guildIds.has(id) && guildIds.add(id);
-            const guildCommandURL = new URL(`${appid}/guilds/${id}/commands`, baseURL)
             const guildCommands = await rest.getGuild(id)
                 .then(res => res.json())
                 .catch((e) => { 
