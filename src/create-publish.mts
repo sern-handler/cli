@@ -3,7 +3,7 @@
  */
 
 import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
-import { join, basename, extname, resolve, relative } from 'node:path';
+import { join, basename, extname, resolve } from 'node:path';
 import { pathExistsSync } from 'find-up';
 import assert from 'assert'
 import type { sernConfig } from './utilities/getConfig';
@@ -17,14 +17,10 @@ async function deriveFileInfo(dir: string, file: string) {
     };
 }
 
-const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', '.ts'];
-function createSkipCondition(base: string) {
-    return (type: 'file' | 'directory') => {
-        if (type === 'file') {
-            return base[0] === '!' || !validExtensions.includes(extname(base));
-        }
-        return base[0] === '!';
-    };
+function isSkippable (filename: string) {
+    //empty string is for non extension files (directories)
+    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', ''];
+    return filename[0] === '!' || !validExtensions.includes(extname(filename));
 }
 
 async function* readPaths(
@@ -38,17 +34,16 @@ async function* readPaths(
                 dir,
                 file
             );
-            const isSkippable = createSkipCondition(base);
             if (fileStats.isDirectory()) {
                 //Todo: refactor so that i dont repeat myself for files (line 71)
-                if (isSkippable('directory')) {
+                if (isSkippable(base)) {
                     if (shouldDebug)
                         console.info(`ignored directory: ${fullPath}`);
                 } else {
                     yield* readPaths(fullPath, shouldDebug);
                 }
             } else {
-                if (isSkippable('file')) {
+                if (isSkippable(base)) {
                     if (shouldDebug) console.info(`ignored: ${fullPath}`);
                 } else {
                     yield 'file:///' + fullPath;
