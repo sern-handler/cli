@@ -206,7 +206,6 @@ interface TheoreticalEnv {
 const env = dotenv.parse<TheoreticalEnv>(await readFile(dotenvPath))
 
 
-
 const token = env.DISCORD_TOKEN ?? process.env.token;
 const appid = env.APPLICATION_ID ?? process.env.applicationId;
 
@@ -235,7 +234,7 @@ const [globalCommands, guildedCommands] = publishableData.reduce(
         } 
         return [globals, [module, ...guilded]];
 
-    }, [[], []] as [PublishableModule[], PublishableModule[]])
+    }, [[], []] as [PublishableModule[], PublishableModule[]]);
 console.log('publishing global commands')
 const res = await fetch(globalURL, { 
         method: 'PUT', 
@@ -290,8 +289,15 @@ for(const { config, data } of guildedCommands) {
                     throw Error(`Something went wrong while trying to edit ${data.name} for ${id}`)
                 }
 	    } else {
-                const response = await fetch(new URL(guildCommandURL),
-                    { method: 'POST', body: JSON.stringify(data), headers: { 'Authorization': 'Bot '+token } }
+                const response = await fetch(guildCommandURL,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: { 
+                            'Authorization': 'Bot '+token,
+                            'Content-Type': 'application/json' 
+                        } 
+                    }
                 )
                 if(response.ok) {
                     console.log('Created ', data.name, ' for guild', id, ' correctly!')
