@@ -265,6 +265,7 @@ for(const { config, data } of guildedCommands) {
         for(const id of config.guildIds) {
             !guildIds.has(id) && guildIds.add(id);
             const guildCommandURL = new URL(`${appid}/guilds/${id}/commands`, baseURL)
+            console.log(guildCommandURL)
             const guildCommands = await fetch(guildCommandURL,
                 { 
                     headers: {
@@ -280,8 +281,9 @@ for(const { config, data } of guildedCommands) {
             if(!guildCommands) continue;
             const guildCmd = guildCommands.find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
 	    if (guildCmd) {
-                const response = await fetch(new URL(`/${guildCmd.id}`, guildCommandURL),
-                    { method: 'PATCH', body: JSON.stringify(guildCmd), headers: { 'Authorization': 'Bot '+token } }
+                const editCommandUrl = new URL(guildCmd.id, guildCommandURL.href+'/')
+                const response = await fetch(editCommandUrl,
+                    { method: 'PATCH', body: JSON.stringify(guildCmd), headers: { 'Authorization': 'Bot '+token, 'Content-Type': 'application/json' }}
                 )
                 if(response.ok) {
                     console.log('Edited ', data.name, ' for guild', id, ' correctly!')
