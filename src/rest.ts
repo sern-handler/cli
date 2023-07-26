@@ -17,7 +17,11 @@ export const create = (appid: string, token: string) => {
     return {
         updateGlobal : (commands: PublishableModule[]) => 
             fetch(globalURL, { method: 'PUT', body: publishablesIntoJson(commands), headers }),
-                getGuild: (id: string) => {
+        getGuild: (id: string) => {
+            const guildCommandURL = new URL(`${appid}/guilds/${id}/`, baseURL)
+            return fetch(guildCommandURL, { headers })
+        },
+        getGuildCommands: (id: string) => {
             const guildCommandURL = new URL(`${appid}/guilds/${id}/commands`, baseURL)
             return fetch(guildCommandURL, { headers })
         },

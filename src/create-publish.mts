@@ -21,7 +21,7 @@ async function deriveFileInfo(dir: string, file: string) {
 
 function isSkippable (filename: string) {
     //empty string is for non extension files (directories)
-    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', 'cts', ''];
+    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
     return filename[0] === '!' || !validExtensions.includes(extname(filename));
 }
 
@@ -74,7 +74,6 @@ console.debug('pattern:', process.env.pattern);
 //Where the actual script starts running
 //assert(process.env.DISCORD_TOKEN, 'Could not find token');
 //assert(process.env.APP_ID, 'Could not find application id');
-console.log(resolve(paths.base, paths.commands))
 const filePaths = readPaths(resolve(paths.base, paths.commands), true);
 
 const modules = [];
@@ -94,7 +93,6 @@ for await (const absPath of filePaths) {
     } catch {}
 
     if ((publishable & commandModule.type) != 0) {
-    
         // assign defaults
         const filename = basename(absPath);
         const filenameNoExtension = filename.substring(
@@ -108,9 +106,6 @@ for await (const absPath of filePaths) {
     }
 }
 
-
-
-
 const cacheDir = resolve('./.sern');
 if (!pathExistsSync(cacheDir)) {
     console.log('Making .sern directory: ', cacheDir);
@@ -120,7 +115,7 @@ if (!pathExistsSync(cacheDir)) {
 interface Typeable {
     type: number;
 }
-function optionsTransformer(ops: Array<Typeable>) {
+const optionsTransformer = (ops: Array<Typeable>) => {
     return ops.map((el) => {
         if ('command' in el) {
             const { command, ...rest } = el;
@@ -153,12 +148,11 @@ const makePublishData = ( { commandModule, config }: Record<string, Record<strin
         data: {
             name: commandModule.name as string,
             type: applicationType,
-            description: makeDescription(
-                applicationType,
-                commandModule.description as string
-            ),
+            description: makeDescription(applicationType, commandModule.description as string),
             absPath: commandModule.absPath as string,
             options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
+            dm_permission: config?.dmPermission,
+            default_member_permissions: config?.defaultMemberPermissions ?? null
         },
         config 
     };
@@ -200,12 +194,7 @@ assert(
 )
 
 
-
-const baseURL = new URL('https://discord.com/api/v10/applications/')
-
 //partition globally published and guilded commands
-const rest = Rest.create(appid, token)
-
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
         const isPublishableGlobally = !module.config || !Array.isArray(module.config.guildIds)
@@ -217,12 +206,18 @@ const [globalCommands, guildedCommands] = publishableData.reduce(
     }, [[], []] as [PublishableModule[], PublishableModule[]]);
 console.log('publishing global commands')
 
-const res = await rest.updateGlobal(globalCommands);
 
+const rest = Rest.create(appid, token);
+const res = await rest.updateGlobal(globalCommands);
+let remoteGlobal;
 if(res.ok) {
     console.log('All global commands published')
+    remoteGlobal = await res.json()
 } else {
     console.error('code: ', res.status)
+    if(res.status === 429) {
+        throw Error("Chill out homie, too many requests")
+    }
     console.error('errors:', await res.json()
         .then(res => {
             const errors = Object.values(res.errors)
@@ -232,21 +227,27 @@ if(res.ok) {
     console.error(res.statusText)
     throw Error("Failed to published global commands")
 }
-
+console.log(remoteGlobal)
 const guildIds = new Set<string>()
 
 for(const { config, data } of guildedCommands) {
      if(config.guildIds) {
         for(const id of config.guildIds) {
             !guildIds.has(id) && guildIds.add(id);
-            const guildCommands = await rest.getGuild(id)
+            const guild = await rest.getGuild(id)
                 .then(res => res.json())
                 .catch((e) => { 
                     console.warn(e);
                     return null
                 });
-            if(!guildCommands) continue;
-            const guildCmd = guildCommands.find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
+            assert(guild, `guild with id ${id} does not exist`)
+            const guildCommands = await rest
+                .getGuildCommands(id)
+                .then(res => res.json())
+                .catch((e) => { throw e });
+            
+            const guildCmd = guildCommands
+                .find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
 	    if (guildCmd) {
                 const response = await rest.editGuildCommand(id, guildCmd)
                 if(response.ok) {
