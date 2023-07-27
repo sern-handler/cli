@@ -186,11 +186,11 @@ const appid = env.APPLICATION_ID ?? process.env.applicationId;
 
 assert(
     token,
-    "Could not find a token for this bot in .env or commandline"
+    "Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?"
 )
 assert(
     appid, 
-    "Could not find an application id for this bot in .env or commandline"
+    "Could not find an application id for this bot in .env or commandline. Do you have APPLICATION_ID in env?"
 )
 
 
@@ -236,10 +236,7 @@ for(const { config, data } of guildedCommands) {
             !guildIds.has(id) && guildIds.add(id);
             const guild = await rest.getGuild(id)
                 .then(res => res.json())
-                .catch((e) => { 
-                    console.warn(e);
-                    return null
-                });
+                .catch(() => null);
             assert(guild, `guild with id ${id} does not exist`)
             const guildCommands = await rest
                 .getGuildCommands(id)
