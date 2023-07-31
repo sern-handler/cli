@@ -5,7 +5,9 @@ export interface PublishableData {
     absPath: string,
     options: Typeable[],
 }
-
+interface Typeable {
+    type: number
+}
 export interface Config { 
     guildIds?: string[]
     

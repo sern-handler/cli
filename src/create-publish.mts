@@ -209,10 +209,8 @@ console.log('publishing global commands')
 
 const rest = Rest.create(appid, token);
 const res = await rest.updateGlobal(globalCommands);
-let remoteGlobal;
 if(res.ok) {
     console.log('All global commands published')
-    remoteGlobal = await res.json()
 } else {
     console.error('code: ', res.status)
     if(res.status === 429) {
@@ -227,7 +225,7 @@ if(res.ok) {
     console.error(res.statusText)
     throw Error("Failed to published global commands")
 }
-console.log(remoteGlobal)
+
 const guildIds = new Set<string>()
 
 for(const { config, data } of guildedCommands) {
