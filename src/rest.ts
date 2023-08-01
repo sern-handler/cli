@@ -17,29 +17,18 @@ export const create = (appid: string, token: string) => {
     return {
         updateGlobal : (commands: PublishableModule[]) => 
             fetch(globalURL, { method: 'PUT', body: publishablesIntoJson(commands), headers }),
-        getGuild: (id: string) => {
-            const guildCommandURL = new URL(`${appid}/guilds/${id}/`, baseURL)
-            return fetch(guildCommandURL, { headers })
-        },
         getGuildCommands: (id: string) => {
             const guildCommandURL = new URL(`${appid}/guilds/${id}/commands`, baseURL)
             return fetch(guildCommandURL, { headers })
         },
 
-        editGuildCommand: (guildId: string, guildCommand: any) => {
+        putGuildCommands: (guildId: string, guildCommand: any) => {
             const guildCommandURL = new URL(`${appid}/guilds/${guildId}/commands`, baseURL)
-            const editCommandUrl = new URL(guildCommand.id, guildCommandURL+'/')
-            return fetch(editCommandUrl,
-                { method: 'PATCH', body: JSON.stringify(guildCommand), headers }
-            )
-
-        },
-        createGuildCommand: (guildCommand: any, guildId: string) => {
-            const guildCommandURL = new URL(`${appid}/guilds/${guildId}/commands`, baseURL)
+            console.log(guildCommand)
             return fetch(guildCommandURL,
-                { method: 'POST', body: JSON.stringify(guildCommand), headers }
+                { method: 'PUT', body: JSON.stringify(guildCommand), headers }
             )
-        }
+        },
 
     }
 }

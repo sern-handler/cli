@@ -10,7 +10,6 @@ interface Typeable {
 }
 export interface Config { 
     guildIds?: string[]
-    
 }
 export interface PublishableModule {
     data: PublishableData,

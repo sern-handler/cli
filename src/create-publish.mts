@@ -8,7 +8,7 @@ import { pathExistsSync } from 'find-up';
 import assert from 'assert'
 import * as Rest from './rest'
 import type { sernConfig } from './utilities/getConfig';
-import type { PublishableModule } from './create-publish.d.ts';
+import type { Config, PublishableData, PublishableModule } from './create-publish.d.ts';
 const args = process.argv.slice(2);
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
@@ -163,12 +163,6 @@ const publishablesIntoJson = (ps : PublishableModule[]) =>
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData);
 const excludedKeys = new Set(['command', 'absPath']);
-await writeFile(
-    resolve(cacheDir, 'command-data-local.json'),
-    publishablesIntoJson(publishableData),
-    'utf8'
-);
-
 
 const dotenv = await import('dotenv')
 
@@ -209,8 +203,12 @@ console.log('publishing global commands')
 
 const rest = Rest.create(appid, token);
 const res = await rest.updateGlobal(globalCommands);
+
+let globalCommandsResponse;
+
 if(res.ok) {
     console.log('All global commands published')
+    globalCommandsResponse = await res.json()
 } else {
     console.error('code: ', res.status)
     if(res.status === 429) {
@@ -226,41 +224,54 @@ if(res.ok) {
     throw Error("Failed to published global commands")
 }
 
-const guildIds = new Set<string>()
+function associateGuildIdsWithData(data: {
+  data: PublishableData;
+  config?: Config;
+}[]): Map<string, PublishableData[]> {
+  const guildIdMap: Map<string, PublishableData[]> = new Map();
 
-for(const { config, data } of guildedCommands) {
-     if(config.guildIds) {
-        for(const id of config.guildIds) {
-            !guildIds.has(id) && guildIds.add(id);
-            const guild = await rest.getGuild(id)
-                .then(res => res.json())
-                .catch(() => null);
-            assert(guild, `guild with id ${id} does not exist`)
-            const guildCommands = await rest
-                .getGuildCommands(id)
-                .then(res => res.json())
-                .catch((e) => { throw e });
-            
-            const guildCmd = guildCommands
-                .find((command: Record<string,unknown>) => command.name === data.name && command.type === data.type);
-	    if (guildCmd) {
-                const response = await rest.editGuildCommand(id, guildCmd)
-                if(response.ok) {
-                    console.log('Edited ', data.name, ' for guild', id, ' correctly!')
-                } else {
-                    throw Error(`Something went wrong while trying to edit ${data.name} for ${id}`)
-                }
-	    } else {
-                const response = await rest.createGuildCommand(guildCmd, id) 
-                if(response.ok) {
-                    console.log('Created ', data.name, ' for guild', id, ' correctly!')
-                } else {
-                    throw Error(`Something went wrong while trying to create ${data.name} for ${id}`)
-                }            
-            }
+  data.forEach((entry) => {
+    const { data, config } = entry;
+    const { guildIds } = config || {};
+
+    if (guildIds) {
+      guildIds.forEach((guildId) => {
+        if (guildIdMap.has(guildId)) {
+          guildIdMap.get(guildId)?.push(data);
+        } else {
+          guildIdMap.set(guildId, [data]);
         }
-     }
+      });
+    }
+  });
+
+  return guildIdMap;
+}
+const guildCommandMap = associateGuildIdsWithData(guildedCommands);
+
+let guildCommandMapResponse = new Map<string, Record<string, unknown>>();
+
+for(const [guildId, array] of guildCommandMap.entries()) {
+    console.log('Updating commands for guild', guildId)
+
+    const response = await rest.putGuildCommands(guildId, array)
+    if(res.ok) {
+        guildCommandMapResponse.set(guildId, await response.json())
+    } else {
+        throw Error(await res.json())
+    }
+    
+}
+const remoteData = {
+    global: globalCommandsResponse,
+    ...Object.fromEntries(guildCommandMapResponse)
 }
 
-// need this to exit properly
+await writeFile(
+    resolve(cacheDir, 'command-data-remote.json'),
+    JSON.stringify(remoteData, null, 4),
+    'utf8'
+);
+
+
 process.exit(0);
