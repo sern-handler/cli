@@ -2,60 +2,17 @@
  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
  */
 
-import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
-import { join, basename, extname, resolve } from 'node:path';
+import { mkdir, writeFile, readFile } from 'fs/promises';
+import { basename, resolve } from 'node:path';
 import { pathExistsSync } from 'find-up';
 import assert from 'assert'
 import * as Rest from './rest'
-import type { sernConfig } from './utilities/getConfig';
 import type { Config, PublishableData, PublishableModule } from './create-publish.d.ts';
+import type { sernConfig } from './types/config.d.ts';
+import { readPaths } from './utilities/readPaths.js';
 const args = process.argv.slice(2);
-async function deriveFileInfo(dir: string, file: string) {
-    const fullPath = join(dir, file);
-    return {
-        fullPath,
-        fileStats: await stat(fullPath),
-        base: basename(file),
-    };
-}
 
-function isSkippable (filename: string) {
-    //empty string is for non extension files (directories)
-    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
-    return filename[0] === '!' || !validExtensions.includes(extname(filename));
-}
 
-async function* readPaths(
-    dir: string,
-    shouldDebug: boolean
-): AsyncGenerator<string> {
-    try {
-        const files = await readdir(dir);
-        for (const file of files) {
-            const { fullPath, fileStats, base } = await deriveFileInfo(
-                dir,
-                file
-            );
-            if (fileStats.isDirectory()) {
-                //Todo: refactor so that i dont repeat myself for files (line 71)
-                if (isSkippable(base)) {
-                    if (shouldDebug)
-                        console.info(`ignored directory: ${fullPath}`);
-                } else {
-                    yield* readPaths(fullPath, shouldDebug);
-                }
-            } else {
-                if (isSkippable(base)) {
-                    if (shouldDebug) console.info(`ignored: ${fullPath}`);
-                } else {
-                    yield 'file:///' + fullPath;
-                }
-            }
-        }
-    } catch (err) {
-        throw err;
-    }
-}
 //recieved sern config
 const config = await new Promise<sernConfig>((resolve) => {
         process.once('message', resolve);
@@ -165,13 +122,6 @@ const publishableData = modules.map(makePublishData);
 const excludedKeys = new Set(['command', 'absPath']);
 
 const dotenv = await import('dotenv')
-
-interface TheoreticalEnv {
-    DISCORD_TOKEN: string
-    APPLICATION_ID: string,
-    [name: string]: string
-}
-
 const env = dotenv.parse<TheoreticalEnv>(await readFile(resolve('.env')))
 
 

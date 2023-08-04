@@ -37,8 +37,10 @@
         "colorette": "2.0.20",
         "commander": "11.0.0",
         "dotenv": "^16.3.1",
+        "esbuild": "^0.18.17",
         "execa": "7.1.1",
         "find-up": "6.3.0",
+        "glob": "^10.3.3",
         "ora": "6.3.1",
         "prompts": "2.4.2",
         "undici": "5.22.1"

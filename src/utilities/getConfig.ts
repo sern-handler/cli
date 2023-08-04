@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
 import assert from 'node:assert';
+import type { sernConfig } from '../types/config.d.ts';
 export async function getConfig(): Promise<sernConfig> {
     const sernLocation = await findUp('sern.config.json');
     assert(sernLocation, "Can't find sern.config.json");
@@ -14,11 +15,4 @@ export async function getConfig(): Promise<sernConfig> {
     return output;
 }
 
-export interface sernConfig {
-    language: 'typescript' | 'javascript';
-    paths: {
-        base: string;
-        commands: string;
-    };
-    rest?: Record<string, Record<string,unknown>>;
-}
+

@@ -4,7 +4,7 @@ import { extra } from './commands/extra.js';
 import { help } from './commands/help.js';
 import { init } from './commands/init.js';
 import { publish } from './commands/publish.js';
-
+import { build } from './commands/build.js'
 import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
 import { yellowBright } from 'colorette';
@@ -41,7 +41,7 @@ program
 
 program
     .command(publish.name)
-    .description('New way to manage your slash commands')
+    .description('Manage your slash commands')
     .option('-a, --all', 'Publish all commands')
     .option('-t, --token [token]')
     .option('--appId [applicationId]')
@@ -51,5 +51,11 @@ program
         '<<none>>'
     )
     .action(publish);
+
+program 
+    .command(build.name)
+    .description('Build your bot')
+    .action(build)
+
 
 program.parse();
