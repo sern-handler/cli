@@ -2,8 +2,8 @@ import { mkdir, readFile, writeFile } from 'fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, URL } from 'url';
 const root = new URL('../../', import.meta.url);
-
-const templates = new URL('./templates/', root);
+const cli = new URL('./cli/', root);
+const templates = new URL('./templates/', cli);
 const extraURL = new URL('./extra/', templates);
 const extraFolder = fileURLToPath(extraURL);
 
