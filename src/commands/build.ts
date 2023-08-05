@@ -1,11 +1,12 @@
 import esbuild, { type Plugin } from 'esbuild'
 import { getConfig } from '../utilities/getConfig'
-import { resolve, basename } from 'node:path'
+import { resolve } from 'node:path'
 import { glob } from 'glob'
 import { configDotenv } from 'dotenv'
 import type { TheoreticalEnv } from '../types/config.d.ts'
 import assert from 'node:assert'
-import { imageLoader, validExtensions } from '../plugins/imageLoader'
+import { validExtensions } from '../plugins/imageLoader'
+import defaultEsbuild from '../utilities/defaultEsbuildConfig'
 
 export async function build() {
     const config = await getConfig()
@@ -13,6 +14,16 @@ export async function build() {
     if(config.buildPath) {
         try {
             buildConfig = (await import(resolve(config.buildPath))).default
+            if(buildConfig.entryPoints) {
+                throw Error('Entry points are handled by sern.')
+            }
+            buildConfig.entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
+                //for some reason, my ignore glob wasn't registering correctly'
+                ignore: {
+                    ignored: p => p.name.endsWith('.d.ts')
+                }
+            })
+
         } catch(e) {
             throw e;
         }
@@ -49,8 +60,7 @@ export async function build() {
     try {
         await esbuild.build({ 
             ...buildConfig,
-            platform: 'node',
-            format: 'esm',
+            ...defaultEsbuild,
             tsconfigRaw: tsconfig === undefined ? JSON.stringify({ 
                moduleResolution: "node",
 	       resolveJsonModule: true,
@@ -62,20 +72,12 @@ export async function build() {
 	       strict: true,
             }) : undefined,
             tsconfig,
-            logLevel: 'info',
-            minify: false,
             define: {
                 DEV: (mode === 'development').toString(),
                 PROD:(mode === 'production').toString(),
             },
-            loader: { 
-                '.txt': 'default',
-            },
             //external: ['discord.js', '@sern/handler',],
             dropLabels: [ mode === 'production' ? 'PROD' : 'DEV' ],
-            outdir: resolve('dist'),
-
-            plugins: [imageLoader]
         })
     } catch(e) {
         console.error(e)

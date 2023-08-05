@@ -1,13 +1,11 @@
 import fs from 'fs/promises'
 import path from 'node:path'
-import { createRequire } from 'node:module'
+import { require } from '../utilities/require.js'
 import { type Plugin } from 'esbuild'
-import { } from '../utilities/getConfig'
 import { basename } from 'node:path'
 
 export const validExtensions = ['.ts','.js', '.json', '.png', '.jpg', '.jpeg', '.webp']
 
-const require = createRequire(import.meta.url)
 //https://github.com/evanw/esbuild/issues/1051
 export const imageLoader = {
     name: 'attachment-loader',
