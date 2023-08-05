@@ -4,6 +4,9 @@ export interface sernConfig {
         base: string;
         commands: string;
     };
+    scripts?: {
+        prepublish?: string;
+    }
     buildPath: string;
     rest?: Record<string, Record<string,unknown>>;
 }

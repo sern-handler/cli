@@ -46,7 +46,6 @@ export async function build() {
     assert(mode === 'development' || mode === 'production', "Mode is not `production` or `development`"); 
     console.log(...await glob(`./src/**/*.{${validExtensions.slice(3).join(',')}}`))
 
-    const pkg = require(resolve('package.json'))
     try {
         await esbuild.build({ 
             ...buildConfig,

@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 
-import { extra } from './commands/extra.js';
 import { help } from './commands/help.js';
-import { init } from './commands/init.js';
-import { publish } from './commands/publish.js';
-import { build } from './commands/build.js'
 import { Command } from 'commander';
-import { plugins } from './commands/plugins.js';
 import { yellowBright } from 'colorette';
 export const program = new Command();
 
+const importDynamic = async <T extends string>(filename: T) => import(`./commands/${filename}` as const)
 const version: string = '[VI]{{inject}}[/VI]';
 program
     .name('sern')
@@ -18,29 +14,29 @@ program
     .exitOverride(() => process.exit(0));
 
 program
-    .command(init.name)
+    .command('init')
     .description(
         `Quickest way to scaffold a new project ${yellowBright('[DEPRECATED]')}`
     )
     .option('-y', 'Finishes setup as default')
     .option('-s, --sync', 'Syncs the project and generates sern.config.json')
-    .action(init);
+    .action(async (args) => importDynamic('init.js').then(m => m.init(args)));
 
 program
-    .command(plugins.name)
+    .command('plugins')
     .description(
         'Install plugins from https://github.com/sern-handler/awesome-plugins'
     )
     .option('-n --name', 'Name of plugin')
-    .action(plugins);
+    .action(async (args) => importDynamic('plugins.js').then(m => m.plugins(args)));
 
 program
-    .command(extra.name)
+    .command('extra')
     .description('Easy way to add extra things in your sern project')
-    .action(extra);
+    .action(async args => importDynamic('extra').then(m => m.extra(args)));
 
 program
-    .command(publish.name)
+    .command('publish')
     .description('Manage your slash commands')
     .option('-a, --all', 'Publish all commands')
     .option('-t, --token [token]')
@@ -50,12 +46,12 @@ program
         'glob pattern that will locate all published files',
         '<<none>>'
     )
-    .action(publish);
+    .action(async args => importDynamic('publish.js').then(m => m.publish(args)));
 
 program 
-    .command(build.name)
+    .command('build')
     .description('Build your bot')
-    .action(build)
+    .action(async args => importDynamic('build.js').then(m => m.build(args)))
 
 
 program.parse();

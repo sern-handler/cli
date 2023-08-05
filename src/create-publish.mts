@@ -8,7 +8,7 @@ import { pathExistsSync } from 'find-up';
 import assert from 'assert'
 import * as Rest from './rest'
 import type { Config, PublishableData, PublishableModule } from './create-publish.d.ts';
-import type { sernConfig } from './types/config.d.ts';
+import type { TheoreticalEnv, sernConfig } from './types/config.d.ts';
 import { readPaths } from './utilities/readPaths.js';
 const args = process.argv.slice(2);
 
