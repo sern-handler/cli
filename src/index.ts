@@ -42,13 +42,12 @@ program
 program
     .command(publish.name)
     .description('New way to manage your slash commands')
-    .option('-a, --all', 'Publish all commands')
+    .option('-i, --import [scriptPath...]', 'Prerequire a script to load into publisher. Need node version 19 >=')
     .option('-t, --token [token]')
     .option('--appId [applicationId]')
     .argument(
-        '[pattern]',
+        '[path]',
         'glob pattern that will locate all published files',
-        '<<none>>'
     )
     .action(publish);
 

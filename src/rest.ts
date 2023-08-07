@@ -24,7 +24,6 @@ export const create = (appid: string, token: string) => {
 
         putGuildCommands: (guildId: string, guildCommand: any) => {
             const guildCommandURL = new URL(`${appid}/guilds/${guildId}/commands`, baseURL)
-            console.log(guildCommand)
             return fetch(guildCommandURL,
                 { method: 'PUT', body: JSON.stringify(guildCommand), headers }
             )

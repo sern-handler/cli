@@ -16,9 +16,10 @@ export async function getConfig(): Promise<sernConfig> {
 
 export interface sernConfig {
     language: 'typescript' | 'javascript';
+    defaultPrefix?: string;
     paths: {
         base: string;
         commands: string;
+        events?: string;
     };
-    rest?: Record<string, Record<string,unknown>>;
 }

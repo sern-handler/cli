@@ -3,9 +3,10 @@
  */
 
 import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
-import { join, basename, extname, resolve } from 'node:path';
+import { join, basename, extname, resolve, format, parse } from 'node:path';
 import { pathExistsSync } from 'find-up';
 import assert from 'assert'
+import { once } from 'node:events'
 import * as Rest from './rest'
 import type { sernConfig } from './utilities/getConfig';
 import type { Config, PublishableData, PublishableModule } from './create-publish.d.ts';
@@ -56,25 +57,20 @@ async function* readPaths(
         throw err;
     }
 }
+
+
 //recieved sern config
-const config = await new Promise<sernConfig>((resolve) => {
-        process.once('message', resolve);
-    }),
-    { paths } = config;
+const [{ config, preloads, commandDir }] = await once(process, 'message'),
+      { paths } = config as sernConfig;
 
-const publishAll = process.env.all === 'T';
-
-if (publishAll && process.env.pattern !== '<<none>>') {
-    throw Error('--all flag and pattern argument are mutually exclusive');
+for(const preload of preloads) {
+    await import('file:///'+resolve(preload))
 }
-
-console.debug('all:', publishAll);
-console.debug('pattern:', process.env.pattern);
-
 //Where the actual script starts running
 //assert(process.env.DISCORD_TOKEN, 'Could not find token');
 //assert(process.env.APP_ID, 'Could not find application id');
-const filePaths = readPaths(resolve(paths.base, paths.commands), true);
+const commandsPath = resolve(commandDir) ?? resolve(paths.base, paths.commands)
+const filePaths = readPaths(commandsPath, true);
 
 const modules = [];
 const publishable = 0b1110;
@@ -158,25 +154,10 @@ const makePublishData = ( { commandModule, config }: Record<string, Record<strin
     };
 };
 
-const publishablesIntoJson = (ps : PublishableModule[]) => 
-    JSON.stringify(ps.map(module => module.data), (key, value) => (excludedKeys.has(key) ? undefined : value), 4)
 // We can use these objects to publish to DAPI
-const publishableData = modules.map(makePublishData);
-const excludedKeys = new Set(['command', 'absPath']);
-
-const dotenv = await import('dotenv')
-
-interface TheoreticalEnv {
-    DISCORD_TOKEN: string
-    APPLICATION_ID: string,
-    [name: string]: string
-}
-
-const env = dotenv.parse<TheoreticalEnv>(await readFile(resolve('.env')))
-
-
-const token = env.DISCORD_TOKEN ?? process.env.token;
-const appid = env.APPLICATION_ID ?? process.env.applicationId;
+const publishableData = modules.map(makePublishData),
+      token = process.env.DISCORD_TOKEN ?? process.env.token, 
+      appid = process.env.APPLICATION_ID ?? process.env.applicationId;
 
 assert(
     token,
