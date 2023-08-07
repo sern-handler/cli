@@ -2,15 +2,15 @@
  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
  */
 
-import { readdir, stat, mkdir, writeFile, readFile } from 'fs/promises';
-import { join, basename, extname, resolve, format, parse } from 'node:path';
+import { readdir, stat, mkdir, writeFile } from 'fs/promises';
+import { join, basename, extname, resolve } from 'node:path';
 import { pathExistsSync } from 'find-up';
 import assert from 'assert'
 import { once } from 'node:events'
 import * as Rest from './rest'
 import type { sernConfig } from './utilities/getConfig';
 import type { Config, PublishableData, PublishableModule } from './create-publish.d.ts';
-const args = process.argv.slice(2);
+const args = process.argv.slice(3);
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
     return {
@@ -62,16 +62,14 @@ async function* readPaths(
 //recieved sern config
 const [{ config, preloads, commandDir }] = await once(process, 'message'),
       { paths } = config as sernConfig;
-
 for(const preload of preloads) {
     await import('file:///'+resolve(preload))
 }
 //Where the actual script starts running
 //assert(process.env.DISCORD_TOKEN, 'Could not find token');
 //assert(process.env.APP_ID, 'Could not find application id');
-const commandsPath = resolve(commandDir) ?? resolve(paths.base, paths.commands)
+const commandsPath = commandDir ? resolve(commandDir) : resolve(paths.base, paths.commands)
 const filePaths = readPaths(commandsPath, true);
-
 const modules = [];
 const publishable = 0b1110;
 for await (const absPath of filePaths) {
@@ -254,5 +252,5 @@ await writeFile(
     'utf8'
 );
 
-
+console.log('View json output in '+resolve(cacheDir, 'command-data-remote.json'));
 process.exit(0);

@@ -39,16 +39,23 @@ program
     .description('Easy way to add extra things in your sern project')
     .action(extra);
 
+
+
+
 program
-    .command(publish.name)
-    .description('New way to manage your slash commands')
-    .option('-i, --import [scriptPath...]', 'Prerequire a script to load into publisher. Need node version 19 >=')
-    .option('-t, --token [token]')
-    .option('--appId [applicationId]')
-    .argument(
-        '[path]',
-        'glob pattern that will locate all published files',
-    )
-    .action(publish);
+    .command('command')
+    .description('Defacto way to manage your slash commands')
+    .addCommand( 
+        program
+            .command(publish.name)
+            .description('New way to manage your slash commands')
+            .option('-i, --import [scriptPath...]', 'Prerequire a script to load into publisher')
+            .option('-t, --token [token]')
+            .option('--appId [applicationId]')
+            .argument(
+                '[path]',
+                'path with respect to current working directory that will locate all published files',
+            )
+            .action(publish))
 
 program.parse();
