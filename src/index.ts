@@ -8,6 +8,7 @@ import { publish } from './commands/publish.js';
 import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
 import { yellowBright } from 'colorette';
+import { list } from './commands/list.js';
 export const program = new Command();
 
 const version: string = '[VI]{{inject}}[/VI]';
@@ -43,7 +44,7 @@ program
 
 
 program
-    .command('command')
+    .command('commands')
     .description('Defacto way to manage your slash commands')
     .addCommand( 
         program
