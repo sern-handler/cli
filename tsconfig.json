@@ -1,18 +1,18 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"outDir": "dist",
-		"rootDir": ".",
-		"declaration": true,
-		"declarationMap": true,
-		"strict": true,
-		"esModuleInterop": true,
-		"noImplicitAny": true,
-		"strictNullChecks": true,
-		"verbatimModuleSyntax": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
-	}
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "outDir": "dist",
+        "rootDir": ".",
+        "declaration": true,
+        "declarationMap": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "verbatimModuleSyntax": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    }
 }
