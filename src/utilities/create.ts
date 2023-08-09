@@ -15,17 +15,10 @@ const extraFolder = fileURLToPath(extraURL);
  * @param  location - The location of the file to be created.
  * @param  no_ext - If true, the file will be created without an extension.
  */
-export async function create(
-    name: string,
-    lang: string,
-    location: string,
-    no_ext: boolean
-) {
+export async function create(name: string, lang: string, location: string, no_ext: boolean) {
     const file = `${name}.${lang}.sern`;
 
-    const target = no_ext
-        ? `${location}/${name}`
-        : `${location}/${name}.${lang}`;
+    const target = no_ext ? `${location}/${name}` : `${location}/${name}.${lang}`;
 
     return createFile(file, target);
 }

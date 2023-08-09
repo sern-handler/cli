@@ -3,15 +3,7 @@ import { execa } from 'execa';
 import { findUp } from 'find-up';
 import ora from 'ora';
 import prompt from 'prompts';
-import {
-    cmds_dir,
-    gitInit,
-    lang,
-    main_dir,
-    name,
-    skip_install_dep,
-    which_manager,
-} from '../prompts/init.js';
+import { cmds_dir, gitInit, lang, main_dir, name, skip_install_dep, which_manager } from '../prompts/init.js';
 
 import { writeFile } from 'fs/promises';
 import { editDirs, editMain } from '../utilities/edits.js';
@@ -21,13 +13,7 @@ import type { PackageManagerChoice } from '../utilities/types.js';
 
 /** @deprecated Use npm create instead */
 export async function init(flags: Flags) {
-    console.log(
-        `${yellowBright(
-            '[WARN]:'
-        )} This command is deprecated, use ${greenBright(
-            'npm create @sern/bot'
-        )} instead`
-    );
+    console.log(`${yellowBright('[WARN]:')} This command is deprecated, use ${greenBright('npm create @sern/bot')} instead`);
 
     let data: PromptData;
     let git_init = true; // the default;
@@ -87,9 +73,7 @@ export async function init(flags: Flags) {
     if (pm === 'both') {
         choice = (await prompt([which_manager])).manager;
     } else {
-        choice = (
-            (await prompt([skip_install_dep])).skip_install_dep ? pm : 'skip'
-        ) as PackageManagerChoice;
+        choice = ((await prompt([skip_install_dep])).skip_install_dep ? pm : 'skip') as PackageManagerChoice;
     }
 
     await installDeps(choice, data.name);
@@ -112,13 +96,7 @@ async function git(data: Data) {
         await wait(300);
         spin.succeed('Git initialized!');
     } catch (error) {
-        spin.fail(
-            `${redBright(
-                'Failed'
-            )} to initialize git!\nTry to install it at ${underline(
-                'https://git-scm.com'
-            )}\nSkipping for now.`
-        );
+        spin.fail(`${redBright('Failed')} to initialize git!\nTry to install it at ${underline('https://git-scm.com')}\nSkipping for now.`);
     }
 }
 
