@@ -29,7 +29,7 @@ export const create = (appid: string, token: string) => {
             return fetch(guildCommandURL, { headers });
         },
 
-        putGuildCommands: (guildId: string, guildCommand: any) => {
+        putGuildCommands: (guildId: string, guildCommand: unknown) => {
             const guildCommandURL = new URL(`${appid}/guilds/${guildId}/commands`, baseURL);
             return fetch(guildCommandURL, {
                 method: 'PUT',
