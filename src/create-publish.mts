@@ -144,8 +144,8 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
 
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData),
-    token = process.env.DISCORD_TOKEN ?? process.env.token,
-    appid = process.env.APPLICATION_ID ?? process.env.applicationId;
+    token = process.env.token || process.env.DISCORD_TOKEN,
+    appid = process.env.applicationId || process.env.APPLICATION_ID;
 
 assert(token, 'Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?');
 assert(appid, 'Could not find an application id for this bot in .env or commandline. Do you have APPLICATION_ID in env?');
