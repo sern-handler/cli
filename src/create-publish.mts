@@ -2,60 +2,92 @@
  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
  */
 
-import { mkdir, writeFile, readFile } from 'fs/promises';
-import { basename, resolve } from 'node:path';
+import { readdir, stat, mkdir, writeFile } from 'fs/promises';
+import { join, basename, extname, resolve } from 'node:path';
 import { pathExistsSync } from 'find-up';
-import assert from 'assert'
-import * as Rest from './rest'
-import type { Config, PublishableData, PublishableModule } from './create-publish.d.ts';
-import type { TheoreticalEnv, sernConfig } from './types/config.d.ts';
-import { readPaths } from './utilities/readPaths.js';
-const args = process.argv.slice(2);
+import assert from 'assert';
+import { once } from 'node:events';
+import * as Rest from './rest';
+import type { sernConfig } from './utilities/getConfig';
+import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
+import { cyanBright, greenBright, redBright } from 'colorette';
+import ora from 'ora';
+import type { TheoreticalEnv } from './types/config';
 
-
-//recieved sern config
-const config = await new Promise<sernConfig>((resolve) => {
-        process.once('message', resolve);
-    }),
-    { paths } = config;
-
-const publishAll = process.env.all === 'T';
-
-if (publishAll && process.env.pattern !== '<<none>>') {
-    throw Error('--all flag and pattern argument are mutually exclusive');
+async function deriveFileInfo(dir: string, file: string) {
+    const fullPath = join(dir, file);
+    return {
+        fullPath,
+        fileStats: await stat(fullPath),
+        base: basename(file),
+    };
 }
 
-console.debug('all:', publishAll);
-console.debug('pattern:', process.env.pattern);
+function isSkippable(filename: string) {
+    // empty string is for non extension files (directories)
+    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
+    return filename[0] === '!' || !validExtensions.includes(extname(filename));
+}
 
-//Where the actual script starts running
-//assert(process.env.DISCORD_TOKEN, 'Could not find token');
-//assert(process.env.APP_ID, 'Could not find application id');
-const filePaths = readPaths(resolve(paths.base, paths.commands), true);
+async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<string> {
+    try {
+        const files = await readdir(dir);
+        for (const file of files) {
+            const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
 
+            if (fileStats.isDirectory()) {
+                // TODO: refactor so that i dont repeat myself for files (line 71)
+                if (isSkippable(base)) {
+                    if (shouldDebug) console.info(`ignored directory: ${fullPath}`);
+                } else {
+                    yield* readPaths(fullPath, shouldDebug);
+                }
+            } else {
+                if (isSkippable(base)) {
+                    if (shouldDebug) console.info(`ignored: ${fullPath}`);
+                } else {
+                    yield 'file:///' + fullPath;
+                }
+            }
+        }
+    } catch (err) {
+        throw err;
+    }
+}
+
+// recieved sern config
+const [{ config, preloads, commandDir }] = await once(process, 'message'),
+    { paths } = config as sernConfig;
+for (const preload of preloads) {
+    await import('file:///' + resolve(preload));
+}
+
+const commandsPath = commandDir ? resolve(commandDir) : resolve(paths.base, paths.commands);
+const filePaths = readPaths(commandsPath, true);
 const modules = [];
-const publishable = 0b1110;
+const PUBLISHABLE = 0b1110;
+
 for await (const absPath of filePaths) {
-    let mod = await import(absPath)
+    let mod = await import(absPath);
     let commandModule = mod.default;
     let config = mod.config;
+
     if ('default' in commandModule) {
         commandModule = commandModule.default;
     }
-    if(typeof config === 'function') {
-        config = config(absPath, commandModule)
+
+    if (typeof config === 'function') {
+        config = config(absPath, commandModule);
     }
+
     try {
         commandModule = commandModule.getInstance();
     } catch {}
 
-    if ((publishable & commandModule.type) != 0) {
+    if ((PUBLISHABLE & commandModule.type) != 0) {
         // assign defaults
         const filename = basename(absPath);
-        const filenameNoExtension = filename.substring(
-            0,
-            filename.lastIndexOf('.')
-        );
+        const filenameNoExtension = filename.substring(0, filename.lastIndexOf('.'));
         commandModule.name ??= filenameNoExtension;
         commandModule.description ??= '';
         commandModule.absPath = absPath;
@@ -65,13 +97,11 @@ for await (const absPath of filePaths) {
 
 const cacheDir = resolve('./.sern');
 if (!pathExistsSync(cacheDir)) {
-    console.log('Making .sern directory: ', cacheDir);
+    // TODO: add this in verbose flag
+    // console.log('Making .sern directory: ', cacheDir);
     await mkdir(cacheDir);
 }
 
-interface Typeable {
-    type: number;
-}
 const optionsTransformer = (ops: Array<Typeable>) => {
     return ops.map((el) => {
         if ('command' in el) {
@@ -80,7 +110,7 @@ const optionsTransformer = (ops: Array<Typeable>) => {
         }
         return el;
     });
-}
+};
 
 const intoApplicationType = (type: number) => {
     if (type === 3) {
@@ -91,15 +121,13 @@ const intoApplicationType = (type: number) => {
 
 const makeDescription = (type: number, desc: string) => {
     if (type !== 1 && desc !== '') {
-        console.warn(
-            'Found context menu that has non empty description field. Implictly publishing with empty description'
-        );
+        console.warn('Found context menu that has non empty description field. Implictly publishing with empty description');
         return '';
     }
     return desc;
 };
 
-const makePublishData = ( { commandModule, config }: Record<string, Record<string,unknown>>) => {
+const makePublishData = ({ commandModule, config }: Record<string, Record<string, unknown>>) => {
     const applicationType = intoApplicationType(commandModule.type as number);
     return {
         data: {
@@ -109,119 +137,107 @@ const makePublishData = ( { commandModule, config }: Record<string, Record<strin
             absPath: commandModule.absPath as string,
             options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
             dm_permission: config?.dmPermission,
-            default_member_permissions: config?.defaultMemberPermissions ?? null
+            default_member_permissions: config?.defaultMemberPermissions ?? null,
         },
-        config 
+        config,
     };
 };
 
-const publishablesIntoJson = (ps : PublishableModule[]) => 
-    JSON.stringify(ps.map(module => module.data), (key, value) => (excludedKeys.has(key) ? undefined : value), 4)
 // We can use these objects to publish to DAPI
-const publishableData = modules.map(makePublishData);
-const excludedKeys = new Set(['command', 'absPath']);
+const publishableData = modules.map(makePublishData),
+    token = process.env.token || process.env.DISCORD_TOKEN,
+    appid = process.env.applicationId || process.env.APPLICATION_ID;
 
-const dotenv = await import('dotenv')
-const env = dotenv.parse<TheoreticalEnv>(await readFile(resolve('.env')))
+assert(token, 'Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?');
+assert(appid, 'Could not find an application id for this bot in .env or commandline. Do you have APPLICATION_ID in env?');
 
-
-const token = env.DISCORD_TOKEN ?? process.env.token;
-const appid = env.APPLICATION_ID ?? process.env.applicationId;
-
-assert(
-    token,
-    "Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?"
-)
-assert(
-    appid, 
-    "Could not find an application id for this bot in .env or commandline. Do you have APPLICATION_ID in env?"
-)
-
-
-//partition globally published and guilded commands
+// partition globally published and guilded commands
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
-        const isPublishableGlobally = !module.config || !Array.isArray(module.config.guildIds)
-        if(isPublishableGlobally) {
-            return [[module , ...globals], guilded];
-        } 
+        const isPublishableGlobally = !module.config || !Array.isArray(module.config.guildIds);
+        if (isPublishableGlobally) {
+            return [[module, ...globals], guilded];
+        }
         return [globals, [module, ...guilded]];
+    },
+    [[], []] as [PublishableModule[], PublishableModule[]]
+);
 
-    }, [[], []] as [PublishableModule[], PublishableModule[]]);
-console.log('publishing global commands')
+const spin = ora(`Publishing ${cyanBright('Global')} commands`);
 
+globalCommands.length && spin.start();
 
 const rest = Rest.create(appid, token);
 const res = await rest.updateGlobal(globalCommands);
 
-let globalCommandsResponse;
+let globalCommandsResponse: unknown;
 
-if(res.ok) {
-    console.log('All global commands published')
-    globalCommandsResponse = await res.json()
+if (res.ok) {
+    spin.succeed(`All ${cyanBright('Global')} commands published`);
+    globalCommandsResponse = await res.json();
 } else {
-    console.error('code: ', res.status)
-    if(res.status === 429) {
-        throw Error("Chill out homie, too many requests")
+    spin.fail(`Failed to publish global commands [Code: ${redBright(res.status)}]`);
+    if (res.status === 429) {
+        throw Error('Chill out homie, too many requests');
     }
-    console.error('errors:', await res.json()
-        .then(res => {
-            const errors = Object.values(res.errors)
-            //@ts-ignore
-            return errors.map(err => err?.name?._errors);
-        }))
-    console.error(res.statusText)
-    throw Error("Failed to published global commands")
+    console.error(
+        'errors:',
+        await res.json().then((res) => {
+            const errors = Object.values(res.errors);
+            // @ts-ignore
+            return errors.map((err) => err?.name?._errors);
+        })
+    );
+    console.error(res.statusText);
 }
 
-function associateGuildIdsWithData(data: {
-  data: PublishableData;
-  config?: Config;
-}[]): Map<string, PublishableData[]> {
-  const guildIdMap: Map<string, PublishableData[]> = new Map();
+function associateGuildIdsWithData(data: PublishableModule[]): Map<string, PublishableData[]> {
+    const guildIdMap: Map<string, PublishableData[]> = new Map();
 
-  data.forEach((entry) => {
-    const { data, config } = entry;
-    const { guildIds } = config || {};
+    data.forEach((entry) => {
+        const { data, config } = entry;
+        const { guildIds } = config || {};
 
-    if (guildIds) {
-      guildIds.forEach((guildId) => {
-        if (guildIdMap.has(guildId)) {
-          guildIdMap.get(guildId)?.push(data);
-        } else {
-          guildIdMap.set(guildId, [data]);
+        if (guildIds) {
+            guildIds.forEach((guildId) => {
+                if (guildIdMap.has(guildId)) {
+                    guildIdMap.get(guildId)?.push(data);
+                } else {
+                    guildIdMap.set(guildId, [data]);
+                }
+            });
         }
-      });
-    }
-  });
+    });
 
-  return guildIdMap;
+    return guildIdMap;
 }
 const guildCommandMap = associateGuildIdsWithData(guildedCommands);
 
 let guildCommandMapResponse = new Map<string, Record<string, unknown>>();
 
-for(const [guildId, array] of guildCommandMap.entries()) {
-    console.log('Updating commands for guild', guildId)
 
-    const response = await rest.putGuildCommands(guildId, array)
-    if(res.ok) {
-        guildCommandMapResponse.set(guildId, await response.json())
+for (const [guildId, array] of guildCommandMap.entries()) {
+    const spin = ora(`[${cyanBright(guildId)}] Updating commands for guild`);
+    spin.start();
+
+    const response = await rest.putGuildCommands(guildId, array);
+    const result = await response.json();
+
+    if (response.ok) {
+        guildCommandMapResponse.set(guildId, result);
+        spin.succeed(`[${greenBright(guildId)}] Successfully updated commands for guild`);
     } else {
-        throw Error(await res.json())
+        spin.fail(`[${redBright(guildId)}] Failed to update commands for guild, Reason: ${result.message}`);
+        throw Error(result.message);
     }
-    
 }
 const remoteData = {
     global: globalCommandsResponse,
-    ...Object.fromEntries(guildCommandMapResponse)
-}
+    ...Object.fromEntries(guildCommandMapResponse),
+};
 
-await writeFile(
-    resolve(cacheDir, 'command-data-remote.json'),
-    JSON.stringify(remoteData, null, 4),
-    'utf8'
-);
+await writeFile(resolve(cacheDir, 'command-data-remote.json'), JSON.stringify(remoteData, null, 4), 'utf8');
 
-
+// TODO: add this in a verbose flag
+// console.info('View json output in ' + resolve(cacheDir, 'command-data-remote.json'));
 process.exit(0);

@@ -16,8 +16,12 @@ async function gimmechoices(): Promise<Choice[]> {
     const link = `https://api.github.com/repos/sern-handler/awesome-plugins/contents/${lang}`;
 
     const resp = await fetch(link).catch(() => null);
+<<<<<<< HEAD
     if (!resp)
         return [{ title: 'No plugins found!', value: '', disabled: true }];
+=======
+    if (!resp) return [{ title: 'No plugins found!', value: '', disabled: true }];
+>>>>>>> main
 
     const data = (await resp.json()) as Data[];
     const choices = data.map((e) => ({

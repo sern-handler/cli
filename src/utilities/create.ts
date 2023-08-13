@@ -2,8 +2,9 @@ import { mkdir, readFile, writeFile } from 'fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, URL } from 'url';
 const root = new URL('../../', import.meta.url);
-
-const templates = new URL('./templates/', root);
+const sern = new URL('./@sern/', root);
+const cli = new URL('./cli/', sern);
+const templates = new URL('./templates/', cli);
 const extraURL = new URL('./extra/', templates);
 const extraFolder = fileURLToPath(extraURL);
 
@@ -14,17 +15,11 @@ const extraFolder = fileURLToPath(extraURL);
  * @param  location - The location of the file to be created.
  * @param  no_ext - If true, the file will be created without an extension.
  */
-export async function create(
-    name: string,
-    lang: string,
-    location: string,
-    no_ext: boolean
-) {
+
+export async function create(name: string, lang: string, location: string, no_ext: boolean) {
     const file = `${name}.${lang}.sern`;
 
-    const target = no_ext
-        ? `${location}/${name}`
-        : `${location}/${name}.${lang}`;
+    const target = no_ext ? `${location}/${name}` : `${location}/${name}.${lang}`;
 
     return createFile(file, target);
 }

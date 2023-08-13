@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0](https://github.com/sern-handler/cli/compare/v0.5.1...v0.6.0) (2023-08-09)
+
+
+### Features
+
+* publish command ([#105](https://github.com/sern-handler/cli/issues/105)) ([827ffb7](https://github.com/sern-handler/cli/commit/827ffb7ad9252e3cda257bed1febdca2da03e253))
+
+
+### Bug Fixes
+
+* change file path for sern/extras ([#109](https://github.com/sern-handler/cli/issues/109)) ([2348e3e](https://github.com/sern-handler/cli/commit/2348e3e9ab055fddab3f44d574af79fd7ccd4485))
+
+
+### Miscellaneous Chores
+
+* release 0.6.0 ([642bf11](https://github.com/sern-handler/cli/commit/642bf11608cf5d9b4256999e3bdb48e762ca88ee))
+
 ## [0.5.1](https://github.com/sern-handler/cli/compare/v0.5.0...v0.5.1) (2023-06-16)
 
 

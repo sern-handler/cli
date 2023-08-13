@@ -36,8 +36,7 @@ export const cmds_dir: PromptObject = {
     name: 'cmds_dir',
     type: 'text',
     initial: 'commands',
-    validate: (dir: string) =>
-        dir === 'src' ? 'You can not use src as a directory' : true,
+    validate: (dir: string) => (dir === 'src' ? 'You can not use src as a directory' : true),
 };
 
 export const npmInit: PromptObject = {
@@ -89,8 +88,5 @@ export const name: PromptObject = {
     message: 'What is your project name?',
     name: 'name',
     type: 'text',
-    validate: (name: string) =>
-        name.match('^(?:@[a-z0-9-*~][a-z0-9-*._~]*/)?[a-z0-9-~][a-z0-9-._~]*$')
-            ? true
-            : 'Invalid name',
+    validate: (name: string) => (name.match('^(?:@[a-z0-9-*~][a-z0-9-*._~]*/)?[a-z0-9-~][a-z0-9-._~]*$') ? true : 'Invalid name'),
 };

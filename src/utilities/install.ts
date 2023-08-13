@@ -50,18 +50,11 @@ export async function installDeps(choice: PackageManagerChoice, name: string) {
  */
 export async function cloneRepo(lang: string, name: string) {
     try {
-        await execa('git', [
-            'clone',
-            `https://github.com/sern-handler/templates.git`,
-        ]);
+        await execa('git', ['clone', `https://github.com/sern-handler/templates.git`]);
         copyRecursiveSync(`templates/templates/${lang}`, name);
         fs.rmSync(`templates/`, { recursive: true, force: true });
     } catch (error) {
-        console.log(
-            `${redBright(
-                '✖ Failed'
-            )} to clone github templates repo. Install git and try again!`
-        );
+        console.log(`${redBright('✖ Failed')} to clone github templates repo. Install git and try again!`);
         process.exit(1);
     }
 }
@@ -83,10 +76,7 @@ export function copyRecursiveSync(src: string, dest: string) {
         fs.mkdirSync(dest);
 
         fs.readdirSync(src).forEach(function (childItemName) {
-            copyRecursiveSync(
-                path.join(src, childItemName),
-                path.join(dest, childItemName)
-            );
+            copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
         });
     } else {
         fs.copyFileSync(src, dest);

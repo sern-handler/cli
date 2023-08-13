@@ -74,10 +74,7 @@ export async function editDirs(
     const newfold = ext === 'ts' ? 'dist' : srcName;
 
     const regex = new RegExp(`commands: '${oldfold}/commands'`);
-    const edit = output.replace(
-        regex,
-        `commands: '${newfold}/${cmds_dirName}'`
-    );
+    const edit = output.replace(regex, `commands: '${newfold}/${cmds_dirName}'`);
 
     return writeFile(index, edit);
 }
