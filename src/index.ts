@@ -33,7 +33,7 @@ program
 program
     .command('extra')
     .description('Easy way to add extra things in your sern project')
-    .action((...args) => importDynamic('extra').then(m => m.extra(...args)));
+    .action((...args) => importDynamic('extra.js').then(m => m.extra(...args)));
 
 program //
     .command('commands')
