@@ -1,12 +1,16 @@
 import esbuild from 'esbuild'
 import { getConfig } from '../utilities/getConfig'
-import { resolve } from 'node:path'
+import { resolve, join } from 'node:path'
 import { glob } from 'glob'
 import { configDotenv } from 'dotenv'
 import type { TheoreticalEnv } from '../types/config.d.ts'
 import assert from 'node:assert'
 import { imageLoader, validExtensions } from '../plugins/imageLoader'
 import defaultEsbuild from '../utilities/defaultEsbuildConfig'
+import { require } from '../utilities/require'
+import { pathExists } from 'find-up'
+import { mkdir, writeFile } from 'fs/promises'
+import { StringWriter } from '../utilities/preprocessor'
 
 export async function build() {
     const sernConfig = await getConfig()
@@ -79,8 +83,24 @@ export async function build() {
         }
     }
     tsconfig && console.log('Using default options for tsconfig', defaultTsConfig)
+    const tsconfigRaw = tsconfig ? require(tsconfig) : defaultTsConfig;
 
+    tsconfigRaw && !tsconfigRaw.extends && console.warn('tsconfig does not contain an "extends". Will not use sern automatic path aliasing')
+    const sernDir = resolve('.sern'),
+          genDir = resolve(sernDir, 'generated'),
+          ambientFile = resolve(sernDir, 'ambient.d.ts')
+
+    if(!(await pathExists(genDir))) {
+        console.log('Making .sern/generated dir, does not exist')
+        await mkdir(sernDir) 
+    }
+    
     try {
+        const define = {
+                ...buildConfig.define ?? {},
+                __DEV__: `${mode === 'development'}`,
+                __PROD__: `${mode === 'production'}`,
+        }
         //https://esbuild.github.io/content-types/#tsconfig-json
         await esbuild.build({ 
             ...buildConfig,
@@ -88,13 +108,25 @@ export async function build() {
             ...defaultEsbuild('esm'),
             tsconfigRaw: tsconfig === undefined ? JSON.stringify(defaultTsConfig) : undefined,
             tsconfig,
-            define: {
-                ...buildConfig.define ?? {},
-                DEV: (mode === 'development').toString(),
-                PROD:(mode === 'production').toString(),
-            },
+            define,
             dropLabels: [ mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels??[]],
         })
+        
+        const fileContent = new StringWriter()
+        for(const [k,v] of Object.entries(define)) {
+            fileContent.varDecl(k,v)
+        }
+        fileContent.println('declare namespace NodeJS {') 
+        fileContent.tab()
+        fileContent.println('interface ProcessEnv {')
+        fileContent.envFields(process.env)
+
+        fileContent.tab()
+        fileContent.println('}')
+
+        fileContent.println('}')
+        
+        await writeFile(ambientFile, fileContent.build(), 'utf8')
     } catch(e) {
         console.error(e)
         process.exit(1)
