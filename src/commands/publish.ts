@@ -6,7 +6,7 @@ export async function publish(commandDir: string | undefined, args: Partial<Publ
     const config = await getConfig();
     // pass in args into the command.
     const rootPath = new URL('../', import.meta.url),
-        publishScript = new URL('./dist/create-publish.js', rootPath);
+        publishScript = new URL('../dist/create-publish.js', rootPath);
     // assign args.import to empty array if non existent
     args.import ??= [];
 
@@ -14,8 +14,8 @@ export async function publish(commandDir: string | undefined, args: Partial<Publ
     args.applicationId && console.info('applicationId passed through command line');
     commandDir && console.info('Publishing with override path: ', commandDir);
 
-    const dotenvLocation = new URL('./node_modules/dotenv/config.js', rootPath),
-        esmLoader = new URL('./node_modules/@esbuild-kit/esm-loader/dist/index.js', rootPath);
+    const dotenvLocation = new URL('../node_modules/dotenv/config.js', rootPath),
+        esmLoader = new URL('../node_modules/@esbuild-kit/esm-loader/dist/index.js', rootPath);
 
     // We dynamically load the create-publish script in a child process so that we can pass the special
     // loader flag to require typescript files

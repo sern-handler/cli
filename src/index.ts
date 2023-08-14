@@ -5,11 +5,12 @@ import { yellowBright } from 'colorette';
 export const program = new Command();
 
 const importDynamic = async <T extends string>(filename: T) => import(`./commands/${filename}` as const)
-const version: string = '[VI]{{inject}}[/VI]';
+declare const __VERSION__: string
+
 program
     .name('sern')
     .description(await importDynamic('help.js').then(m => m.help))
-    .version(`sern CLI v${version}`, '-v, --version')
+    .version(`sern CLI v${__VERSION__}`, '-v, --version')
     .exitOverride(() => process.exit(0));
 
 program

@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsup';
-import { esbuildPluginVersionInjector } from 'esbuild-plugin-version-injector';
+import { createRequire } from 'node:module'
 const shared = {
     entry: ['src/index.ts', 'src/create-publish.mts', 'src/commands/**'],
     clean: true,
@@ -12,8 +12,11 @@ export default defineConfig({
     outDir: './dist',
     treeshake: true,
     bundle: true,
-    esbuildPlugins: [esbuildPluginVersionInjector()],
+    esbuildPlugins: [],
     platform: 'node',
     splitting: true,
+    define: {
+        __VERSION__: `"${createRequire(import.meta.url)('./package.json').version}"`
+    },
     ...shared,
 });

@@ -21,4 +21,5 @@ export interface sernConfig {
         commands: string;
         events?: string;
     };
+    buildPath: string
 }

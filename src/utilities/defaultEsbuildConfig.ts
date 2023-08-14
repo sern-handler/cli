@@ -1,13 +1,11 @@
 import type esbuild from 'esbuild'
 import { resolve } from 'path'
-import { imageLoader } from '../plugins/imageLoader'
-export default {
+
+export default (format: 'cjs' | 'esm') => ({
     platform: 'node',
-    format: 'esm',
+    format,
     logLevel: 'info',
     minify: false,
     outdir: resolve('dist'),
-    plugins: [imageLoader]
 
-
-} satisfies esbuild.BuildOptions
+} satisfies esbuild.BuildOptions)
