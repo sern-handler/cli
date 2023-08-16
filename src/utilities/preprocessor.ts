@@ -17,8 +17,45 @@ const determineJSONType = (s : string) => {
     return typeof JSON.parse(s)
 }
 
+type FileWriter = (path: string, content: string, format: BufferEncoding) => Promise<void>;
+const writeAmbientFile = async (
+    path: string,
+    define: Record<string, string>,
+    writeFile: FileWriter
+) => {
+    const fileContent = new StringWriter()
+    for(const [k,v] of Object.entries(define)) {
+        fileContent.varDecl(k,v)
+    }
+    fileContent
+        .println('declare namespace NodeJS {') 
+        .tab()
+        .println('interface ProcessEnv {')
+        .envFields(process.env)
+        .tab()
+        .println('}')
+        .println('}')
+        
+    await writeFile(path, fileContent.build(), 'utf8')
+}
 
-export class StringWriter {
+const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: FileWriter) => {
+    //maybe better way to do this
+    const target = format === 'esm' ? { target: 'esnext' } : {};   
+    const sernTsConfig = {
+        "compilerOptions": {
+            "moduleResolution": "bundler",
+            "strict": true, 
+            ...target,
+            "rootDirs": ["./generated", "../src"]
+        },
+        "include": ["./ambient.d.ts", "../src"]
+    }
+
+    await fw(configPath, JSON.stringify(sernTsConfig, null, 3), 'utf8')
+
+}
+class StringWriter {
     private fileString = "" 
 
     tab() {
@@ -54,3 +91,5 @@ export class StringWriter {
     }
 
 }
+
+export { writeAmbientFile, writeTsConfig }
