@@ -41,6 +41,7 @@ program //
     .addCommand(
         new Command('publish')
             .description('New way to manage your slash commands')
+            .option('-W --suppress-warnings', 'suppress experimental warning')
             .option('-i, --import [scriptPath...]', 'Prerequire a script to load into publisher')
             .option('-t, --token [token]')
             .option('--appId [applicationId]')
@@ -51,6 +52,7 @@ program //
 program 
     .command('build')
     .description('Build your bot')
+    .option('-W --suppress-warnings', 'suppress experimental warning')
     .action(async (...args) => importDynamic('build.js').then(m => m.build(...args)))
 
 program.parse();

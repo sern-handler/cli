@@ -1,8 +1,13 @@
+import { magentaBright } from 'colorette';
 import { getConfig } from '../utilities/getConfig';
 import { fork } from 'node:child_process';
 import { fileURLToPath } from 'url';
 
 export async function publish(commandDir: string | undefined, args: Partial<PublishArgs>) {
+    if(!args.suppressWarnings) {
+        console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`)
+
+    }
     const config = await getConfig();
     // pass in args into the command.
     const rootPath = new URL('../', import.meta.url),
@@ -31,6 +36,7 @@ export async function publish(commandDir: string | undefined, args: Partial<Publ
 }
 
 interface PublishArgs {
+    suppressWarnings: boolean
     import: string[];
     token: string;
     applicationId: string;

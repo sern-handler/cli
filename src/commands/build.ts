@@ -10,6 +10,7 @@ import { require } from '../utilities/require'
 import { pathExists, pathExistsSync } from 'find-up'
 import { mkdir, writeFile } from 'fs/promises'
 import * as Preprocessor  from '../utilities/preprocessor'
+import { magentaBright } from 'colorette'
 
 type BuildOptions = {
     /**
@@ -53,7 +54,10 @@ const getWorkingMode = (): string => {
     
 }
 
-export async function build() {
+export async function build(options: Record<string,boolean>) {
+    if(!options.supressWarnings) {
+        console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`)
+    }
     const sernConfig = await getConfig()
     let buildConfig: Partial<BuildOptions>; 
     const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
@@ -135,7 +139,7 @@ export async function build() {
             define,
             dropLabels: [ mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels??[]],
         })
-         
+
     } catch(e) {
         console.error(e)
         process.exit(1)
