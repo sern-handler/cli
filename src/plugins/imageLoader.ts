@@ -10,7 +10,7 @@ export const validExtensions = ['.ts','.js', '.json', '.png', '.jpg', '.jpeg', '
 export const imageLoader = {
     name: 'attachment-loader',
     setup: b => {
-        const filter = new RegExp(`\\.${validExtensions.slice(3).join('|')}$`)
+        const filter = new RegExp(`\.${validExtensions.slice(3).join('|')}$`)
         b.onResolve({ filter }, args => {
             //if the module is being imported, resolve the path and transform to the js stub
             if(args.importer) {
