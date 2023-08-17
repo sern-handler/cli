@@ -55,10 +55,9 @@ Commands:
 
 ## Setting Up Your Project
 
-Run `sern init (-y)` for an interactive setup on a brand new project using our framework. <br>
-Adding the `-y` flag sets up project as default. ( **Note** : the default initiates a typescript project)
+Run `npm create @sern/bot` for an interactive setup on a brand new project using our framework.
 
 ## Installing Plugins
 
-sern runs on your plugins. Contribute to the [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
-Run `sern plugins` to see all installable options
+sern runs on your plugins. Contribute to our [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
+Run `sern plugins` to see all installable plugins.
