@@ -53,6 +53,7 @@ program
     .command('build')
     .description('Build your bot')
     .option('-W --suppress-warnings', 'suppress experimental warning')
+    .option('-p --project [filePath]', 'build with this sern.build file')
     .action(async (...args) => importDynamic('build.js').then(m => m.build(...args)))
 
 program.parse();

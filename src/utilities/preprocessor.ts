@@ -46,6 +46,7 @@ const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: File
         "compilerOptions": {
             "moduleResolution": "bundler",
             "strict": true, 
+            "skipLibCheck": true,
             ...target,
             "rootDirs": ["./generated", "../src"]
         },

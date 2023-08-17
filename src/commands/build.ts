@@ -54,10 +54,11 @@ const getWorkingMode = (): string => {
     
 }
 
-export async function build(options: Record<string,boolean>) {
+export async function build(options: Record<string,any>) {
     if(!options.supressWarnings) {
         console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`)
     }
+    console.log(options)
     const sernConfig = await getConfig()
     let buildConfig: Partial<BuildOptions>; 
     const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
@@ -66,7 +67,7 @@ export async function build(options: Record<string,boolean>) {
                     ignored: p => p.name.endsWith('.d.ts')
                 }
             })
-    const buildConfigPath = resolve('sern.build.js')
+    const buildConfigPath = resolve(options.project ?? 'sern.build.js')
     if(pathExistsSync(buildConfigPath)) {
         try {
             buildConfig = (await import('file:///'+buildConfigPath)).default
@@ -78,6 +79,7 @@ export async function build(options: Record<string,boolean>) {
             throw e;
         }
     } else {
+        console.log('No build config found, defaulting')
         buildConfig = {
             entryPoints 
         }
