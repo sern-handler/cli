@@ -10,7 +10,7 @@ import { require } from '../utilities/require'
 import { pathExists, pathExistsSync } from 'find-up'
 import { mkdir, writeFile } from 'fs/promises'
 import * as Preprocessor  from '../utilities/preprocessor'
-import { magentaBright } from 'colorette'
+import { bold, magentaBright } from 'colorette'
 
 type BuildOptions = {
     /**
@@ -36,31 +36,25 @@ type BuildOptions = {
      **/
     define?: Record<string, string>
 
-    entryPoints?: string[]
-
     tsconfig?: string;
+    /**
+      * default = 'development'
+      */
+    mode: 'production' | 'development',
+    /**
+      * will search for env file. If none exists, 
+      * default to .env.
+      */
+    env?: string
 }
 
-
-const getWorkingMode = (): string => {
-    if(!process.env.NODE_ENV) {
-        if(process.env.MODE === 'PROD') {
-            return 'production' 
-        } else {
-            return 'development'
-        }
-    } 
-    return process.env.NODE_ENV; 
-    
-}
 
 export async function build(options: Record<string,any>) {
     if(!options.supressWarnings) {
         console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`)
     }
-    console.log(options)
     const sernConfig = await getConfig()
-    let buildConfig: Partial<BuildOptions>; 
+    let buildConfig: Partial<BuildOptions> = {}; 
     const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
                 //for some reason, my ignore glob wasn't registering correctly'
                 ignore: {
@@ -68,45 +62,63 @@ export async function build(options: Record<string,any>) {
                 }
             })
     const buildConfigPath = resolve(options.project ?? 'sern.build.js')
+    
+
+    const defaultBuildConfig = {
+        defineVersion: true,
+        format: options.format ?? 'esm',
+        mode: options.mode ?? 'development',
+        tsconfig: resolve('tsconfig.json'),
+        env: resolve('.env')
+    }
     if(pathExistsSync(buildConfigPath)) {
         try {
-            buildConfig = (await import('file:///'+buildConfigPath)).default
-            if(buildConfig.entryPoints) {
-                throw Error('Entry points are handled by sern.')
+            buildConfig = {
+                ...defaultBuildConfig,
+                ...(await import('file:///'+buildConfigPath)).default,
             }
-            buildConfig.entryPoints = entryPoints
         } catch(e) {
-            throw e;
+            console.log(e)
+            process.exit(1)
         }
     } else {
         console.log('No build config found, defaulting')
-        buildConfig = {
-            entryPoints 
-        }
     }
-    let tsconfigPath = buildConfig.tsconfig ? resolve(buildConfig.tsconfig) : resolve('tsconfig.json');
-    configDotenv({ debug: true }).parsed
-    if(process.env.MODE && !process.env.NODE_ENV) {
-        console.warn('It is recommended to use NODE_ENV instead of MODE');
+    let env = {} as Record<string,string>
+    configDotenv({ path: defaultBuildConfig.env, processEnv: env })
+
+    
+    if(env.MODE && !env.NODE_ENV) {
+        console.warn('Use NODE_ENV instead of MODE');
+        console.warn('MODE has no effect.')
         console.warn(`https://nodejs.dev/en/learn/nodejs-the-difference-between-development-and-production/`);
-        console.warn('Will maintain no breaking changes. However, MODE will be removed in the next feature update as it is experimental')
     }
         
-    const mode = getWorkingMode(),
-          format = buildConfig.format ?? 'esm'
+    if(env.NODE_ENV) {
+       buildConfig.mode = env.NODE_ENV as 'production' | 'development'
+       console.log(magentaBright('NODE_ENV:'), 'Found NODE_ENV variable, setting `mode` to this.')
+    }
+    assert(buildConfig.mode === 'development' || buildConfig.mode === 'production', "Mode is not `production` or `development`"); 
 
-    assert(mode === 'development' || mode === 'production', "Mode is not `production` or `development`"); 
     const defaultTsConfig = {
         extends: "./.sern/tsconfig.json",
     }
-    !tsconfigPath && console.log('Using default options for tsconfig', defaultTsConfig);
-    const tsconfigRaw = tsconfigPath ? require(tsconfigPath) : defaultTsConfig;
+    !buildConfig.tsconfig && console.log('Using default options for tsconfig', defaultTsConfig);
+    const tsconfigRaw = require(buildConfig.tsconfig!);
     
     sernConfig.language === 'typescript' && tsconfigRaw && !tsconfigRaw.extends && (
         console.warn('tsconfig does not contain an "extends". Will not use sern automatic path aliasing'),
         console.warn('For projects that predate sern build and want to fully integrate, extend the tsconfig generated in .sern'),
         console.warn('Extend preexisting tsconfig with top level: "extends": "./.sern/tsconfig.json"')
     );
+    console.log(bold('Building with:'))
+    console.log(' ', magentaBright('defineVersion'), buildConfig.defineVersion)
+    console.log(' ', magentaBright('format'), buildConfig.format)
+    console.log(' ', magentaBright('mode'), buildConfig.mode)
+    console.log(' ', magentaBright('tsconfig'), buildConfig.tsconfig)
+    console.log(' ', magentaBright('env'), buildConfig.env)
+
+
     const sernDir = resolve('.sern'),
           genDir = resolve(sernDir, 'generated'),
           ambientFilePath = resolve(sernDir, 'ambient.d.ts'),
@@ -119,32 +131,30 @@ export async function build(options: Record<string,any>) {
         console.log('Making .sern/generated dir, does not exist')
         await mkdir(genDir) 
     }
-    
+     
     try {
         const defVersion = () => JSON.stringify(packageJson().version)
         const define = {
                 ...buildConfig.define ?? {},
-                __DEV__: `${mode === 'development'}`,
-                __PROD__: `${mode === 'production'}`,
+                __DEV__: `${buildConfig.mode === 'development'}`,
+                __PROD__: `${buildConfig.mode === 'production'}`,
         } satisfies Record<string, string>;
 
         buildConfig.defineVersion && Object.assign(define, { '__VERSION__': defVersion() });
 
-        await Preprocessor.writeTsConfig(format, sernTsConfigPath, writeFile);
+        await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
         await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
         
         //https://esbuild.github.io/content-types/#tsconfig-json
         await esbuild.build({ 
-            entryPoints: buildConfig.entryPoints,
+            entryPoints,
             plugins: [imageLoader, ...buildConfig.esbuildPlugins??[] ],
-            ...defaultEsbuild(format, tsconfigRaw),
+            ...defaultEsbuild(buildConfig.format!, tsconfigRaw),
             define,
-            dropLabels: [ mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels??[]],
+            dropLabels: [ buildConfig.mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels??[]],
         })
-
     } catch(e) {
         console.error(e)
         process.exit(1)
     }
-    
 }

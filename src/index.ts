@@ -52,6 +52,8 @@ program //
 program 
     .command('build')
     .description('Build your bot')
+    .option('-f --format [fmt]', 'The module system of your application. `cjs` or `esm`', 'esm')
+    .option('-m --mode [mode]', 'the mode for sern to build in. `production` or `development`', 'development')
     .option('-W --suppress-warnings', 'suppress experimental warning')
     .option('-p --project [filePath]', 'build with this sern.build file')
     .action(async (...args) => importDynamic('build.js').then(m => m.build(...args)))
