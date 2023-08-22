@@ -82,6 +82,9 @@ export async function build(options: Record<string,any>) {
             process.exit(1)
         }
     } else {
+        buildConfig = {
+            ...defaultBuildConfig
+        }
         console.log('No build config found, defaulting')
     }
     let env = {} as Record<string,string>
