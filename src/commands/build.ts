@@ -68,8 +68,8 @@ export async function build(options: Record<string,any>) {
         defineVersion: true,
         format: options.format ?? 'esm',
         mode: options.mode ?? 'development',
-        tsconfig: resolve('tsconfig.json'),
-        env: resolve('.env')
+        tsconfig: options.tsconfig ?? resolve('tsconfig.json'),
+        env: options.env ?? resolve('.env')
     }
     if(pathExistsSync(buildConfigPath)) {
         try {
@@ -88,7 +88,7 @@ export async function build(options: Record<string,any>) {
         console.log('No build config found, defaulting')
     }
     let env = {} as Record<string,string>
-    configDotenv({ path: defaultBuildConfig.env, processEnv: env })
+    configDotenv({ path: buildConfig.env, processEnv: env })
 
     
     if(env.MODE && !env.NODE_ENV) {
