@@ -68,7 +68,9 @@ export async function build(options: Record<string,any>) {
         defineVersion: true,
         format: options.format ?? 'esm',
         mode: options.mode ?? 'development',
+        dropLabels: [],
         tsconfig: options.tsconfig ?? resolve('tsconfig.json'),
+        
         env: options.env ?? resolve('.env')
     }
     if(pathExistsSync(buildConfigPath)) {
@@ -154,7 +156,7 @@ export async function build(options: Record<string,any>) {
             plugins: [imageLoader, ...buildConfig.esbuildPlugins??[] ],
             ...defaultEsbuild(buildConfig.format!, tsconfigRaw),
             define,
-            dropLabels: [ buildConfig.mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels??[]],
+            dropLabels: [ buildConfig.mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels!],
         })
     } catch(e) {
         console.error(e)
