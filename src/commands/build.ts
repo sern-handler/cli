@@ -156,7 +156,7 @@ export async function build(options: Record<string,any>) {
             plugins: [imageLoader, ...buildConfig.esbuildPlugins??[] ],
             ...defaultEsbuild(buildConfig.format!, tsconfigRaw),
             define,
-            dropLabels: [ buildConfig.mode === 'production' ? 'PROD' : 'DEV', ...buildConfig.dropLabels!],
+            dropLabels: [ buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
         })
     } catch(e) {
         console.error(e)

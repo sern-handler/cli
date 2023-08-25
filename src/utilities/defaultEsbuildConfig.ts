@@ -1,10 +1,10 @@
 import type esbuild from 'esbuild'
 import { resolve } from 'path'
 
-export default (format: 'cjs' | 'esm', tsconfigRaw: any) => ({
+export default (format: 'cjs' | 'esm', tsconfigRaw: unknown) => ({
     platform: 'node',
     format,
-    tsconfigRaw,
+    tsconfigRaw: tsconfigRaw as esbuild.TsconfigRaw,
     logLevel: 'info',
     minify: false,
     outdir: resolve('dist'),
