@@ -49,6 +49,7 @@ const AppCommandOptionType: Record<number, string> = {
 function log(command: CommandData) {
     console.log(`\t${cyanBright(command.name)} ${command.description} (${greenBright(command.id)})`);
     console.log(`\t  Type: ${AppCommandsType[command.type]}`);
+
     if (command.options) {
         console.log(`\t  Options:`);
         for (const option of command.options) {
