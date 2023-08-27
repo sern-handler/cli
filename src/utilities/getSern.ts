@@ -4,6 +4,7 @@ import { redBright, cyanBright } from 'colorette';
 
 export function getSern() {
     let files: string[] = [];
+
     try {
         const sern = fromCwd('.sern');
         files = readdirSync(sern);
