@@ -8,6 +8,7 @@ import { publish } from './commands/publish.js';
 import { Command } from 'commander';
 import { plugins } from './commands/plugins.js';
 import { yellowBright } from 'colorette';
+import { list } from './commands/list.js';
 export const program = new Command();
 
 const version: string = '[VI]{{inject}}[/VI]';
@@ -47,6 +48,11 @@ program //
             .option('--appId [applicationId]')
             .argument('[path]', 'path with respect to current working directory that will locate all published files')
             .action(publish)
+    )
+    .addCommand(
+        new Command(list.name) //
+            .description('List all slash commands')
+            .action(list)
     );
 
 program.parse();
