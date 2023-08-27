@@ -1,4 +1,4 @@
-import { cyanBright, magentaBright, underline } from 'colorette';
+import { cyanBright, greenBright, magentaBright, underline } from 'colorette';
 import { getSern } from '../utilities/getSern';
 import { readFileSync } from 'node:fs';
 import type { CommandData, GuildId } from '../utilities/types';
@@ -17,6 +17,8 @@ export function list() {
     console.log('Global Commands:');
     for (const command of globalCommands) log(command);
 
+    console.log('\t');
+
     for (const guildId in commands) {
         const guildCommands = commands[guildId];
         console.log(`Guild Commands [${underline(cyanBright(guildId))}]`);
@@ -25,45 +27,38 @@ export function list() {
 }
 
 const AppCommandsType: Record<number, string> = {
-    1: magentaBright('SLASH'),
-    2: magentaBright('USER'),
-    3: magentaBright('MESSAGE'),
+    1: magentaBright('Slash'),
+    2: magentaBright('User'),
+    3: magentaBright('Message'),
 };
 
 const AppCommandOptionType: Record<number, string> = {
-    1: magentaBright('SUB_COMMAND'),
-    2: magentaBright('SUB_COMMAND_GROUP'),
-    3: magentaBright('STRING'),
-    4: magentaBright('INTEGER'),
-    5: magentaBright('BOOLEAN'),
-    6: magentaBright('USER'),
-    7: magentaBright('CHANNEL'),
-    8: magentaBright('ROLE'),
-    9: magentaBright('MENTIONABLE'),
-    10: magentaBright('NUMBER'),
-    11: magentaBright('ATTACHMENT'),
+    1: magentaBright('SubCommand'),
+    2: magentaBright('SubCommand Group'),
+    3: magentaBright('String'),
+    4: magentaBright('Integer'),
+    5: magentaBright('Boolean'),
+    6: magentaBright('User'),
+    7: magentaBright('Channel'),
+    8: magentaBright('Role'),
+    9: magentaBright('Mentionable'),
+    10: magentaBright('Number'),
+    11: magentaBright('Attachment'),
 };
 
 function log(command: CommandData) {
-    const tableData = {
-        Name: command.name,
-        Description: command.description,
-        ID: command.id,
-        Type: AppCommandsType[command.type],
-    };
-
+    console.log(`\t${cyanBright(command.name)} ${command.description} (${greenBright(command.id)})`);
+    console.log(`\t  Type: ${AppCommandsType[command.type]}`);
     if (command.options) {
+        console.log(`\t  Options:`);
         for (const option of command.options) {
-            tableData[`Option: ${option.name}`] = option.description;
-            tableData[`Type: ${option.name}`] = AppCommandOptionType[option.type];
-
-            if (option.choices) {
-                for (const choice of option.choices) {
-                    tableData[`Choice: ${choice.name}`] = choice.value;
+            console.log(`\t    ${cyanBright(option.name)}: ${AppCommandOptionType[option.type]}`);
+            if (option.options) {
+                console.log(`\t      Options:`);
+                for (const subOption of option.options) {
+                    console.log(`\t        ${cyanBright(subOption.name)}: ${AppCommandOptionType[subOption.type]}`);
                 }
             }
         }
     }
-
-    console.table(tableData);
 }

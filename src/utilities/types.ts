@@ -26,6 +26,7 @@ interface OptionData {
     description_localizations?: Record<string, string>;
     required?: boolean;
     choices?: ChoiceData[];
+    options?: OptionData[];
 }
 
 interface ChoiceData {
