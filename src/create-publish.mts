@@ -12,6 +12,7 @@ import type { sernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
 import { cyanBright, greenBright, redBright } from 'colorette';
 import ora from 'ora';
+import type { TheoreticalEnv } from './types/config';
 
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
@@ -213,6 +214,7 @@ function associateGuildIdsWithData(data: PublishableModule[]): Map<string, Publi
 const guildCommandMap = associateGuildIdsWithData(guildedCommands);
 
 let guildCommandMapResponse = new Map<string, Record<string, unknown>>();
+
 
 for (const [guildId, array] of guildCommandMap.entries()) {
     const spin = ora(`[${cyanBright(guildId)}] Updating commands for guild`);

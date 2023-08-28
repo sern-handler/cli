@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
-import { esbuildPluginVersionInjector } from 'esbuild-plugin-version-injector';
+import { createRequire } from 'node:module'
 const shared = {
-    entry: ['src/index.ts', 'src/create-publish.mts'],
+    entry: ['src/index.ts', 'src/create-publish.mts', 'src/commands/**', 'sern-tsconfig.json'],
     clean: true,
     sourcemap: true,
 };
@@ -11,8 +11,15 @@ export default defineConfig({
     tsconfig: './tsconfig.json',
     outDir: './dist',
     treeshake: true,
-    esbuildPlugins: [esbuildPluginVersionInjector()],
+    bundle: true,
+    esbuildPlugins: [],
     platform: 'node',
-    splitting: false,
+    splitting: true,
+    define: {
+        __VERSION__: `"${createRequire(import.meta.url)('./package.json').version}"`
+    },
+    loader: {
+        '.json': 'file'
+    },
     ...shared,
 });
