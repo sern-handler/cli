@@ -1,96 +1,90 @@
-const declareConstType = (name: string, type: string) => String.raw`declare var ${name}: ${type}`
+const declareConstType = (name: string, type: string) => String.raw`declare var ${name}: ${type}`;
 
 const processEnvType = (env: NodeJS.ProcessEnv) => {
-    const entries = Object.keys(env)
+    const entries = Object.keys(env);
 
-    const envBuilder = new StringWriter()
+    const envBuilder = new StringWriter();
 
-    for(const key of entries) {
-        envBuilder.tab()
-        envBuilder.tab()
-        envBuilder.envField(key)
+    for (const key of entries) {
+        envBuilder.tab();
+        envBuilder.tab();
+        envBuilder.envField(key);
     }
-    return envBuilder.build()
-}
+    return envBuilder.build();
+};
 
-const determineJSONType = (s : string) => {
-    return typeof JSON.parse(s)
-}
+const determineJSONType = (s: string) => {
+    return typeof JSON.parse(s);
+};
 
 type FileWriter = (path: string, content: string, format: BufferEncoding) => Promise<void>;
-const writeAmbientFile = async (
-    path: string,
-    define: Record<string, string>,
-    writeFile: FileWriter
-) => {
-    const fileContent = new StringWriter()
-    for(const [k,v] of Object.entries(define)) {
-        fileContent.varDecl(k,v)
+const writeAmbientFile = async (path: string, define: Record<string, string>, writeFile: FileWriter) => {
+    const fileContent = new StringWriter();
+    for (const [k, v] of Object.entries(define)) {
+        fileContent.varDecl(k, v);
     }
     fileContent
-        .println('declare namespace NodeJS {') 
+        .println('declare namespace NodeJS {')
         .tab()
         .println('interface ProcessEnv {')
         .envFields(process.env)
         .tab()
         .println('}')
-        .println('}')
-        
-    await writeFile(path, fileContent.build(), 'utf8')
-}
+        .println('}');
+
+    await writeFile(path, fileContent.build(), 'utf8');
+};
 
 const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: FileWriter) => {
     //maybe better way to do this
-    const target = format === 'esm' ? { target: 'esnext' } : {};   
+    const target = format === 'esm' ? { target: 'esnext' } : {};
     const sernTsConfig = {
-        "compilerOptions": {
-            "moduleResolution": "bundler",
-            "strict": true, 
-            "skipLibCheck": true,
+        compilerOptions: {
+            moduleResolution: 'bundler',
+            strict: true,
+            skipLibCheck: true,
             ...target,
-            "rootDirs": ["./generated", "../src"]
+            rootDirs: ['./generated', '../src'],
         },
-        "include": ["./ambient.d.ts", "../src"]
-    }
+        include: ['./ambient.d.ts', '../src'],
+    };
 
-    await fw(configPath, JSON.stringify(sernTsConfig, null, 3), 'utf8')
-
-}
+    await fw(configPath, JSON.stringify(sernTsConfig, null, 3), 'utf8');
+};
 class StringWriter {
-    private fileString = "" 
+    private fileString = '';
 
     tab() {
-        this.fileString+="    "
+        this.fileString += '    ';
         return this;
     }
 
     varDecl(name: string, type: string) {
-        this.fileString+=declareConstType(name, determineJSONType(type))+'\n'
+        this.fileString += declareConstType(name, determineJSONType(type)) + '\n';
         return this;
     }
 
     println(data: string) {
-        this.fileString+=data+"\n"
+        this.fileString += data + '\n';
         return this;
     }
     envField(key: string) {
-        if(/\s|\(|\)/g.test(key)) {
-            this.fileString+=`"${key}": string`
+        if (/\s|\(|\)/g.test(key)) {
+            this.fileString += `"${key}": string`;
         } else {
-            this.fileString+=key+ ':'+ 'string'
+            this.fileString += key + ':' + 'string';
         }
-        this.fileString+="\n"
+        this.fileString += '\n';
         return this;
     }
 
     envFields(env: NodeJS.ProcessEnv) {
-        this.fileString+=processEnvType(env);
+        this.fileString += processEnvType(env);
         return this;
     }
     build() {
         return this.fileString;
     }
-
 }
 
-export { writeAmbientFile, writeTsConfig }
+export { writeAmbientFile, writeTsConfig };

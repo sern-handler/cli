@@ -215,7 +215,6 @@ const guildCommandMap = associateGuildIdsWithData(guildedCommands);
 
 let guildCommandMapResponse = new Map<string, Record<string, unknown>>();
 
-
 for (const [guildId, array] of guildCommandMap.entries()) {
     const spin = ora(`[${cyanBright(guildId)}] Updating commands for guild`);
     spin.start();

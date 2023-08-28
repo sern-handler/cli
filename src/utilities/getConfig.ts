@@ -1,4 +1,3 @@
-
 import { readFile } from 'node:fs/promises';
 import { findUp } from 'find-up';
 import assert from 'node:assert';
@@ -21,5 +20,5 @@ export interface sernConfig {
         commands: string;
         events?: string;
     };
-    buildPath: string
+    buildPath: string;
 }
