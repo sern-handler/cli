@@ -52,7 +52,7 @@ program //
         new Command('list') //
             .description('List all slash commands')
             .action(async (...args) => importDynamic('list.js').then(m => m.list(...args)))
-    );
+    ));
 
 program 
     .command('build')
