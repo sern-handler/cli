@@ -2,7 +2,6 @@
 
 import { Command } from 'commander';
 import { yellowBright } from 'colorette';
-import { list } from './commands/list.js';
 export const program = new Command();
 
 const importDynamic = async <T extends string>(filename: T) => import(`./commands/${filename}` as const)
@@ -48,11 +47,13 @@ program //
             .option('--appId [applicationId]')
             .argument('[path]', 'path with respect to current working directory that will locate all published files')
             .action(async (...args) => importDynamic('publish.js').then(m => m.publish(...args)))
-    .addCommand(
+    )
+    .addCommand( 
         new Command('list') //
             .description('List all slash commands')
             .action(async (...args) => importDynamic('list.js').then(m => m.list(...args)))
-    ));
+    )
+    
 
 program 
     .command('build')
