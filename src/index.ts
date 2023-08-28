@@ -2,7 +2,6 @@
 
 import { Command } from 'commander';
 import { yellowBright } from 'colorette';
-import { list } from './commands/list.js';
 export const program = new Command();
 
 const importDynamic = async <T extends string>(filename: T) => import(`./commands/${filename}` as const);
