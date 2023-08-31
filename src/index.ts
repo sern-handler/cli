@@ -43,6 +43,11 @@ program //
             .option('--appId [applicationId]')
             .argument('[path]', 'path with respect to current working directory that will locate all published files')
             .action(async (...args) => importDynamic('publish.js').then((m) => m.publish(...args)))
+    )
+    .addCommand(
+        new Command('list') //
+            .description('List all slash commands')
+            .action(async (...args) => importDynamic('list.js').then((m) => m.list(...args)))
     );
 
 program
