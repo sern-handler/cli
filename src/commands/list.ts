@@ -1,4 +1,4 @@
-import { cyanBright, greenBright, magentaBright, underline } from 'colorette';
+import { blueBright, bold, cyanBright, greenBright, italic, magentaBright, underline } from 'colorette';
 import { getSern } from '../utilities/getSern';
 import { readFileSync } from 'node:fs';
 import type { CommandData, GuildId } from '../utilities/types';
@@ -14,14 +14,14 @@ export function list() {
     const globalCommands = commands.global;
 
     delete commands.global;
-    console.log('Global Commands:');
+    console.log(bold('Global Commands'));
     for (const command of globalCommands) log(command);
 
     console.log('\t');
 
     for (const guildId in commands) {
         const guildCommands = commands[guildId];
-        console.log(`Guild Commands [${underline(cyanBright(guildId))}]`);
+        console.log(`${bold('Guild Commands')} [${underline(cyanBright(guildId))}]`);
         for (const command of guildCommands) log(command);
     }
 }
@@ -47,13 +47,13 @@ const AppCommandOptionType: Record<number, string> = {
 };
 
 function log(command: CommandData) {
-    console.log(`\t${cyanBright(command.name)} ${command.description} (${greenBright(command.id)})`);
+    console.log(clean(`\t${cyanBright(command.name)} ${italic(command.description)} (${greenBright(command.id)})`));
     console.log(`\t  Type: ${AppCommandsType[command.type]}`);
 
     if (command.options) {
         console.log(`\t  Options:`);
         for (const option of command.options) {
-            console.log(`\t    ${cyanBright(option.name)}: ${AppCommandOptionType[option.type]}`);
+            console.log(`\t    ${blueBright(option.name)}: ${AppCommandOptionType[option.type]}`);
             if (option.options) {
                 console.log(`\t      Options:`);
                 for (const subOption of option.options) {
@@ -63,3 +63,5 @@ function log(command: CommandData) {
         }
     }
 }
+
+const clean = (str: string) => str.split(' ').filter(Boolean).join(' ');
