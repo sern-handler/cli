@@ -40,7 +40,7 @@ const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: File
     const target = format === 'esm' ? { target: 'esnext' } : {};
     const sernTsConfig = {
         compilerOptions: {
-            moduleResolution: 'bundler',
+            moduleResolution: 'node',
             strict: true,
             skipLibCheck: true,
             ...target,
