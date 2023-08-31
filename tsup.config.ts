@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsup';
-import { createRequire } from 'node:module'
+import { createRequire } from 'node:module';
 const shared = {
     entry: ['src/index.ts', 'src/create-publish.mts', 'src/commands/**', 'sern-tsconfig.json'],
     clean: true,
@@ -16,10 +16,10 @@ export default defineConfig({
     platform: 'node',
     splitting: true,
     define: {
-        __VERSION__: `"${createRequire(import.meta.url)('./package.json').version}"`
+        __VERSION__: `"${createRequire(import.meta.url)('./package.json').version}"`,
     },
     loader: {
-        '.json': 'file'
+        '.json': 'file',
     },
     ...shared,
 });
