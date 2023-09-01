@@ -10,6 +10,6 @@ RUN npm install -D typescript
 
 COPY . .
 
-RUN tsc --build || npx tsc -p "./tsconfig.json" --build
+RUN tsc --build || npx -p typescript tsc --build
 
 CMD node dist/index.js
