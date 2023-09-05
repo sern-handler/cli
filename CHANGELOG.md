@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0](https://github.com/sern-handler/cli/compare/v0.6.0...v1.0.0) (2023-09-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **plugins:** older versions of cli does not have plugins command functional
+
+### Features
+
+* build app ([#112](https://github.com/sern-handler/cli/issues/112)) ([88e2bbf](https://github.com/sern-handler/cli/commit/88e2bbf6c84e3841370a4288181e8ec721ef1925))
+* list subcommand ([#113](https://github.com/sern-handler/cli/issues/113)) ([5fd2a7b](https://github.com/sern-handler/cli/commit/5fd2a7b4c4bc92467fbaa26005d261d4ed8b2a13))
+* **plugins:** new method to obtain plugins ([#114](https://github.com/sern-handler/cli/issues/114)) ([c785d49](https://github.com/sern-handler/cli/commit/c785d49fa5c0d98261de7d7b0c39f85c21316156))
+
+
+### Bug Fixes
+
+* credentials precedence ([#111](https://github.com/sern-handler/cli/issues/111)) ([3f74658](https://github.com/sern-handler/cli/commit/3f74658b16b2697df11c7e33172c09c30b7543a8))
+* **extra:** dockerfile errors and tsc fallback ([#101](https://github.com/sern-handler/cli/issues/101)) ([4082926](https://github.com/sern-handler/cli/commit/40829267c4e77b316a60604c63bad79124713b89))
+
 ## [0.6.0](https://github.com/sern-handler/cli/compare/v0.5.1...v0.6.0) (2023-08-09)
 
 
