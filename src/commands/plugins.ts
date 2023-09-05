@@ -4,18 +4,18 @@ import prompt from 'prompts';
 import { fetch } from 'undici';
 import { pluginsQ } from '../prompts/plugin.js';
 import { fromCwd } from '../utilities/fromCwd.js';
-import esbuild  from 'esbuild'
+import esbuild from 'esbuild';
 import { getLang } from '../utilities/getLang.js';
-import { resolve } from 'path'
-import { require } from '../utilities/require.js'
+import { resolve } from 'path';
+import { require } from '../utilities/require.js';
 interface PluginData {
-    "description" : string,
-    "hash" : string,
-    "name" : string,
-    "author" : string[],
-    "link" : string,
-    "example" : string,
-    "version" : "1.0.0"
+    description: string;
+    hash: string;
+    name: string;
+    author: string[];
+    link: string;
+    example: string;
+    version: '1.0.0';
 }
 
 /**
@@ -33,32 +33,29 @@ export async function plugins() {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
-        if(lang === 'typescript') {
-            fs.writeFileSync(linkNoExtension+".ts", pluginText);
+        if (lang === 'typescript') {
+            fs.writeFileSync(linkNoExtension + '.ts', pluginText);
         } else {
-            const { type=undefined } = require(resolve('package.json'))
-            const format = (type === undefined || type === 'cjs') ? 'cjs' : 'esm'
+            const { type = undefined } = require(resolve('package.json'));
+            const format = type === undefined || type === 'cjs' ? 'cjs' : 'esm';
             const transformResult = await esbuild.transform(pluginText, {
                 target: 'node18',
                 format,
                 loader: 'ts',
-                banner: `/**\n    Partial information: ${plgData.description}\n    @author ${plgData.author}\n    @example${plgData.example}*/`
+                banner: `/**\n    Partial information: ${plgData.description}\n    @author ${plgData.author}\n    @example${plgData.example}*/`,
             });
-            if(transformResult.warnings.length > 0) {
-                console.log(transformResult
-                                .warnings
-                                .map(msg => msg.text)
-                                .join('\n'))
+            if (transformResult.warnings.length > 0) {
+                console.log(transformResult.warnings.map((msg) => msg.text).join('\n'));
             }
-            console.warn("transforming plugins with js strips comments");
-            console.warn("We provided some minimal information at top of file, or view the documentation for this plugin here:")
+            console.warn('transforming plugins with js strips comments');
+            console.warn('We provided some minimal information at top of file, or view the documentation for this plugin here:');
             console.warn(plgData.link);
-            fs.writeFileSync(linkNoExtension+".js", transformResult.code);
+            fs.writeFileSync(linkNoExtension + '.js', transformResult.code);
         }
     }
 
     const pluginNames = e.map((data) => {
-        return "Installed " + data.name+" "+"from "+data.author.join(',');
+        return 'Installed ' + data.name + ' ' + 'from ' + data.author.join(',');
     });
     console.log(`Successfully downloaded plugin(s):\n${greenBright(pluginNames.join('\n'))}`);
 }
@@ -70,5 +67,5 @@ async function download(url: string) {
 
     if (!data) throw new Error('Download failed! Kindly contact developers');
 
-    return data
+    return data;
 }

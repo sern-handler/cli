@@ -1,7 +1,6 @@
 import type { Choice, PromptObject } from 'prompts';
 import { fetch } from 'undici';
 
-
 async function gimmechoices(): Promise<Choice[]> {
     const link = `https://raw.githubusercontent.com/sern-handler/awesome-plugins/main/pluginlist.json`;
 
