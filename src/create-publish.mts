@@ -12,7 +12,6 @@ import type { sernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
 import { cyanBright, greenBright, redBright } from 'colorette';
 import ora from 'ora';
-import type { TheoreticalEnv } from './types/config';
 
 async function deriveFileInfo(dir: string, file: string) {
     const fullPath = join(dir, file);
@@ -58,7 +57,10 @@ async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<str
 // recieved sern config
 const [{ config, preloads, commandDir }] = await once(process, 'message'),
     { paths } = config as sernConfig;
+
 for (const preload of preloads) {
+
+    console.log("preloading: ", preload);
     await import('file:///' + resolve(preload));
 }
 
@@ -126,6 +128,17 @@ const makeDescription = (type: number, desc: string) => {
     }
     return desc;
 };
+const serialize = (permissions: unknown) => {
+    if(typeof permissions === 'bigint') {
+       return permissions; 
+    }
+    if(Array.isArray(permissions)) {
+        return permissions.reduce((acc, cur) => {
+            return acc | cur;
+        }, 0)
+    }
+    return null;
+}
 
 const makePublishData = ({ commandModule, config }: Record<string, Record<string, unknown>>) => {
     const applicationType = intoApplicationType(commandModule.type as number);
@@ -137,7 +150,7 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
             absPath: commandModule.absPath as string,
             options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
             dm_permission: config?.dmPermission,
-            default_member_permissions: config?.defaultMemberPermissions ?? null,
+            default_member_permissions: serialize(config?.defaultMemberPermissions),
         },
         config,
     };
@@ -173,12 +186,15 @@ const res = await rest.updateGlobal(globalCommands);
 let globalCommandsResponse: unknown;
 
 if (res.ok) {
-    spin.succeed(`All ${cyanBright('Global')} commands published`);
+    globalCommands.length && spin.succeed(`All ${cyanBright('Global')} commands published`);
     globalCommandsResponse = await res.json();
 } else {
     spin.fail(`Failed to publish global commands [Code: ${redBright(res.status)}]`);
-    if (res.status === 429) {
-        throw Error('Chill out homie, too many requests');
+    switch(res.status) {
+        case 400 : 
+            throw Error("400: Ensure your commands have proper fields and data and left nothing out");
+        case 404 : 
+            throw Error("Forbidden 404. Is you application id and/or token correct?")
     }
     console.error(
         'errors:',
@@ -208,7 +224,6 @@ function associateGuildIdsWithData(data: PublishableModule[]): Map<string, Publi
             });
         }
     });
-
     return guildIdMap;
 }
 const guildCommandMap = associateGuildIdsWithData(guildedCommands);
@@ -227,7 +242,12 @@ for (const [guildId, array] of guildCommandMap.entries()) {
         spin.succeed(`[${greenBright(guildId)}] Successfully updated commands for guild`);
     } else {
         spin.fail(`[${redBright(guildId)}] Failed to update commands for guild, Reason: ${result.message}`);
-        throw Error(result.message);
+        switch(response.status) {
+            case 400 : 
+                throw Error("400: Ensure your commands have proper fields and data and left nothing out");
+            case 404 : 
+                throw Error("Forbidden 404. Is you application id and/or token correct?")
+        }
     }
 }
 const remoteData = {
