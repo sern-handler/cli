@@ -11,7 +11,7 @@ import { pathExists, pathExistsSync } from 'find-up';
 import { mkdir, writeFile } from 'fs/promises';
 import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
-import { fileURLToPath } from 'url'
+
 type BuildOptions = {
     /**
      * Define __VERSION__
