@@ -192,7 +192,7 @@ if (res.ok) {
     spin.fail(`Failed to publish global commands [Code: ${redBright(res.status)}]`);
     switch(res.status) {
         case 400 : 
-            throw Error("400: Ensure your commands have proper fields and data and left nothing out");
+            throw Error("400: Ensure your commands have proper fields and data with left nothing out");
         case 404 : 
             throw Error("Forbidden 404. Is you application id and/or token correct?")
     }
