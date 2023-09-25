@@ -129,9 +129,10 @@ const makeDescription = (type: number, desc: string) => {
     return desc;
 };
 const serialize = (permissions: unknown) => {
-    if(typeof permissions === 'bigint') {
+    if(typeof permissions === 'bigint' || typeof permissions === 'number') {
        return permissions.toString(); 
     }
+
     if(Array.isArray(permissions)) {
         return permissions
             .reduce((acc, cur) => acc | cur, BigInt(0))
