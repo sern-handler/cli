@@ -196,6 +196,8 @@ if (res.ok) {
             throw Error("400: Ensure your commands have proper fields and data with left nothing out");
         case 404 : 
             throw Error("Forbidden 404. Is you application id and/or token correct?")
+        case 429: 
+            throw Error('Chill out homie, too many requests')
     }
     console.error(
         'errors:',
@@ -248,6 +250,8 @@ for (const [guildId, array] of guildCommandMap.entries()) {
                 throw Error("400: Ensure your commands have proper fields and data and left nothing out");
             case 404 : 
                 throw Error("Forbidden 404. Is you application id and/or token correct?")
+            case 429: 
+                throw Error('Chill out homie, too many requests')
         }
     }
 }
