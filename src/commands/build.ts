@@ -138,7 +138,7 @@ export async function build(options: Record<string, any>) {
 
     if (!(await pathExists(genDir))) {
         console.log('Making .sern/generated dir, does not exist');
-        await mkdir(genDir);
+        await mkdir(genDir, { recursive: true });
     }
 
     try {
