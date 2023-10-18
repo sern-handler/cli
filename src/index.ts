@@ -56,7 +56,7 @@ program
     .option('-f --format [fmt]', 'The module system of your application. `cjs` or `esm`', 'esm')
     .option('-m --mode [mode]', 'the mode for sern to build in. `production` or `development`', 'development')
     .option('-W --suppress-warnings', 'suppress experimental warning')
-    .option('-p --project [filePath]', 'build with this sern.build file')
+    .option('-p --project [filePath]', 'build with the provided sern.build file')
     .option('-e --env', 'path to .env file')
     .option('--tsconfig [filePath]', 'Use this tsconfig')
     .action(async (...args) => importDynamic('build.js').then((m) => m.build(...args)));
