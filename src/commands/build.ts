@@ -61,14 +61,18 @@ export async function build(options: Record<string, any>) {
         },
     });
     const buildConfigPath = resolve(options.project ?? 'sern.build.js');
-
+    const resolveBuildConfig = (path: string|undefined, language: string) => {
+       if(language === 'javascript') {
+        return path ?? resolve('jsconfig.json')
+       }
+       return path ?? resolve('tsconfig.json')
+    }
     const defaultBuildConfig = {
         defineVersion: true,
         format: options.format ?? 'esm',
         mode: options.mode ?? 'development',
         dropLabels: [],
-        tsconfig: options.tsconfig ?? resolve('tsconfig.json'),
-
+        tsconfig: resolveBuildConfig(options.tsconfig, sernConfig.language),
         env: options.env ?? resolve('.env'),
     };
     if (pathExistsSync(buildConfigPath)) {
@@ -100,20 +104,24 @@ export async function build(options: Record<string, any>) {
         buildConfig.mode = env.NODE_ENV as 'production' | 'development';
         console.log(magentaBright('NODE_ENV:'), 'Found NODE_ENV variable, setting `mode` to this.');
     }
+
     assert(buildConfig.mode === 'development' || buildConfig.mode === 'production', 'Mode is not `production` or `development`');
 
-    const defaultTsConfig = {
-        extends: './.sern/tsconfig.json',
-    };
-    !buildConfig.tsconfig && console.log('Using default options for tsconfig', defaultTsConfig);
-    const tsconfigRaw = require(buildConfig.tsconfig!);
 
-    sernConfig.language === 'typescript' &&
-        tsconfigRaw &&
-        !tsconfigRaw.extends &&
-        (console.warn('tsconfig does not contain an "extends". Will not use sern automatic path aliasing'),
-        console.warn('For projects that predate sern build and want to fully integrate, extend the tsconfig generated in .sern'),
-        console.warn('Extend preexisting tsconfig with top level: "extends": "./.sern/tsconfig.json"'));
+    try {
+        let config = require(buildConfig.tsconfig!);
+        config.extends && console.warn("Please ensure to extend the generated tsconfig")
+    } catch(e) {
+         console.warn("no tsconfig / jsconfig found");
+         console.warn(`Please create a ${sernConfig.language === 'javascript' ? 'jsconfig.json' : 'tsconfig.json' }`);
+         console.warn("It should have at least extend the generated one sern makes.")
+         console.warn(`
+            { 
+                "extends": "./.sern/tsconfig.json",
+            }`.trim())
+        throw e;
+    }
+
     console.log(bold('Building with:'));
     console.log(' ', magentaBright('defineVersion'), buildConfig.defineVersion);
     console.log(' ', magentaBright('format'), buildConfig.format);
@@ -130,7 +138,7 @@ export async function build(options: Record<string, any>) {
 
     if (!(await pathExists(genDir))) {
         console.log('Making .sern/generated dir, does not exist');
-        await mkdir(genDir);
+        await mkdir(genDir, { recursive: true });
     }
 
     try {
@@ -150,7 +158,7 @@ export async function build(options: Record<string, any>) {
         await esbuild.build({
             entryPoints,
             plugins: [imageLoader, ...(buildConfig.esbuildPlugins ?? [])],
-            ...defaultEsbuild(buildConfig.format!, tsconfigRaw),
+            ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
             define,
             dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
         });

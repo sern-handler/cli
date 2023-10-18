@@ -1,6 +1,6 @@
 {
     "name": "@sern/cli",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Official CLI for @sern/handler",
     "exports": "./dist/index.js",
     "bin": {
@@ -50,7 +50,7 @@
         "@favware/npm-deprecate": "1.0.7",
         "@types/prompts": "2.4.4",
         "prettier": "2.8.8",
-        "tsup": "6.7.0",
+        "tsup": "^6.7.0",
         "typescript": "5.2.2"
     },
     "engines": {

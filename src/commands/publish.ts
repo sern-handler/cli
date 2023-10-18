@@ -14,7 +14,7 @@ export async function publish(commandDir: string | undefined, args: Partial<Publ
     // assign args.import to empty array if non existent
     args.import ??= [];
 
-    args.token && console.info('token passed through command line');
+    args.token && console.info('Token passed through command line');
     args.applicationId && console.info('applicationId passed through command line');
     commandDir && console.info('Publishing with override path: ', commandDir);
 
