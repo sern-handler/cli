@@ -186,6 +186,7 @@ const res = await rest.updateGlobal(globalCommands);
 
 let globalCommandsResponse: unknown;
 
+
 if (res.ok) {
     globalCommands.length && spin.succeed(`All ${cyanBright('Global')} commands published`);
     globalCommandsResponse = await res.json();
@@ -199,15 +200,17 @@ if (res.ok) {
         case 429: 
             throw Error('Chill out homie, too many requests')
     }
-    console.error(
-        'errors:',
-        await res.json().then((res) => {
-            const errors = Object.values(res.errors);
-            // @ts-ignore
-            return errors.map((err) => err?.name?._errors);
-        })
+    console.error('errors:',
+        await res
+            .json()
+            .then((res) => {
+                const errors = Object.values(res?.errors ?? {});
+                // @ts-ignore
+                return errors.map((err) => err?.name?._errors);
+            })
+            .catch(() => "No errors found (Unparsable json for a request with bad status code). Read the status code.")
     );
-    console.error(res.statusText);
+    console.error("Status Text ", res.statusText);
 }
 
 function associateGuildIdsWithData(data: PublishableModule[]): Map<string, PublishableData[]> {
