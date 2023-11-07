@@ -1,5 +1,5 @@
 import esbuild from 'esbuild';
-import { getConfig } from '../utilities/getConfig';
+import { getConfig, type sernConfig } from '../utilities/getConfig';
 import { resolve } from 'node:path';
 import { glob } from 'glob';
 import { configDotenv } from 'dotenv';
@@ -48,51 +48,58 @@ type BuildOptions = {
     env?: string;
 };
 
-export async function build(options: Record<string, any>) {
-    if (!options.supressWarnings) {
-        console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`);
-    }
-    const sernConfig = await getConfig();
-    let buildConfig: Partial<BuildOptions> = {};
-    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
-        //for some reason, my ignore glob wasn't registering correctly'
-        ignore: {
-            ignored: (p) => p.name.endsWith('.d.ts'),
-        },
-    });
-    const buildConfigPath = resolve(options.project ?? 'sern.build.js');
-    const resolveBuildConfig = (path: string|undefined, language: string) => {
-       if(language === 'javascript') {
-        return path ?? resolve('jsconfig.json')
-       }
-       return path ?? resolve('tsconfig.json')
-    }
+/*
+ * locates jsconfig or tsconfig depending on language.
+ * If path is not given, default to the current working directory's `(js|ts)config.json`
+ */
+function resolveConfigPath (path: string|undefined, language: string) {
+   if(language === 'javascript') {
+    return path ?? resolve('jsconfig.json')
+   }
+   return path ?? resolve('tsconfig.json')
+}
+
+async function createBuildConfig(options: Record<string,any>, sernConfig: sernConfig) {
+    const buildConfigPath = resolve(options.project ?? 'sern.build.js');    
     const defaultBuildConfig = {
         defineVersion: true,
         format: options.format ?? 'esm',
         mode: options.mode ?? 'development',
         dropLabels: [],
-        tsconfig: resolveBuildConfig(options.tsconfig, sernConfig.language),
+        esbuildPlugins: [],
+        tsconfig: resolveConfigPath(options.tsconfig, sernConfig.language),
         env: options.env ?? resolve('.env'),
-    };
-    if (pathExistsSync(buildConfigPath)) {
-        try {
-            buildConfig = {
-                ...defaultBuildConfig,
-                ...(await import('file:///' + buildConfigPath)).default,
-            };
-        } catch (e) {
-            console.log(e);
-            process.exit(1);
+    } satisfies BuildOptions;
+
+    if(pathExistsSync(buildConfigPath)) {
+        return {
+             ...defaultBuildConfig,
+            ...(await import('file:///' + buildConfigPath)).default,
         }
     } else {
-        buildConfig = {
-            ...defaultBuildConfig,
-        };
-        console.log('No build config found, defaulting');
+        return defaultBuildConfig;
     }
+}
+
+function fillEnv(options: Record<string, any>) {
     let env = {} as Record<string, string>;
-    configDotenv({ path: buildConfig.env, processEnv: env });
+    configDotenv({ path: options.env, processEnv: env });
+    return env;
+}
+
+export async function build(options: Record<string, any>) {
+    if (!options.supressWarnings) {
+        console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`);
+    }
+    const sernConfig = await getConfig();
+    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
+        ignore: {
+            ignored: (p) => p.name.endsWith('.d.ts'),
+        },
+    });
+
+    const buildConfig = await createBuildConfig(options, sernConfig);
+    let env = fillEnv(options);
 
     if (env.MODE && !env.NODE_ENV) {
         console.warn('Use NODE_ENV instead of MODE');
@@ -105,7 +112,8 @@ export async function build(options: Record<string, any>) {
         console.log(magentaBright('NODE_ENV:'), 'Found NODE_ENV variable, setting `mode` to this.');
     }
 
-    assert(buildConfig.mode === 'development' || buildConfig.mode === 'production', 'Mode is not `production` or `development`');
+    assert(buildConfig.mode === 'development' 
+        || buildConfig.mode === 'production', 'Mode is not `production` or `development`');
 
 
     try {

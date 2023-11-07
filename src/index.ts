@@ -60,5 +60,8 @@ program
     .option('-e --env', 'path to .env file')
     .option('--tsconfig [filePath]', 'Use this tsconfig')
     .action(async (...args) => importDynamic('build.js').then((m) => m.build(...args)));
-
+program
+    .command('watch')
+    .description('start a hmr session')
+    .action(async (...args) => importDynamic('watch.js').then((m) => m.watch(...args)))
 program.parse();
