@@ -37,7 +37,6 @@ export async function publish(commandDir: string | undefined, args: Partial<Publ
 interface PublishArgs {
     suppressWarnings: boolean;
     import: string[];
-    'env' : string;
     token: string;
     applicationId: string;
 }
