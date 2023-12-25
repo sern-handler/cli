@@ -54,19 +54,23 @@ export async function build(options: Record<string, any>) {
     }
     const sernConfig = await getConfig();
     let buildConfig: Partial<BuildOptions> = {};
+
     const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
         //for some reason, my ignore glob wasn't registering correctly'
         ignore: {
             ignored: (p) => p.name.endsWith('.d.ts'),
         },
     });
+
     const buildConfigPath = resolve(options.project ?? 'sern.build.js');
+
     const resolveBuildConfig = (path: string|undefined, language: string) => {
        if(language === 'javascript') {
         return path ?? resolve('jsconfig.json')
        }
        return path ?? resolve('tsconfig.json')
     }
+
     const defaultBuildConfig = {
         defineVersion: true,
         format: options.format ?? 'esm',
@@ -76,28 +80,23 @@ export async function build(options: Record<string, any>) {
         env: options.env ?? resolve('.env'),
     };
     if (pathExistsSync(buildConfigPath)) {
-        try {
-            buildConfig = {
-                ...defaultBuildConfig,
-                ...(await import('file:///' + buildConfigPath)).default,
-            };
-        } catch (e) {
-            console.log(e);
-            process.exit(1);
-        }
-    } else {
+        //throwable, buildConfigPath may not exist
         buildConfig = {
             ...defaultBuildConfig,
+            ...(await import('file:///' + buildConfigPath)).default,
         };
+    } else {
+        buildConfig = defaultBuildConfig;
         console.log('No build config found, defaulting');
     }
+
     let env = {} as Record<string, string>;
     configDotenv({ path: buildConfig.env, processEnv: env });
-
-    if (env.MODE && !env.NODE_ENV) {
+    const modeButNotNodeEnvExists = env.MODE && !env.NODE_ENV;
+    if (modeButNotNodeEnvExists) {
         console.warn('Use NODE_ENV instead of MODE');
         console.warn('MODE has no effect.');
-        console.warn(`https://nodejs.dev/en/learn/nodejs-the-difference-between-development-and-production/`);
+        console.warn(`https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production`);
     }
 
     if (env.NODE_ENV) {
@@ -110,7 +109,7 @@ export async function build(options: Record<string, any>) {
 
     try {
         let config = require(buildConfig.tsconfig!);
-        config.extends && console.warn("Please ensure to extend the generated tsconfig")
+        config.extends && console.warn("Extend the generated tsconfig")
     } catch(e) {
          console.warn("no tsconfig / jsconfig found");
          console.warn(`Please create a ${sernConfig.language === 'javascript' ? 'jsconfig.json' : 'tsconfig.json' }`);
@@ -130,11 +129,11 @@ export async function build(options: Record<string, any>) {
     console.log(' ', magentaBright('env'), buildConfig.env);
 
     const sernDir = resolve('.sern'),
-        genDir = resolve(sernDir, 'generated'),
-        ambientFilePath = resolve(sernDir, 'ambient.d.ts'),
-        packageJsonPath = resolve('package.json'),
-        sernTsConfigPath = resolve(sernDir, 'tsconfig.json'),
-        packageJson = () => require(packageJsonPath);
+          genDir = resolve(sernDir, 'generated'),
+          ambientFilePath = resolve(sernDir, 'ambient.d.ts'),
+          packageJsonPath = resolve('package.json'),
+          sernTsConfigPath = resolve(sernDir, 'tsconfig.json'),
+          packageJson = () => require(packageJsonPath);
 
     if (!(await pathExists(genDir))) {
         console.log('Making .sern/generated dir, does not exist');

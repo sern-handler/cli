@@ -6,9 +6,9 @@ const processEnvType = (env: NodeJS.ProcessEnv) => {
     const envBuilder = new StringWriter();
 
     for (const key of entries) {
-        envBuilder.tab();
-        envBuilder.tab();
-        envBuilder.envField(key);
+        envBuilder.tab()
+                  .tab()
+                  .envField(key);
     }
     return envBuilder.build();
 };
@@ -40,6 +40,8 @@ const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: File
     const target = format === 'esm' ? { target: 'esnext' } : {};
     const sernTsConfig = {
         compilerOptions: {
+            //module determines top level await. CJS doesn't have that abliity afaik
+            module: format === 'cjs' ? 'node' : 'esnext',
             moduleResolution: 'node',
             strict: true,
             skipLibCheck: true,
@@ -69,6 +71,7 @@ class StringWriter {
         return this;
     }
     envField(key: string) {
+        //if env field has space or parens, wrap key in ""
         if (/\s|\(|\)/g.test(key)) {
             this.fileString += `"${key}": string`;
         } else {
