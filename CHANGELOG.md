@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3](https://github.com/sern-handler/cli/compare/v1.0.2...v1.0.3) (2023-12-25)
+
+
+### Bug Fixes
+
+* intellisense for esm build ts ([#126](https://github.com/sern-handler/cli/issues/126)) ([a5cb668](https://github.com/sern-handler/cli/commit/a5cb66828eae47d3eac5b86c7e67c01dbed500d5))
+
 ## [1.0.2](https://github.com/sern-handler/cli/compare/v1.0.1...v1.0.2) (2023-11-04)
 
 
