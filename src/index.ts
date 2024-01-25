@@ -43,12 +43,16 @@ program //
             .option('--appId [applicationId]')
             .argument('[path]', 'path with respect to current working directory that will locate all published files')
             .action(async (...args) => importDynamic('publish.js').then((m) => m.publish(...args)))
-    )
-    .addCommand(
+    ).addCommand(
         new Command('list') //
             .description('List all slash commands')
-            .action(async (...args) => importDynamic('list.js').then((m) => m.list(...args)))
-    );
+            .action(async (...args) => importDynamic('list.js').then((m) => m.list(...args))))
+    .addCommand(
+        new Command('clear')
+            .description('Clear and reset commands-data-remote.json and the api')
+            .option('-y, --yes', "Say yes to all prompts")
+            .option('-e, --env [path]', "Supply a path to a .env")
+            .action(async (...args) => importDynamic('command-clear.js').then((m) => m.command_clear(...args))));
 
 program
     .command('build')
