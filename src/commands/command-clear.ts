@@ -50,6 +50,7 @@ export async function commandClear(args: Record<string,any>) {
                     process.exit(1)
                 }
             })
+            spin.succeed();
         } catch(e) {
             spin.fail("Something went wrong. ");
             throw e;
