@@ -52,7 +52,7 @@ program //
             .description('Clear and reset commands-data-remote.json and the api')
             .option('-y, --yes', "Say yes to all prompts")
             .option('-e, --env [path]', "Supply a path to a .env")
-            .action(async (...args) => importDynamic('command-clear.js').then((m) => m.command_clear(...args))));
+            .action(async (...args) => importDynamic('command-clear.js').then((m) => m.commandClear(...args))));
 
 program
     .command('build')
