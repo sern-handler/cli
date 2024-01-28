@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import * as Rest from './rest';
 import type { sernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
-import { cyanBright, greenBright, redBright } from 'colorette';
+import { cyanBright, greenBright, magentaBright, redBright } from 'colorette';
 import ora from 'ora';
 
 async function deriveFileInfo(dir: string, file: string) {
@@ -163,8 +163,7 @@ const publishableData = modules.map(makePublishData),
     appid = process.env.applicationId || process.env.APPLICATION_ID;
 
 assert(token, 'Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?');
-assert(appid, 'Could not find an application id for this bot in .env or commandline. Do you have APPLICATION_ID in env?');
-
+appid && console.warn(`${magentaBright('WARNING')}: APPLICATION_ID is not necessary anymore`);
 // partition globally published and guilded commands
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
@@ -181,7 +180,7 @@ const spin = ora(`Publishing ${cyanBright('Global')} commands`);
 
 globalCommands.length && spin.start();
 
-const rest = Rest.create(appid, token);
+const rest = await Rest.create(token);
 const res = await rest.updateGlobal(globalCommands);
 
 let globalCommandsResponse: unknown;

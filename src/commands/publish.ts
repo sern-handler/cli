@@ -15,7 +15,7 @@ export async function publish(commandDir: string | undefined, args: Partial<Publ
     args.import ??= [];
 
     args.token && console.info('Token passed through command line');
-    args.applicationId && console.info('applicationId passed through command line');
+    args.applicationId && console.info(magentaBright('WARNING')+ ' This option is deprecated. Do not pass applicationId through command line');
     commandDir && console.info('Publishing with override path: ', commandDir);
 
     const dotenvLocation = new URL('../node_modules/dotenv/config.js', rootPath),

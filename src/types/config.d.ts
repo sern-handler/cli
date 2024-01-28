@@ -13,7 +13,7 @@ export interface sernConfig {
 
 export interface TheoreticalEnv {
     DISCORD_TOKEN: string;
-    APPLICATION_ID: string;
+    APPLICATION_ID?: string;
     MODE: 'PROD' | 'DEV';
     [name: string]: string;
 }

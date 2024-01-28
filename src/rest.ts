@@ -11,12 +11,22 @@ const publishablesIntoJson = (ps: PublishableModule[]) =>
         4
     );
 
-export const create = (appid: string, token: string) => {
-    const globalURL = new URL(`${appid}/commands`, baseURL);
+export const create = async (token: string) => {
     const headers = {
         Authorization: 'Bot ' + token,
         'Content-Type': 'application/json',
     };
+    let me;
+    let appid: string;
+    try {
+        me = await fetch(new URL('@me', baseURL), { headers }).then(res => res.json());
+        appid = me.id;
+    } catch(e) {
+        console.log("Something went wrong while trying to fetch your application:");
+        throw e;
+    }
+    const globalURL = new URL(`${appid}/commands`, baseURL);
+    
     return {
         updateGlobal: (commands: PublishableModule[]) =>
             fetch(globalURL, {
