@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/sern-handler/cli/compare/v1.0.3...v1.1.0) (2024-01-28)
+
+
+### Features
+
+* command clear ([#128](https://github.com/sern-handler/cli/issues/128)) ([303ac02](https://github.com/sern-handler/cli/commit/303ac0280c7c7c55f2670d49c9685b911670bc05))
+
 ## [1.0.3](https://github.com/sern-handler/cli/compare/v1.0.2...v1.0.3) (2023-12-25)
 
 
