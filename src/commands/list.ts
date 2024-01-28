@@ -14,9 +14,11 @@ export function list() {
     const globalCommands = commands.global;
 
     delete commands.global;
-    console.log(bold('Global Commands'));
-    for (const command of globalCommands) log(command);
-
+    if(globalCommands) {
+        console.log(bold('Global Commands'));
+        for (const command of globalCommands) log(command);
+    }
+    
     console.log('\t');
 
     for (const guildId in commands) {
