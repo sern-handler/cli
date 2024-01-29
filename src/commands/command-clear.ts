@@ -23,9 +23,7 @@ const getConfirmation = (args: Record<string,any> ) => {
 export async function commandClear(args: Record<string,any>) {
     dotenv.configDotenv({ path: args.env || resolve('.env') })
     const token = process.env.token || process.env.DISCORD_TOKEN;
-    const appid = process.env.applicationId || process.env.APPLICATION_ID;
     assert(token, 'Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?');
-    assert(appid, 'Could not find an application id for this bot in .env or commandline. Do you have APPLICATION_ID in env?');
     
     const confirmation = await getConfirmation(args);
    
@@ -34,7 +32,7 @@ export async function commandClear(args: Record<string,any>) {
             text: `Deleting ALL application commands...`,
             spinner: 'aesthetic',
         }).start();
-        const rest = Rest.create(appid, token);
+        const rest = await Rest.create(token);
         let guildCommands: Record<GuildId, CommandData[]> 
         try {
             guildCommands = JSON.parse(readFileSync('.sern/command-data-remote.json', 'utf-8'))
