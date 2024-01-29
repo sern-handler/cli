@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/sern-handler/cli/compare/v1.1.0...v1.2.0) (2024-01-29)
+
+
+### Features
+
+* make application id optional, thanks [@trueharuu](https://github.com/trueharuu) ([#130](https://github.com/sern-handler/cli/issues/130)) ([2d6e65a](https://github.com/sern-handler/cli/commit/2d6e65a1e6073f605aab192b8cea33037a04af2c))
+
 ## [1.1.0](https://github.com/sern-handler/cli/compare/v1.0.3...v1.1.0) (2024-01-28)
 
 
