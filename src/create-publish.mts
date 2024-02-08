@@ -196,7 +196,10 @@ if (res.ok) {
     console.error("Status Text ", res.statusText);
     switch(res.status) {
         case 400 : {
-            console.error('errors:', inspect(await res.json(), { depth: Infinity }));
+            const validation_errors = await res.json()
+            console.error('errors:', inspect(validation_errors, { depth: Infinity }));
+            console.error("Modules with validation errors:" 
+                          + inspect(Object.keys(validation_errors.errors).map(idx => globalCommands[idx as any])))
             throw Error("400: Ensure your commands have proper fields and data with nothing left out");
         }
         case 404 : {
@@ -252,6 +255,9 @@ for (const [guildId, array] of guildCommandMap.entries()) {
         switch(response.status) {
             case 400 : {
                 console.error(inspect(result, { depth: Infinity }))
+                console.error("Modules with validation errors:" 
+                + inspect(Object.keys(result.errors).map(idx => array[idx as any])))
+
                 throw Error("400: Ensure your commands have proper fields and data and nothing left out");
             }
             case 404 : {
