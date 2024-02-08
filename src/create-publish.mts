@@ -11,6 +11,7 @@ import * as Rest from './rest';
 import type { sernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
 import { cyanBright, greenBright, magentaBright, redBright } from 'colorette';
+import { inspect } from 'node:util'
 import ora from 'ora';
 
 async function deriveFileInfo(dir: string, file: string) {
@@ -191,25 +192,26 @@ if (res.ok) {
     globalCommandsResponse = await res.json();
 } else {
     spin.fail(`Failed to publish global commands [Code: ${redBright(res.status)}]`);
-    switch(res.status) {
-        case 400 : 
-            throw Error("400: Ensure your commands have proper fields and data with nothing left out");
-        case 404 : 
-            throw Error("Forbidden 404. Is you application id and/or token correct?")
-        case 429: 
-            throw Error('Chill out homie, too many requests')
-    }
-    console.error('errors:',
-        await res
-            .json()
-            .then((res) => {
-                const errors = Object.values(res?.errors ?? {});
-                // @ts-ignore
-                return errors.map((err) => err?.name?._errors);
-            })
-            .catch(() => "No errors found (Unparsable json for a request with bad status code). Read the status code.")
-    );
+    let err: Error
     console.error("Status Text ", res.statusText);
+    switch(res.status) {
+        case 400 : {
+            console.error('errors:', inspect(await res.json(), { depth: Infinity }));
+            throw Error("400: Ensure your commands have proper fields and data with nothing left out");
+        }
+        case 404 : {
+            console.error('errors:', inspect(await res.json(), { depth: Infinity }));
+            throw Error("Forbidden 404. Is you application id and/or token correct?")
+        } 
+        case 429: {
+            console.error('errors:', inspect(await res.json(), { depth: Infinity }));
+            err = Error('Chill out homie, too many requests') 
+        } break;
+        default: {
+            console.error('errors:', inspect(await res.json(), { depth: Infinity }));
+            throw Error(res.status.toString() + " error")
+        }
+    }
 }
 
 function associateGuildIdsWithData(data: PublishableModule[]): Map<string, PublishableData[]> {
@@ -248,12 +250,18 @@ for (const [guildId, array] of guildCommandMap.entries()) {
     } else {
         spin.fail(`[${redBright(guildId)}] Failed to update commands for guild, Reason: ${result.message}`);
         switch(response.status) {
-            case 400 : 
+            case 400 : {
+                console.error(inspect(result, { depth: Infinity }))
                 throw Error("400: Ensure your commands have proper fields and data and nothing left out");
-            case 404 : 
+            }
+            case 404 : {
+                console.error(inspect(result, { depth: Infinity }))
                 throw Error("Forbidden 404. Is you application id and/or token correct?")
-            case 429: 
+            }
+            case 429: {
+                console.error(inspect(result, { depth: Infinity }))
                 throw Error('Chill out homie, too many requests')
+            }
         }
     }
 }
