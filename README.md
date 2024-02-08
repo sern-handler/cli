@@ -3,11 +3,11 @@
 </div>
 
 # Features
-
-😁 **User Friendly** <br>
-💦 **Simple** <br>
-🌱 **Efficient** <br>
-💪 **Powerful** <br>
+- Manage discord application commands from the command line.
+- Install plugins from the community.
+- Really fast startup times (I think).
+- Deploy with premade docker configurations.
+- Inhouse build tool based on esbuild built for sern applications, nearly **zero** config.
 
 ## Installation
 
