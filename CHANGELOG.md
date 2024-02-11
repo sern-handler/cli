@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1](https://github.com/sern-handler/cli/compare/v1.2.0...v1.2.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* better error messages for publish ([d1832e4](https://github.com/sern-handler/cli/commit/d1832e44ce1b10aeb5b9dc902b7d35ab51c41ff3))
+
 ## [1.2.0](https://github.com/sern-handler/cli/compare/v1.1.0...v1.2.0) (2024-01-29)
 
 
