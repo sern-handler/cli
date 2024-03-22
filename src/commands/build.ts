@@ -1,6 +1,6 @@
 import esbuild from 'esbuild';
 import { getConfig } from '../utilities/getConfig';
-import { resolve } from 'node:path';
+import p from 'node:path';
 import { glob } from 'glob';
 import { configDotenv } from 'dotenv';
 import assert from 'node:assert';
@@ -11,7 +11,8 @@ import { pathExists, pathExistsSync } from 'find-up';
 import { mkdir, writeFile } from 'fs/promises';
 import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
-
+import { readFile } from 'fs/promises'
+import { fileURLToPath} from 'node:url'
 type BuildOptions = {
     /**
      * Define __VERSION__
@@ -54,21 +55,13 @@ export async function build(options: Record<string, any>) {
     }
     const sernConfig = await getConfig();
     let buildConfig: Partial<BuildOptions> = {};
-
-    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
-        //for some reason, my ignore glob wasn't registering correctly'
-        ignore: {
-            ignored: (p) => p.name.endsWith('.d.ts'),
-        },
-    });
-
-    const buildConfigPath = resolve(options.project ?? 'sern.build.js');
+    const buildConfigPath = p.resolve(options.project ?? 'sern.build.js');
 
     const resolveBuildConfig = (path: string|undefined, language: string) => {
        if(language === 'javascript') {
-        return path ?? resolve('jsconfig.json')
+        return path ?? p.resolve('jsconfig.json')
        }
-       return path ?? resolve('tsconfig.json')
+       return path ?? p.resolve('tsconfig.json')
     }
 
     const defaultBuildConfig = {
@@ -77,7 +70,7 @@ export async function build(options: Record<string, any>) {
         mode: options.mode ?? 'development',
         dropLabels: [],
         tsconfig: resolveBuildConfig(options.tsconfig, sernConfig.language),
-        env: options.env ?? resolve('.env'),
+        env: options.env ?? p.resolve('.env'),
     };
     if (pathExistsSync(buildConfigPath)) {
         //throwable, buildConfigPath may not exist
@@ -89,7 +82,6 @@ export async function build(options: Record<string, any>) {
         buildConfig = defaultBuildConfig;
         console.log('No build config found, defaulting');
     }
-
     let env = {} as Record<string, string>;
     configDotenv({ path: buildConfig.env, processEnv: env });
     const modeButNotNodeEnvExists = env.MODE && !env.NODE_ENV;
@@ -128,18 +120,74 @@ export async function build(options: Record<string, any>) {
     console.log(' ', magentaBright('tsconfig'), buildConfig.tsconfig);
     console.log(' ', magentaBright('env'), buildConfig.env);
 
-    const sernDir = resolve('.sern'),
-          genDir = resolve(sernDir, 'generated'),
-          ambientFilePath = resolve(sernDir, 'ambient.d.ts'),
-          packageJsonPath = resolve('package.json'),
-          sernTsConfigPath = resolve(sernDir, 'tsconfig.json'),
+    const sernDir = p.resolve('.sern'),
+          genDir = p.resolve(sernDir, 'generated'),
+          ambientFilePath = p.resolve(sernDir, 'ambient.d.ts'),
+          packageJsonPath = p.resolve('package.json'),
+          sernTsConfigPath = p.resolve(sernDir, 'tsconfig.json'),
           packageJson = () => require(packageJsonPath);
 
     if (!(await pathExists(genDir))) {
         console.log('Making .sern/generated dir, does not exist');
         await mkdir(genDir, { recursive: true });
     }
+    if(sernConfig.type == 'serverless') {
+        //we build for cloudflare workers rn
+        const callsite = fileURLToPath(import.meta.url);
+        const template = await readFile(p.resolve(callsite, "../../../templates/cf.js"), 'utf8');
+        const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
+            //for some reason, my ignore glob wasn't registering correctly'
+            ignore: {
+                ignored: (p) => { 
+                    return p.name.endsWith('.d.ts')
+                },
+                childrenIgnored: p => p.isNamed('commands')
+            },
+        });
+        const commandsPaths = await glob(`**/*`, { 
+            ignore: {
+                ignored: p => p.isDirectory()  
+            },
+            cwd: "./src/commands/"
+        });
+        console.log(entryPoints)
+        console.log(commandsPaths)
+        const commandsImports = commandsPaths.map(file => {
+            const fname = p.parse(file)
+            return `import ${fname.name} from "./${p.join(`./commands/${file}`).replace(/\\/g, '/')}"`
+        });
+        console.log(commandsImports)
+        await esbuild.build({
+            entryPoints: commandsPaths.map(file => p.join("src", "commands", file)),
+            plugins: [imageLoader, ...(buildConfig.esbuildPlugins ?? [])],
+            ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig, "./dist/commands"),
+            outdir: "./dist/commands",
+            dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
+        });
+        //may need to invest in magicast for this lol
+        const importedModulesTemplate = template
+            .replace("\"use modules\";", commandsImports.join("\n"))
+            .replace("\"use handle\";", `
+                if(interaction.data.name === "${p.parse(commandsPaths.shift()!).name}") {
+                    return;
+                }
+                ${commandsPaths.map(imp => {
+                    return `else if(interaction.data.name === "${p.parse(imp).name}" ) { }`
+                }).join("\n")}
+            `);
 
+        await writeFile("./dist/out.js", importedModulesTemplate);
+    } else {
+
+
+    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
+        //for some reason, my ignore glob wasn't registering correctly'
+        ignore: {
+            ignored: (p) => p.name.endsWith('.d.ts'),
+        },
+    });
+
+    
     try {
         const defVersion = () => JSON.stringify(packageJson().version);
         const define = {
@@ -164,5 +212,6 @@ export async function build(options: Record<string, any>) {
     } catch (e) {
         console.error(e);
         process.exit(1);
+    }
     }
 }

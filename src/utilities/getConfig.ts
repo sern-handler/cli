@@ -13,6 +13,7 @@ export async function getConfig(): Promise<sernConfig> {
 }
 
 export interface sernConfig {
+    type?: "serverless" | "websocket"
     language: 'typescript' | 'javascript';
     defaultPrefix?: string;
     paths: {
