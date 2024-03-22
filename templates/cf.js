@@ -21,6 +21,21 @@ class JsonResponse extends Response {
   }
 }
 
+async function executeModule(
+    emitter,
+    logger,
+    errHandler,
+    { module, task, args },
+) {
+    try {
+        await module.execute(args);
+        emitter.emit('module.activate', /*resultPayload(PayloadType.Success, module)*/);
+    } catch(e) {
+        throw e /* { } */
+    }
+    
+}
+
 const router = Router();
 
 /**

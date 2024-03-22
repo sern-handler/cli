@@ -154,7 +154,7 @@ export async function build(options: Record<string, any>) {
         console.log(commandsPaths)
         const commandsImports = commandsPaths.map(file => {
             const fname = p.parse(file)
-            return `import ${fname.name} from "./${p.join(`./commands/${file}`).replace(/\\/g, '/')}"`
+            return `import ${fname.name} from "./${p.join(`./commands/${file}`).split(p.sep).join(p.posix.sep)}"`
         });
         console.log(commandsImports)
         await esbuild.build({
