@@ -168,16 +168,15 @@ export async function build(options: Record<string, any>) {
         if(commandsPaths.length === 0) {
             throw Error("No modules found. Stopping building.")
         }
-        const fst = commandsPaths.shift()!
         const importedModulesTemplate = template
             .replace("\"use modules\";", commandsImports.join("\n"))
             .replace("\"use handle\";", `
                 ${commandsPaths.map((imp, i) => {
                     if(i === 0) {
-                    return `if(interaction.data.name === "${p.parse(fst).name}") {
-                                const success = await applyPlugins(${p.parse(fst).name});
+                    return `if(interaction.data.name === "${p.parse(imp).name}") {
+                                const success = await applyPlugins(${p.parse(imp).name});
                                 if(success) {
-                                    await ${p.parse(fst).name}.execute();
+                                    await ${p.parse(imp).name}.execute();
                                 }
                             }`
                     }
