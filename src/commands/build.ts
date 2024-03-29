@@ -165,14 +165,28 @@ export async function build(options: Record<string, any>) {
             dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
         });
         //may need to invest in magicast for this lol
+        if(commandsPaths.length === 0) {
+            throw Error("No modules found. Stopping building.")
+        }
+        const fst = commandsPaths.shift()!
         const importedModulesTemplate = template
             .replace("\"use modules\";", commandsImports.join("\n"))
             .replace("\"use handle\";", `
-                if(interaction.data.name === "${p.parse(commandsPaths.shift()!).name}") {
-                    return;
-                }
-                ${commandsPaths.map(imp => {
-                    return `else if(interaction.data.name === "${p.parse(imp).name}" ) { }`
+                ${commandsPaths.map((imp, i) => {
+                    if(i === 0) {
+                    return `if(interaction.data.name === "${p.parse(fst).name}") {
+                                const success = await applyPlugins(${p.parse(fst).name});
+                                if(success) {
+                                    await ${p.parse(fst).name}.execute();
+                                }
+                            }`
+                    }
+                    return `else if(interaction.data.name === "${p.parse(imp).name}" ) { 
+                           const success = await applyPlugins(${p.parse(imp).name});
+                           if(success) {
+                                await ${p.parse(imp).name}.execute();
+                           }
+                    }`
                 }).join("\n")}
             `);
 

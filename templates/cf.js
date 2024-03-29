@@ -29,11 +29,22 @@ async function executeModule(
 ) {
     try {
         await module.execute(args);
-        emitter.emit('module.activate', /*resultPayload(PayloadType.Success, module)*/);
+        //emitter.emit('module.activate', /*resultPayload(PayloadType.Success, module)*/);
     } catch(e) {
-        throw e /* { } */
+        throw e 
     }
     
+}
+
+async function applyPlugins(module, payload) {
+    let success = true;
+    for (const plg of module.onEvent){
+        const res = await plg.execute(payload);
+        if(!res.ok) {
+            success = false;
+        }
+    }
+    return success;
 }
 
 const router = Router();
