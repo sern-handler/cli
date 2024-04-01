@@ -174,21 +174,22 @@ export async function build(options: Record<string, any>) {
                 ${commandsPaths.map((imp, i) => {
                     if(i === 0) {
                     return `if(interaction.data.name === "${p.parse(imp).name}") {
-                                const success = await applyPlugins(${p.parse(imp).name});
+                                const data = createContext(interaction)
+                                const success = await applyPlugins(${p.parse(imp).name}, data);
                                 if(success) {
-                                    await ${p.parse(imp).name}.execute();
+                                    await ${p.parse(imp).name}.execute(data);
                                 }
                             }`
                     }
                     return `else if(interaction.data.name === "${p.parse(imp).name}" ) { 
-                           const success = await applyPlugins(${p.parse(imp).name});
-                           if(success) {
-                                await ${p.parse(imp).name}.execute();
-                           }
-                    }`
-                }).join("\n")}
-            `);
-
+                                const data = createContext(interaction)
+                                const success = await applyPlugins(${p.parse(imp).name}, data);
+                                if(success) {
+                                    await ${p.parse(imp).name}.execute(data);
+                                }
+                            }`
+                }).join("\n")}`.trim());
+        
         await writeFile("./dist/out.js", importedModulesTemplate);
     } else {
 
