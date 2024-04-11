@@ -182,8 +182,9 @@ appid && console.warn(`${magentaBright('WARNING')}: APPLICATION_ID is not necess
 // partition globally published and guilded commands
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
-        const isPublishableGlobally = !module.config || !Array.isArray(module.config.guildIds);
+        const isPublishableGlobally =  !Array.isArray(module.config?.guildIds);
         if (isPublishableGlobally) {
+            console.log(module)
             return [[module, ...globals], guilded];
         }
         return [globals, [module, ...guilded]];
@@ -200,10 +201,10 @@ const res = await rest.updateGlobal(globalCommands);
 
 let globalCommandsResponse: unknown;
 
-
 if (res.ok) {
     globalCommands.length && spin.succeed(`All ${cyanBright('Global')} commands published`);
     globalCommandsResponse = await res.json();
+    console.log(globalCommandsResponse)
 } else {
     spin.fail(`Failed to publish global commands [Code: ${redBright(res.status)}]`);
     let err: Error
