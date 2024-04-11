@@ -40,7 +40,6 @@ program //
             .option('-W --suppress-warnings', 'suppress experimental warning')
             .option('-i, --import [scriptPath...]', 'Prerequire a script to load into publisher')
             .option('-t, --token [token]')
-            .option('--appId [applicationId]')
             .argument('[path]', 'path with respect to current working directory that will locate all published files')
             .action(async (...args) => importDynamic('publish.js').then((m) => m.publish(...args)))
     ).addCommand(

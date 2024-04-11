@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import * as Rest from './rest';
 import type { sernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
-import { cyanBright, greenBright, magentaBright, redBright } from 'colorette';
+import { cyanBright, greenBright, redBright } from 'colorette';
 import { inspect } from 'node:util'
 import ora from 'ora';
 
@@ -144,7 +144,6 @@ const serialize = (permissions: unknown) => {
 
 const makePublishData = ({ commandModule, config }: Record<string, Record<string, unknown>>) => {
     const applicationType = intoApplicationType(commandModule.type as number);
-    console.log(config)
     return {
         data: {
             name: commandModule.name as string,
@@ -174,11 +173,9 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
 
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData),
-    token = process.env.token || process.env.DISCORD_TOKEN,
-    appid = process.env.applicationId || process.env.APPLICATION_ID;
+    token = process.env.token || process.env.DISCORD_TOKEN;
 
 assert(token, 'Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?');
-appid && console.warn(`${magentaBright('WARNING')}: APPLICATION_ID is not necessary anymore`);
 // partition globally published and guilded commands
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {
