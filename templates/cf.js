@@ -20,6 +20,7 @@ class JsonResponse extends Response {
     super(jsonBody, init);
   }
 }
+
 function createContext(rawcontext) {
     return rawcontext
 }
@@ -40,7 +41,7 @@ async function executeModule(
 
 async function applyPlugins(module, payload) {
     let success = true;
-    for (const plg of module.onEvent){
+    for (const plg of module.onEvent) {
         const res = await plg.execute(payload);
         if(!res.isOk()) {
             success = false;

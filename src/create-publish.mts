@@ -10,7 +10,7 @@ import { once } from 'node:events';
 import * as Rest from './rest';
 import type { sernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
-import { cyanBright, greenBright, magentaBright, redBright } from 'colorette';
+import { cyanBright, greenBright, redBright } from 'colorette';
 import { inspect } from 'node:util'
 import ora from 'ora';
 
@@ -153,6 +153,19 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
             options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
             dm_permission: config?.dmPermission,
             default_member_permissions: serialize(config?.defaultMemberPermissions),
+            //@ts-ignore
+            integration_types: (config?.integrationTypes ?? ['Guild']).map(
+                (s: string) => {
+                    if(s === "Guild") {
+                        return 0
+                    } else if (s == "User") {
+                        return 1
+                    } else {
+                        throw Error("IntegrationType is not one of Guild or User");
+                    }
+                }),
+            //@ts-ignore
+            contexts: config?.contexts ? config.contexts : undefined
         },
         config,
     };
@@ -160,11 +173,9 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
 
 // We can use these objects to publish to DAPI
 const publishableData = modules.map(makePublishData),
-    token = process.env.token || process.env.DISCORD_TOKEN,
-    appid = process.env.applicationId || process.env.APPLICATION_ID;
+    token = process.env.token || process.env.DISCORD_TOKEN;
 
 assert(token, 'Could not find a token for this bot in .env or commandline. Do you have DISCORD_TOKEN in env?');
-appid && console.warn(`${magentaBright('WARNING')}: APPLICATION_ID is not necessary anymore`);
 // partition globally published and guilded commands
 const [globalCommands, guildedCommands] = publishableData.reduce(
     ([globals, guilded], module) => {

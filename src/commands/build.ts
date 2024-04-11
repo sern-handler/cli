@@ -4,7 +4,6 @@ import p from 'node:path';
 import { glob } from 'glob';
 import { configDotenv } from 'dotenv';
 import assert from 'node:assert';
-import { imageLoader, validExtensions } from '../plugins/imageLoader';
 import defaultEsbuild from '../utilities/defaultEsbuildConfig';
 import { require } from '../utilities/require';
 import { pathExists, pathExistsSync } from 'find-up';
@@ -13,6 +12,7 @@ import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
 import { readFile } from 'fs/promises'
 import { fileURLToPath} from 'node:url'
+const validExtensions = ['.ts', '.js', '.json', '.png', '.jpg', '.jpeg', '.webp'];
 type BuildOptions = {
     /**
      * Define __VERSION__
@@ -159,7 +159,7 @@ export async function build(options: Record<string, any>) {
         console.log(commandsImports)
         await esbuild.build({
             entryPoints: commandsPaths.map(file => p.join("src", "commands", file)),
-            plugins: [imageLoader, ...(buildConfig.esbuildPlugins ?? [])],
+            plugins: [...(buildConfig.esbuildPlugins ?? [])],
             ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig, "./dist/commands"),
             outdir: "./dist/commands",
             dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
@@ -173,13 +173,13 @@ export async function build(options: Record<string, any>) {
             .replace("\"use handle\";", `
                 ${commandsPaths.map((imp, i) => {
                     if(i === 0) {
-                    return `if(interaction.data.name === "${p.parse(imp).name}") {
-                                const data = createContext(interaction)
-                                const success = await applyPlugins(${p.parse(imp).name}, data);
-                                if(success) {
-                                    await ${p.parse(imp).name}.execute(data);
-                                }
-                            }`
+                        return `if(interaction.data.name === "${p.parse(imp).name}") {
+                                    const data = createContext(interaction)
+                                    const success = await applyPlugins(${p.parse(imp).name}, data);
+                                    if(success) {
+                                        await ${p.parse(imp).name}.execute(data);
+                                    }
+                                }`
                     }
                     return `else if(interaction.data.name === "${p.parse(imp).name}" ) { 
                                 const data = createContext(interaction)
@@ -192,40 +192,38 @@ export async function build(options: Record<string, any>) {
         
         await writeFile("./dist/out.js", importedModulesTemplate);
     } else {
-
-
-    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
-        //for some reason, my ignore glob wasn't registering correctly'
-        ignore: {
-            ignored: (p) => p.name.endsWith('.d.ts'),
-        },
-    });
-
-    
-    try {
-        const defVersion = () => JSON.stringify(packageJson().version);
-        const define = {
-            ...(buildConfig.define ?? {}),
-            __DEV__: `${buildConfig.mode === 'development'}`,
-            __PROD__: `${buildConfig.mode === 'production'}`,
-        } satisfies Record<string, string>;
-
-        buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
-
-        await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
-        await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
-
-        //https://esbuild.github.io/content-types/#tsconfig-json
-        await esbuild.build({
-            entryPoints,
-            plugins: [imageLoader, ...(buildConfig.esbuildPlugins ?? [])],
-            ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
-            define,
-            dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
+        const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
+            //for some reason, my ignore glob wasn't registering correctly'
+            ignore: {
+                ignored: (p) => p.name.endsWith('.d.ts'),
+            },
         });
-    } catch (e) {
-        console.error(e);
-        process.exit(1);
-    }
+
+        
+        try {
+            const defVersion = () => JSON.stringify(packageJson().version);
+            const define = {
+                ...(buildConfig.define ?? {}),
+                __DEV__: `${buildConfig.mode === 'development'}`,
+                __PROD__: `${buildConfig.mode === 'production'}`,
+            } satisfies Record<string, string>;
+
+            buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
+
+            await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
+            await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
+
+            //https://esbuild.github.io/content-types/#tsconfig-json
+            await esbuild.build({
+                entryPoints,
+                plugins: [...(buildConfig.esbuildPlugins ?? [])],
+                ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
+                define,
+                dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
+            });
+        } catch (e) {
+            console.error(e);
+            process.exit(1);
+        }
     }
 }
