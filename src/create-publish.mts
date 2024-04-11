@@ -144,6 +144,7 @@ const serialize = (permissions: unknown) => {
 
 const makePublishData = ({ commandModule, config }: Record<string, Record<string, unknown>>) => {
     const applicationType = intoApplicationType(commandModule.type as number);
+    console.log(config)
     return {
         data: {
             name: commandModule.name as string,
@@ -153,6 +154,19 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
             options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
             dm_permission: config?.dmPermission,
             default_member_permissions: serialize(config?.defaultMemberPermissions),
+            //@ts-ignore
+            integration_types: (config?.integrationTypes ?? ['Guild']).map(
+                (s: string) => {
+                    if(s === "Guild") {
+                        return 0
+                    } else if (s == "User") {
+                        return 1
+                    } else {
+                        throw Error("IntegrationType is not one of Guild or User");
+                    }
+                }),
+            //@ts-ignore
+            contexts: config?.contexts ? config.contexts : undefined
         },
         config,
     };
