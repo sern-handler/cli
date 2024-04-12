@@ -80,34 +80,10 @@ router.post('/', async (request, env) => {
       type: InteractionResponseType.PONG,
     });
   }
-
-  if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-      "use handle";
-    // Most user commands will come as `APPLICATION_COMMAND`.
-//    switch (interaction.data.name.toLowerCase()) {
-//      case AWW_COMMAND.name.toLowerCase(): {
-//        const cuteUrl = await getCuteUrl();
-//        return new JsonResponse({
-//          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-//          data: {
-//            content: cuteUrl,
-//          },
-//        });
-//      }
-//      case INVITE_COMMAND.name.toLowerCase(): {
-//        const applicationId = env.DISCORD_APPLICATION_ID;
-//        const INVITE_URL = `https://discord.com/oauth2/authorize?client_id=${applicationId}&scope=applications.commands`;
-//        return new JsonResponse({
-//          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-//          data: {
-//            content: INVITE_URL,
-//            flags: InteractionResponseFlags.EPHEMERAL,
-//          },
-//        });
-//      }
-//      default:
-//        return new JsonResponse({ error: 'Unknown Type' }, { status: 400 });
-//    }
+  if(interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {
+      "use autocomplete";
+  } else if (interaction.type === InteractionType.APPLICATION_COMMAND) {
+      "use slash";
   }
 
   console.error('Unknown Type');

@@ -170,11 +170,11 @@ export async function build(options: Record<string, any>) {
         }
         const importedModulesTemplate = template
             .replace("\"use modules\";", commandsImports.join("\n"))
-            .replace("\"use handle\";", `
+            .replace("\"use slash\";", `
                 ${commandsPaths.map((imp, i) => {
                     if(i === 0) {
                         return `if(interaction.data.name === "${p.parse(imp).name}") {
-                                    const data = createContext(interaction)
+                                    const data = createContext(interaction);
                                     const success = await applyPlugins(${p.parse(imp).name}, data);
                                     if(success) {
                                         await ${p.parse(imp).name}.execute(data);
@@ -182,13 +182,14 @@ export async function build(options: Record<string, any>) {
                                 }`
                     }
                     return `else if(interaction.data.name === "${p.parse(imp).name}" ) { 
-                                const data = createContext(interaction)
+                                const data = createContext(interaction);
                                 const success = await applyPlugins(${p.parse(imp).name}, data);
                                 if(success) {
                                     await ${p.parse(imp).name}.execute(data);
                                 }
                             }`
-                }).join("\n")}`.trim());
+                }).join("\n")}`.trim())
+           
         
         await writeFile("./dist/out.js", importedModulesTemplate);
     } else {
