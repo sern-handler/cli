@@ -86,9 +86,9 @@ export async function build(options: Record<string, any>) {
     configDotenv({ path: buildConfig.env, processEnv: env });
     const modeButNotNodeEnvExists = env.MODE && !env.NODE_ENV;
     if (modeButNotNodeEnvExists) {
-        console.warn('Use NODE_ENV instead of MODE');
-        console.warn('MODE has no effect.');
-        console.warn(`https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production`);
+        console.warn('Use NODE_ENV instead of MODE \n\
+                      MODE has no effect. \n\
+                      https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production'); 
     }
 
     if (env.NODE_ENV) {
@@ -97,19 +97,14 @@ export async function build(options: Record<string, any>) {
     }
 
     assert(buildConfig.mode === 'development' || buildConfig.mode === 'production', 'Mode is not `production` or `development`');
-
-
     try {
         let config = require(buildConfig.tsconfig!);
         config.extends && console.warn("Extend the generated tsconfig")
     } catch(e) {
-         console.warn("no tsconfig / jsconfig found");
-         console.warn(`Please create a ${sernConfig.language === 'javascript' ? 'jsconfig.json' : 'tsconfig.json' }`);
-         console.warn("It should have at least extend the generated one sern makes.")
-         console.warn(`
-            { 
-                "extends": "./.sern/tsconfig.json",
-            }`.trim())
+         console.error("no tsconfig / jsconfig found");
+         console.error(`Please create a ${sernConfig.language === 'javascript' ? 'jsconfig.json' : 'tsconfig.json' }`);
+         console.error('It should have at least extend the generated one sern makes.\n \
+                        { "extends": "./.sern/tsconfig.json" }');
         throw e;
     }
 
@@ -201,30 +196,26 @@ export async function build(options: Record<string, any>) {
         });
 
         
-        try {
-            const defVersion = () => JSON.stringify(packageJson().version);
-            const define = {
-                ...(buildConfig.define ?? {}),
-                __DEV__: `${buildConfig.mode === 'development'}`,
-                __PROD__: `${buildConfig.mode === 'production'}`,
-            } satisfies Record<string, string>;
+        const defVersion = () => JSON.stringify(packageJson().version);
+        const define = {
+            ...(buildConfig.define ?? {}),
+            __DEV__: `${buildConfig.mode === 'development'}`,
+            __PROD__: `${buildConfig.mode === 'production'}`,
+        } satisfies Record<string, string>;
 
-            buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
+        buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
 
-            await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
-            await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
+        await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
+        await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
 
-            //https://esbuild.github.io/content-types/#tsconfig-json
-            await esbuild.build({
-                entryPoints,
-                plugins: [...(buildConfig.esbuildPlugins ?? [])],
-                ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
-                define,
-                dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
-            });
-        } catch (e) {
-            console.error(e);
-            process.exit(1);
-        }
+        //https://esbuild.github.io/content-types/#tsconfig-json
+        await esbuild.build({
+            entryPoints,
+            plugins: [...(buildConfig.esbuildPlugins ?? [])],
+            ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
+            define,
+            dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
+        });
+        
     }
 }
