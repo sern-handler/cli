@@ -165,7 +165,7 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
                     }
                 }),
             //@ts-ignore
-            contexts: config?.contexts ? config.contexts : undefined
+            contexts: config?.contexts ?? undefined
         },
         config,
     };

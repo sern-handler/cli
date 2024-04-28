@@ -20,21 +20,4 @@ export interface sernConfig {
         commands: string;
         events?: string;
     };
-    app?: {
-        customInstallUrl?: string;
-        description?: string;
-        roleConnectionsVerificationUrl?: string;
-        installParams?: {
-            type: 'install params object';
-        };
-        integrationTypesConfig?: {
-            type: 'dictionary with keys of application integration types';
-            description: 'In preview. Default scopes and permissions for each supported installation context. Value for each key is an integration type configuration object';
-        };
-        flags?: number;
-        icon?: '?image data';
-        coverImage?: '?image data';
-        interactionsEndpointUrl?: string;
-        tags: string[];
-    }
 }

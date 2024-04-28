@@ -12,7 +12,7 @@ import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
 import { readFile } from 'fs/promises'
 import { fileURLToPath} from 'node:url'
-const validExtensions = ['.ts', '.js', '.json', '.png', '.jpg', '.jpeg', '.webp'];
+const validExtensions = ['.ts', '.js' ];
 type BuildOptions = {
     /**
      * Define __VERSION__
@@ -133,9 +133,6 @@ export async function build(options: Record<string, any>) {
         const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
             //for some reason, my ignore glob wasn't registering correctly'
             ignore: {
-                ignored: (p) => { 
-                    return p.name.endsWith('.d.ts')
-                },
                 childrenIgnored: p => p.isNamed('commands')
             },
         });
@@ -188,14 +185,29 @@ export async function build(options: Record<string, any>) {
         
         await writeFile("./dist/out.js", importedModulesTemplate);
     } else {
-        const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
-            //for some reason, my ignore glob wasn't registering correctly'
+        const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, { 
             ignore: {
-                ignored: (p) => p.name.endsWith('.d.ts'),
+                childrenIgnored: p => p.isNamed('commands')
             },
         });
-
+        const commandsPaths = await glob(`**/*`, { 
+            ignore: {
+                ignored: p => p.isDirectory()  
+            },
+            cwd: "./src/commands/"
+        });
+        const commandNames = commandsPaths.map(p.parse)
+        const commandsImports = commandNames.map(fname => {
+            return `import ${fname.name} from "./${p.join(`./commands/${fname.base}`).split(p.sep).join(p.posix.sep)}"`
+        });
+        const commandMapTemplate = 
+            `const commands = new Map();\n` +
+            commandNames.map(({ name }) => `commands.set(${name}.id, ${name})`).join("\n");
+            
         
+        console.log(entryPoints)
+        console.log(commandsImports)
+        console.log(commandMapTemplate)
         const defVersion = () => JSON.stringify(packageJson().version);
         const define = {
             ...(buildConfig.define ?? {}),
