@@ -49,6 +49,13 @@ type BuildOptions = {
     env?: string;
 };
 
+const resolveBuildConfig = (path: string|undefined, language: string) => {
+    if(language === 'javascript') {
+        return path ?? p.resolve('jsconfig.json')
+    }
+    return path ?? p.resolve('tsconfig.json')
+}
+
 export async function build(options: Record<string, any>) {
     if (!options.supressWarnings) {
         console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`);
@@ -56,13 +63,6 @@ export async function build(options: Record<string, any>) {
     const sernConfig = await getConfig();
     let buildConfig: Partial<BuildOptions> = {};
     const buildConfigPath = p.resolve(options.project ?? 'sern.build.js');
-
-    const resolveBuildConfig = (path: string|undefined, language: string) => {
-       if(language === 'javascript') {
-        return path ?? p.resolve('jsconfig.json')
-       }
-       return path ?? p.resolve('tsconfig.json')
-    }
 
     const defaultBuildConfig = {
         defineVersion: true,
@@ -74,10 +74,7 @@ export async function build(options: Record<string, any>) {
     };
     if (pathExistsSync(buildConfigPath)) {
         //throwable, buildConfigPath may not exist
-        buildConfig = {
-            ...defaultBuildConfig,
-            ...(await import('file:///' + buildConfigPath)).default,
-        };
+        buildConfig = { ...defaultBuildConfig, ...(await import('file:///' + buildConfigPath)).default };
     } else {
         buildConfig = defaultBuildConfig;
         console.log('No build config found, defaulting');
@@ -197,14 +194,17 @@ export async function build(options: Record<string, any>) {
             cwd: "./src/commands/"
         });
         const commandNames = commandsPaths.map(p.parse)
-        const commandsImports = commandNames.map(fname => {
-            return `import ${fname.name} from "./${p.join(`./commands/${fname.base}`).split(p.sep).join(p.posix.sep)}"`
+        const commandsImports = commandNames.map((fname, i) => {
+            return `import m${i} from "./${p.join(`./commands/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`
         });
         const commandMapTemplate = 
-            `const commands = new Map();\n` +
-            commandNames.map(({ name }) => `commands.set(${name}.id, ${name})`).join("\n");
+            `export const commands = new Map();\n` +
+            commandNames.map((_, i) => `commands.set(m${i}.meta.id, m${i})`).join("\n");
             
-        
+        await writeFile("./dist/out.js",
+                        commandsImports.join("\n") + '\n' +
+                        commandMapTemplate);
+
         console.log(entryPoints)
         console.log(commandsImports)
         console.log(commandMapTemplate)
