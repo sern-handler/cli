@@ -188,9 +188,7 @@ export async function build(options: Record<string, any>) {
             },
         });
         const commandsPaths = await glob(`**/*`, { 
-            ignore: {
-                ignored: p => p.isDirectory()  
-            },
+            ignore: { ignored: p => p.isDirectory() },
             cwd: "./src/commands/"
         });
         const commandNames = commandsPaths.map(p.parse)
@@ -204,7 +202,7 @@ export async function build(options: Record<string, any>) {
         await writeFile("./dist/out.js",
                         commandsImports.join("\n") + '\n' +
                         commandMapTemplate);
-
+        
         console.log(entryPoints)
         console.log(commandsImports)
         console.log(commandMapTemplate)
