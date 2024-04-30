@@ -10,8 +10,6 @@ import { pathExists, pathExistsSync } from 'find-up';
 import { mkdir, writeFile } from 'fs/promises';
 import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
-import { readFile } from 'fs/promises'
-import { fileURLToPath} from 'node:url'
 const validExtensions = ['.ts', '.js' ];
 type BuildOptions = {
     /**
@@ -115,117 +113,55 @@ export async function build(options: Record<string, any>) {
     const sernDir = p.resolve('.sern'),
           genDir = p.resolve(sernDir, 'generated'),
           ambientFilePath = p.resolve(sernDir, 'ambient.d.ts'),
-          packageJsonPath = p.resolve('package.json'),
           sernTsConfigPath = p.resolve(sernDir, 'tsconfig.json'),
-          packageJson = () => require(packageJsonPath);
+          packageJson = () => require(p.resolve('package.json'));
 
     if (!(await pathExists(genDir))) {
         console.log('Making .sern/generated dir, does not exist');
         await mkdir(genDir, { recursive: true });
     }
-    if(sernConfig.type == 'serverless') {
-        //we build for cloudflare workers rn
-        const callsite = fileURLToPath(import.meta.url);
-        const template = await readFile(p.resolve(callsite, "../../../templates/cf.js"), 'utf8');
-        const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, {
-            //for some reason, my ignore glob wasn't registering correctly'
-            ignore: {
-                childrenIgnored: p => p.isNamed('commands')
-            },
-        });
-        const commandsPaths = await glob(`**/*`, { 
-            ignore: {
-                ignored: p => p.isDirectory()  
-            },
-            cwd: "./src/commands/"
-        });
-        console.log(entryPoints)
-        console.log(commandsPaths)
-        const commandsImports = commandsPaths.map(file => {
-            const fname = p.parse(file)
-            return `import ${fname.name} from "./${p.join(`./commands/${file}`).split(p.sep).join(p.posix.sep)}"`
-        });
-        console.log(commandsImports)
-        await esbuild.build({
-            entryPoints: commandsPaths.map(file => p.join("src", "commands", file)),
-            plugins: [...(buildConfig.esbuildPlugins ?? [])],
-            ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig, "./dist/commands"),
-            outdir: "./dist/commands",
-            dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
-        });
-        //may need to invest in magicast for this lol
-        if(commandsPaths.length === 0) {
-            throw Error("No modules found. Stopping building.")
-        }
-        const importedModulesTemplate = template
-            .replace("\"use modules\";", commandsImports.join("\n"))
-            .replace("\"use slash\";", `
-                ${commandsPaths.map((imp, i) => {
-                    if(i === 0) {
-                        return `if(interaction.data.name === "${p.parse(imp).name}") {
-                                    const data = createContext(interaction);
-                                    const success = await applyPlugins(${p.parse(imp).name}, data);
-                                    if(success) {
-                                        await ${p.parse(imp).name}.execute(data);
-                                    }
-                                }`
-                    }
-                    return `else if(interaction.data.name === "${p.parse(imp).name}" ) { 
-                                const data = createContext(interaction);
-                                const success = await applyPlugins(${p.parse(imp).name}, data);
-                                if(success) {
-                                    await ${p.parse(imp).name}.execute(data);
-                                }
-                            }`
-                }).join("\n")}`.trim())
-           
-        
-        await writeFile("./dist/out.js", importedModulesTemplate);
-    } else {
-        const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, { 
-            ignore: {
-                childrenIgnored: p => p.isNamed('commands')
-            },
-        });
-        const commandsPaths = await glob(`**/*`, { 
-            ignore: { ignored: p => p.isDirectory() },
-            cwd: "./src/commands/"
-        });
-        const commandNames = commandsPaths.map(p.parse)
-        const commandsImports = commandNames.map((fname, i) => {
-            return `import m${i} from "./${p.join(`./commands/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`
-        });
-        const commandMapTemplate = 
-            `export const commands = new Map();\n` +
-            commandNames.map((_, i) => `commands.set(m${i}.meta.id, m${i})`).join("\n");
-            
-        await writeFile("./dist/out.js",
-                        commandsImports.join("\n") + '\n' +
-                        commandMapTemplate);
-        
-        console.log(entryPoints)
-        console.log(commandsImports)
-        console.log(commandMapTemplate)
-        const defVersion = () => JSON.stringify(packageJson().version);
-        const define = {
-            ...(buildConfig.define ?? {}),
-            __DEV__: `${buildConfig.mode === 'development'}`,
-            __PROD__: `${buildConfig.mode === 'production'}`,
-        } satisfies Record<string, string>;
+    
+    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`, { 
+        ignore: { childrenIgnored: p => p.isNamed('commands') },
+    });
+    const commandsPaths = await glob(`**/*`, { 
+        ignore: { ignored: p => p.isDirectory() },
+        cwd: "./src/commands/"
+    });
+    const commandNames = commandsPaths.map(p.parse)
+    const commandsImports = commandNames.map((fname, i) => 
+        `import m${i} from "./${p.join(`./commands/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`);
+    const commandMapTemplate = 
+        'const __commands = new Map();\n ' +
+        commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
+    const startFile = 
+    'import { interactionHandler } from "@sern/handler/internal" \n'+ 
+    commandsImports.join('\n') + '\n' +
+    commandMapTemplate +
+    "interactionHandler([], __commands)\n" 
+    console.log(startFile)
 
-        buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
+    console.log(entryPoints)
+    console.log(commandsImports)
+    console.log(commandMapTemplate)
+    const defVersion = () => JSON.stringify(packageJson().version);
+    const define = {
+        ...(buildConfig.define ?? {}),
+        __DEV__: `${buildConfig.mode === 'development'}`,
+        __PROD__: `${buildConfig.mode === 'production'}`,
+    } satisfies Record<string, string>;
 
-        await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
-        await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
+    buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
 
-        //https://esbuild.github.io/content-types/#tsconfig-json
-        await esbuild.build({
-            entryPoints,
-            plugins: [...(buildConfig.esbuildPlugins ?? [])],
-            ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
-            define,
-            dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
-        });
-        
-    }
+    await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
+    await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
+
+    //https://esbuild.github.io/content-types/#tsconfig-json
+    await esbuild.build({
+        entryPoints: entryPoints.concat(commandsPaths.map(path => p.join("./src/commands", path))),
+        plugins: buildConfig.esbuildPlugins ?? [],
+        ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
+        define,
+        dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
+    });
 }
