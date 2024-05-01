@@ -5,7 +5,7 @@ import { fetch } from 'undici';
 import { pluginsQ } from '../prompts/plugin.js';
 import { fromCwd } from '../utilities/fromCwd.js';
 import esbuild from 'esbuild';
-import { getLang } from '../utilities/getLang.js';
+import { getLang } from '../utilities/getConfig.js';
 import { resolve } from 'path';
 import { require } from '../utilities/require.js';
 interface PluginData {
