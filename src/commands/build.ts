@@ -135,11 +135,10 @@ export async function build(options: Record<string, any>) {
         'const __commands = new Map();\n ' +
         commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
     const startFile = 
-    'import { interactionHandler } from "@sern/handler/internal" \n'+ 
+    'import { interactionHandler, __dependencies } from "@sern/handler/internal" \n'+ 
     commandsImports.join('\n') + '\n' +
-    commandMapTemplate +
-    "interactionHandler([], __commands)\n" 
-    console.log(startFile)
+    commandMapTemplate + "\n" +
+    "const [emitter, err, log, client] = __dependencies();\n"
 
     console.log(entryPoints)
     console.log(commandsImports)
@@ -164,4 +163,7 @@ export async function build(options: Record<string, any>) {
         define,
         dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
     });
+
+    console.log(startFile)
+    await writeFile("./dist/handler.js", startFile );
 }
