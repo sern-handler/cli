@@ -137,8 +137,8 @@ export async function build(options: Record<string, any>) {
     const startFile = 
     'import { interactionHandler, __dependencies } from "@sern/handler/internal" \n'+ 
     commandsImports.join('\n') + '\n' +
-    commandMapTemplate + "\n" +
-    "const [emitter, err, log, client] = __dependencies();\n"
+    commandMapTemplate + "\n" 
+    
 
     console.log(entryPoints)
     console.log(commandsImports)
@@ -148,9 +148,8 @@ export async function build(options: Record<string, any>) {
         ...(buildConfig.define ?? {}),
         __DEV__: `${buildConfig.mode === 'development'}`,
         __PROD__: `${buildConfig.mode === 'production'}`,
+        __VERSION__: `${buildConfig.defineVersion ? `${defVersion()}` : 'undefined'}`
     } satisfies Record<string, string>;
-
-    buildConfig.defineVersion && Object.assign(define, { __VERSION__: defVersion() });
 
     await Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
     await Preprocessor.writeAmbientFile(ambientFilePath, define, writeFile);
