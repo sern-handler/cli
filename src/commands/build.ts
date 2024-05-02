@@ -135,8 +135,11 @@ export async function build(options: Record<string, any>) {
         'export const __commands = new Map();\n ' +
         commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
     const startFile = 
+        'const __commands = new Map();\n' +
+        commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
     commandsImports.join('\n') + '\n' +
     commandMapTemplate + "\n" 
+    
     
 
     console.log(entryPoints)
