@@ -132,10 +132,9 @@ export async function build(options: Record<string, any>) {
     const commandsImports = commandNames.map((fname, i) => 
         `import m${i} from "./${p.join(`./commands/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`);
     const commandMapTemplate = 
-        'const __commands = new Map();\n ' +
+        'export const __commands = new Map();\n ' +
         commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
     const startFile = 
-    'import { interactionHandler, __dependencies } from "@sern/handler/internal" \n'+ 
     commandsImports.join('\n') + '\n' +
     commandMapTemplate + "\n" 
     
