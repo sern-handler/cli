@@ -128,17 +128,30 @@ export async function build(options: Record<string, any>) {
         ignore: { ignored: p => p.isDirectory() },
         cwd: "./src/commands/"
     });
+    const eventsPaths = await glob(`**/*`, { 
+        ignore: { ignored: p => p.isDirectory() },
+        cwd: "./src/events/"
+    });
+    const eventNames = eventsPaths.map(p.parse);
     const commandNames = commandsPaths.map(p.parse);
     const commandsImports = commandNames.map((fname, i) => 
         `import m${i} from "./${p.join(`./commands/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`);
+    const eventImports = eventNames.map((fname, i) => 
+        `import m${i} from "./${p.join(`./events/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`);
     const commandMapTemplate = 
         'export const __commands = new Map();\n ' +
         commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
+    const eventsMapTemplate =
+        'export const __events = new Map();\n ' +
+        eventNames.map((_, i) => `__events.set(m${i}.meta.id, m${i});`).join("\n");
+
+    const presence = await glob("./src/presence.{ts,js}")
     const startFile = 
         commandsImports.join('\n') + '\n' +
-        commandMapTemplate + "\n"; 
-    
-    
+        eventImports.join('\n') + '\n' +
+        (presence.length ? `import p0 from './presence.js'\n` : `\n`) +
+        commandMapTemplate + "\n" +
+        eventsMapTemplate + "\n"; 
 
     console.log(entryPoints)
     console.log(commandsImports)
@@ -156,7 +169,11 @@ export async function build(options: Record<string, any>) {
 
     //https://esbuild.github.io/content-types/#tsconfig-json
     await esbuild.build({
-        entryPoints: entryPoints.concat(commandsPaths.map(path => p.join("./src/commands", path))),
+        entryPoints: [
+            ...entryPoints,
+            ...commandsPaths.map(path => p.join("./src/commands", path)),
+            ...eventsPaths.map(path => p.join("./src/events", path))
+        ],
         plugins: buildConfig.esbuildPlugins ?? [],
         ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
         define,
