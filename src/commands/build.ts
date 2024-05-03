@@ -128,17 +128,15 @@ export async function build(options: Record<string, any>) {
         ignore: { ignored: p => p.isDirectory() },
         cwd: "./src/commands/"
     });
-    const commandNames = commandsPaths.map(p.parse)
+    const commandNames = commandsPaths.map(p.parse);
     const commandsImports = commandNames.map((fname, i) => 
         `import m${i} from "./${p.join(`./commands/${fname.name}.js`).split(p.sep).join(p.posix.sep)}"`);
     const commandMapTemplate = 
         'export const __commands = new Map();\n ' +
         commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
     const startFile = 
-        'const __commands = new Map();\n' +
-        commandNames.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
-    commandsImports.join('\n') + '\n' +
-    commandMapTemplate + "\n" 
+        commandsImports.join('\n') + '\n' +
+        commandMapTemplate + "\n"; 
     
     
 
