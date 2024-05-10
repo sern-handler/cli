@@ -53,22 +53,22 @@ const CommandHandlerPlugin = (commandPaths: Array<{name: string}>, eventsPaths: 
             build.onEnd(async result => {
                if(result.errors.length) return;
                const commandsImports = commandPaths.map((fname, i) => 
-                   `import m${i} from "./commands/${fname.name}"`);
+                   `import cm${i} from "./commands/${fname.name}"`);
                const eventImports = eventsPaths.map((fname, i) => 
-                   `import m${i} from "./events/${fname.name}"`);
+                   `import em${i} from "./events/${fname.name}"`);
                const commandMapTemplate = 
                    'export const __commands = new Map();\n ' +
-                   commandPaths.map((_, i) => `__commands.set(m${i}.meta.id, m${i});`).join("\n");
+                   commandPaths.map((_, i) => `__commands.set(cm${i}.meta.id, cm${i});`).join("\n");
                const eventsMapTemplate =
-                   'export const __events = new Map();\n ' +
-                   eventsPaths.map((_, i) => `__events.set(m${i}.meta.id, m${i});`).join("\n");
+                   'export const __events = new Map();\n' +
+                   eventsPaths.map((_, i) => `__events.set(em${i}.meta.id, em${i});`).join("\n");
 
-               const presence = await glob("./src/presence.{ts,js}")
+               const presence = await glob("./src/presence.{ts,js}");
                const startFile = 
                     commandsImports.join('\n') + '\n' +
                     eventImports.join('\n') + '\n' +
-                    (presence.length && `import p0 from './presence.js'`) + "\n"
-                    commandMapTemplate + "\n" +
+                    (presence.length ? `import p0 from './presence.js'` : '') + "\n" +
+                    commandMapTemplate + "\n"+
                     eventsMapTemplate + "\n"; 
                 await writeFile("./dist/handler.js", startFile);
             })
@@ -182,5 +182,4 @@ export async function build(options: Record<string, any>) {
         define,
         dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
     });
-
 }
