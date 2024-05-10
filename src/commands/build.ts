@@ -142,8 +142,9 @@ export async function build(options: Record<string, any>) {
         dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
     });
     if(options.watch) {
+        await ctx.watch()
     } else {
-        ctx.rebuild()
-        ctx.dispose()
+        await ctx.rebuild()
+        await ctx.dispose()
     }
 }

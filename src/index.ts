@@ -66,6 +66,7 @@ program
     .description('Build your bot')
     .option('-f --format [fmt]', 'The module system of your application. `cjs` or `esm`', 'esm')
     .option('-m --mode [mode]', 'the mode for sern to build in. `production` or `development`', 'development')
+    .option('-w --watch')
     .option('-W --suppress-warnings', 'suppress experimental warning')
     .option('-p --project [filePath]', 'build with the provided sern.build file')
     .option('-e --env', 'path to .env file')
