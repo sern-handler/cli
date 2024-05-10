@@ -17,18 +17,17 @@ export async function getLang(): Promise<'typescript' | 'javascript'> {
     return output.language;
 }
 
-export async function getConfig(): Promise<sernConfig> {
+export async function getConfig(): Promise<SernConfig> {
     const sernLocation = await findUp('sern.config.json');
     assert(sernLocation, "Can't find sern.config.json");
 
-    const output = JSON.parse(await readFile(sernLocation, 'utf8')) as sernConfig;
+    const output = JSON.parse(await readFile(sernLocation, 'utf8')) as SernConfig;
 
     assert(output, "Can't read your sern.config.json.");
 
     return output;
 }
-export interface sernConfig {
-    type?: "serverless" | "websocket"
+export interface SernConfig {
     language: 'typescript' | 'javascript';
     defaultPrefix?: string;
     paths: {
@@ -36,4 +35,7 @@ export interface sernConfig {
         commands: string;
         events?: string;
     };
+    build?: {
+
+    }
 }

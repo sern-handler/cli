@@ -37,7 +37,6 @@ const writeAmbientFile = async (path: string, define: Record<string, string>, wr
 
 const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: FileWriter) => {
     //maybe better way to do this
-    const target = format === 'esm' ? { target: 'esnext' } : {};
     const sernTsConfig = {
         compilerOptions: {
             //module determines top level await. CJS doesn't have that abliity afaik
@@ -45,7 +44,7 @@ const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: File
             moduleResolution: 'node16',
             strict: true,
             skipLibCheck: true,
-            ...target,
+            target: 'esnext',
             rootDirs: ['./generated', '../src'],
         },
         include: ['./ambient.d.ts', '../src'],
