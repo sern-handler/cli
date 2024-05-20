@@ -132,8 +132,6 @@ export async function build(options: Record<string, any>) {
 //      glob(`**/*`, { withFileTypes: true, ignore: { ignored: p => p.isDirectory() }, cwd: "./src/events/" })
 //  ])
 
-    
-
     //https://esbuild.github.io/content-types/#tsconfig-json
     const ctx = await esbuild.context({
         entryPoints,
@@ -141,10 +139,11 @@ export async function build(options: Record<string, any>) {
         ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
         dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
     });
+
+    await ctx.rebuild()
     if(options.watch) {
         await ctx.watch()
     } else {
-        await ctx.rebuild()
         await ctx.dispose()
     }
 }

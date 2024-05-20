@@ -23,7 +23,7 @@ program
 program
     .command('plugins')
     .description('Install plugins from https://github.com/sern-handler/awesome-plugins')
-    .option('-n --name', 'Name of plugin')
+    .argument('[names...]', 'Names of plugins to install')
     .action((...args) => importDynamic('plugins.js').then((m) => m.plugins(...args)));
 
 program
