@@ -79,9 +79,7 @@ for await (const absPath of filePaths) {
         commandModule = commandModule.default;
     }
 
-    if (typeof config === 'function') {
-        config = config(absPath, commandModule);
-    }
+    
 
     try {
         commandModule = commandModule.getInstance();
@@ -95,6 +93,9 @@ for await (const absPath of filePaths) {
         commandModule.description ??= '';
         commandModule.absPath = absPath;
         modules.push({ commandModule, config });
+    }
+    if (typeof config === 'function') {
+        config = config(absPath, commandModule);
     }
 }
 
