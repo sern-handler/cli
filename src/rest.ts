@@ -4,12 +4,12 @@ const baseURL = new URL('https://discord.com/api/v10/applications/');
 
 const excludedKeys = new Set(['command', 'absPath']);
 
-const publishablesIntoJson = (ps: PublishableModule[]) =>
-    JSON.stringify(
+const publishablesIntoJson = (ps: PublishableModule[]) => {
+    const s = JSON.stringify(
         ps.map((module) => module.data),
-        (key, value) => (excludedKeys.has(key) ? undefined : value),
-        4
-    );
+        (key, value) => (excludedKeys.has(key) ? undefined : value), 4);
+    return s;
+}
 
 export const create = async (token: string) => {
     const headers = {
