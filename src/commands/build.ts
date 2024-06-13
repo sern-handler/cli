@@ -7,10 +7,12 @@ import assert from 'node:assert';
 import defaultEsbuild from '../utilities/defaultEsbuildConfig';
 import { require } from '../utilities/require';
 import { pathExists, pathExistsSync } from 'find-up';
-import { mkdir, writeFile } from 'fs/promises';
+import { mkdir, writeFile, readFile } from 'fs/promises';
 import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
-const validExtensions = ['.ts', '.js' ];
+
+const VALID_EXTENSIONS = ['.ts', '.js' ];
+
 type BuildOptions = {
     /**
      * Define __VERSION__
@@ -42,13 +44,13 @@ type BuildOptions = {
      */
     env?: string;
 };
+
 const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePath: string, sernTsConfigPath: string) => {
     return {
         name: "commandhandler",
         setup(build) {
 
             const options = build.initialOptions
-
             const defVersion = () => JSON.stringify(require(p.resolve('package.json')).version);
             options.define = { 
                 ...buildConfig.define ?? {},
@@ -64,9 +66,9 @@ const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePat
 }
 const resolveBuildConfig = (path: string|undefined, language: string) => {
     if(language === 'javascript') {
-        return path ?? p.resolve('jsconfig.json')
+        return path ?? 'jsconfig.json'
     }
-    return path ?? p.resolve('tsconfig.json')
+    return path ?? 'tsconfig.json'
 }
 
 export async function build(options: Record<string, any>) {
@@ -74,7 +76,7 @@ export async function build(options: Record<string, any>) {
         console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`);
     }
     const sernConfig = await getConfig();
-    let buildConfig: Partial<BuildOptions> = {};
+    let buildConfig: BuildOptions; 
     const buildConfigPath = p.resolve(options.project ?? 'sern.build.js');
 
     const defaultBuildConfig = {
@@ -83,7 +85,8 @@ export async function build(options: Record<string, any>) {
         mode: options.mode ?? 'development',
         dropLabels: [],
         tsconfig: resolveBuildConfig(options.tsconfig, sernConfig.language),
-        env: options.env ?? p.resolve('.env'),
+        env: options.env ?? '.env',
+        include: []
     };
     if (pathExistsSync(buildConfigPath)) {
         //throwable, buildConfigPath may not exist
@@ -100,7 +103,7 @@ export async function build(options: Record<string, any>) {
     }
     assert(buildConfig.mode === 'development' || buildConfig.mode === 'production', 'Mode is not `production` or `development`');
     try {
-        let config = require(buildConfig.tsconfig!);
+        let config = JSON.parse(await readFile(buildConfig.tsconfig!, 'utf8'));
         config.extends && console.warn("Extend the generated tsconfig")
     } catch(e) {
          console.error("no tsconfig / jsconfig found");
@@ -126,12 +129,11 @@ export async function build(options: Record<string, any>) {
         await mkdir(genDir, { recursive: true });
     }
     
-    const entryPoints = await glob(`./src/**/*{${validExtensions.join(',')}}`);
-//  const [commandsPaths, eventsPaths] = await Promise.all([
-//      glob(`**/*`, { withFileTypes: true, ignore: { ignored: p => p.isDirectory() }, cwd: "./src/commands/" }),
-//      glob(`**/*`, { withFileTypes: true, ignore: { ignored: p => p.isDirectory() }, cwd: "./src/events/" })
-//  ])
-
+    const entryPoints = await glob(`src/**/*{${VALID_EXTENSIONS.join(',')}}`,{ 
+         ignore: {
+            ignored: (p) => p.name.endsWith('.d.ts'),
+        }
+    });
     //https://esbuild.github.io/content-types/#tsconfig-json
     const ctx = await esbuild.context({
         entryPoints,

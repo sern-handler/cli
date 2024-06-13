@@ -2,65 +2,38 @@
  * This file is meant to be run with the esm / cjs esbuild-kit loader to properly import typescript modules
  */
 
-import { readdir, stat, mkdir, writeFile } from 'fs/promises';
-import { join, basename, extname, resolve } from 'node:path';
+import { readdir, mkdir, writeFile } from 'fs/promises';
+import { basename, resolve, posix as pathpsx } from 'node:path';
 import { pathExistsSync } from 'find-up';
 import assert from 'assert';
 import { once } from 'node:events';
 import * as Rest from './rest';
-import type { sernConfig } from './utilities/getConfig';
+import type { SernConfig } from './utilities/getConfig';
 import type { PublishableData, PublishableModule, Typeable } from './create-publish.d.ts';
 import { cyanBright, greenBright, redBright } from 'colorette';
 import { inspect } from 'node:util'
 import ora from 'ora';
 
-async function deriveFileInfo(dir: string, file: string) {
-    const fullPath = join(dir, file);
-    return {
-        fullPath,
-        fileStats: await stat(fullPath),
-        base: basename(file),
-    };
-}
-
-function isSkippable(filename: string) {
-    // empty string is for non extension files (directories)
-    const validExtensions = ['.js', '.cjs', '.mts', '.mjs', '.cts', '.ts', ''];
-    return filename[0] === '!' || !validExtensions.includes(extname(filename));
-}
 
 async function* readPaths(dir: string, shouldDebug: boolean): AsyncGenerator<string> {
-    try {
-        const files = await readdir(dir);
-        for (const file of files) {
-            const { fullPath, fileStats, base } = await deriveFileInfo(dir, file);
-
-            if (fileStats.isDirectory()) {
-                // TODO: refactor so that i dont repeat myself for files (line 71)
-                if (isSkippable(base)) {
-                    if (shouldDebug) console.info(`ignored directory: ${fullPath}`);
-                } else {
-                    yield* readPaths(fullPath, shouldDebug);
-                }
-            } else {
-                if (isSkippable(base)) {
-                    if (shouldDebug) console.info(`ignored: ${fullPath}`);
-                } else {
-                    yield 'file:///' + fullPath;
-                }
+    const files = await readdir(dir, { withFileTypes: true });
+    for (const file of files) {
+        const fullPath = pathpsx.join(dir, file.name);
+        if (file.isDirectory()) {
+            if (!file.name.startsWith('!')) {
+                yield* readPaths(fullPath, shouldDebug);
             }
+        } else if (!file.name.startsWith('!')) {
+            yield "file:///"+resolve(fullPath);
         }
-    } catch (err) {
-        throw err;
     }
 }
 
 // recieved sern config
 const [{ config, preloads, commandDir }] = await once(process, 'message'),
-    { paths } = config as sernConfig;
+    { paths } = config as SernConfig;
 
 for (const preload of preloads) {
-
     console.log("preloading: ", preload);
     await import('file:///' + resolve(preload));
 }
@@ -83,17 +56,16 @@ for await (const absPath of filePaths) {
         config = config(absPath, commandModule);
     }
 
-    try {
-        commandModule = commandModule.getInstance();
-    } catch {}
-
     if ((PUBLISHABLE & commandModule.type) != 0) {
         // assign defaults
         const filename = basename(absPath);
         const filenameNoExtension = filename.substring(0, filename.lastIndexOf('.'));
         commandModule.name ??= filenameNoExtension;
         commandModule.description ??= '';
-        commandModule.absPath = absPath;
+        commandModule.meta = {
+            absPath
+        }
+
         modules.push({ commandModule, config });
     }
 }
@@ -151,7 +123,7 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
             description: makeDescription(applicationType, commandModule.description as string),
             absPath: commandModule.absPath as string,
             options: optionsTransformer((commandModule?.options ?? []) as Typeable[]),
-            dm_permission: config?.dmPermission,
+            dm_permission: config?.dmPermission ?? false,
             default_member_permissions: serialize(config?.defaultMemberPermissions),
             //@ts-ignore
             integration_types: (config?.integrationTypes ?? ['Guild']).map(
@@ -161,11 +133,13 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
                     } else if (s == "User") {
                         return 1
                     } else {
-                        throw Error("IntegrationType is not one of Guild or User");
+                        throw Error("IntegrationType is not one of Guild (0) or User (1)");
                     }
                 }),
             //@ts-ignore
-            contexts: config?.contexts ?? undefined
+            contexts: config?.contexts ?? undefined,
+            name_localizations: commandModule.name_localizations,
+            description_localizations: commandModule.description_localizations
         },
         config,
     };
@@ -248,7 +222,6 @@ function associateGuildIdsWithData(data: PublishableModule[]): Map<string, Publi
     return guildIdMap;
 }
 const guildCommandMap = associateGuildIdsWithData(guildedCommands);
-
 let guildCommandMapResponse = new Map<string, Record<string, unknown>>();
 
 for (const [guildId, array] of guildCommandMap.entries()) {
