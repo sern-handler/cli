@@ -18,6 +18,7 @@ export interface sernConfig {
         base: string;
         commands: string;
         events?: string;
+        plugins?: string;
     };
     app?: {
         customInstallUrl?: string;

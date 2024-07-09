@@ -8,6 +8,7 @@ import esbuild from 'esbuild';
 import { getLang } from '../utilities/getLang.js';
 import { resolve } from 'path';
 import { require } from '../utilities/require.js';
+import { getConfig } from  '../utilities/getConfig.js';
 interface PluginData {
     description: string;
     hash: string;
@@ -26,10 +27,11 @@ export async function plugins() {
     if (!e) process.exit(1);
 
     const lang = await getLang();
+    const config = await getConfig();
     for await (const plgData of e) {
         const pluginText = await download(plgData.link);
-        const dir = fromCwd('/src/plugins');
-        const linkNoExtension = `${process.cwd()}/src/plugins/${plgData.name}`;
+        const dir = fromCwd(`src/${config.paths.plugins ?? 'plugins'}`);
+        const linkNoExtension = `${dir}/${plgData.name}`;
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
