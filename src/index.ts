@@ -53,15 +53,6 @@ program //
             .option('-e, --env [path]', "Supply a path to a .env")
             .action(async (...args) => importDynamic('command-clear.js').then((m) => m.commandClear(...args))));
 program
-    .command('app')
-    .description('manage your discord application')
-    .addCommand(
-        new Command('update')
-            .description("Refresh your discord application.")
-            .option('-W --suppress-warnings', 'suppress experimental warning')
-            .action(async (...args) => importDynamic('app-update.js').then(m => m.appUpdate(...args))))
-
-program
     .command('build')
     .description('Build your bot')
     .option('-f --format [fmt]', 'The module system of your application. `cjs` or `esm`', 'esm')
