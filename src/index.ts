@@ -23,7 +23,7 @@ program
 program
     .command('plugins')
     .description('Install plugins from https://github.com/sern-handler/awesome-plugins')
-    .option('-n --name', 'Name of plugin')
+    .argument('[names...]', 'Names of plugins to install')
     .action((...args) => importDynamic('plugins.js').then((m) => m.plugins(...args)));
 
 program
@@ -66,6 +66,7 @@ program
     .description('Build your bot')
     .option('-f --format [fmt]', 'The module system of your application. `cjs` or `esm`', 'esm')
     .option('-m --mode [mode]', 'the mode for sern to build in. `production` or `development`', 'development')
+    .option('-w --watch')
     .option('-W --suppress-warnings', 'suppress experimental warning')
     .option('-p --project [filePath]', 'build with the provided sern.build file')
     .option('-e --env', 'path to .env file')

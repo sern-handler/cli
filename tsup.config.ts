@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup';
 import { createRequire } from 'node:module';
+
 const shared = {
     entry: [
         'src/index.ts',

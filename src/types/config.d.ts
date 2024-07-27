@@ -4,9 +4,6 @@ export interface sernConfig {
         base: string;
         commands: string;
     };
-    scripts?: {
-        prepublish?: string;
-    };
     buildPath: string;
     rest?: Record<string, Record<string, unknown>>;
 }
@@ -14,6 +11,6 @@ export interface sernConfig {
 export interface TheoreticalEnv {
     DISCORD_TOKEN: string;
     APPLICATION_ID?: string;
-    MODE: 'PROD' | 'DEV';
+    MODE: 'production' | 'environment';
     [name: string]: string;
 }
