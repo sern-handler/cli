@@ -52,10 +52,6 @@ for await (const absPath of filePaths) {
         commandModule = commandModule.default;
     }
 
-    if (typeof config === 'function') {
-        config = config(absPath, commandModule);
-    }
-
     if ((PUBLISHABLE & commandModule.type) != 0) {
         // assign defaults
         const filename = basename(absPath);
@@ -65,7 +61,10 @@ for await (const absPath of filePaths) {
         commandModule.meta = {
             absPath
         }
-
+        commandModule.absPath = absPath;
+        if (typeof config === 'function') {
+            config = config(absPath, commandModule);
+        }
         modules.push({ commandModule, config });
     }
 }
@@ -129,9 +128,9 @@ const makePublishData = ({ commandModule, config }: Record<string, Record<string
             integration_types: (config?.integrationTypes ?? ['Guild']).map(
                 (s: string) => {
                     if(s === "Guild") {
-                        return 0
+                        return "0"
                     } else if (s == "User") {
-                        return 1
+                        return "1"
                     } else {
                         throw Error("IntegrationType is not one of Guild (0) or User (1)");
                     }
@@ -259,7 +258,6 @@ const remoteData = {
     global: globalCommandsResponse,
     ...Object.fromEntries(guildCommandMapResponse),
 };
-
 await writeFile(resolve(cacheDir, 'command-data-remote.json'), JSON.stringify(remoteData, null, 4), 'utf8');
 
 // TODO: add this in a verbose flag
