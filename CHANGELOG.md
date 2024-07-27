@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/sern-handler/cli/compare/v1.2.1...v1.3.0) (2024-07-27)
+
+
+### Features
+
+* plugin, no prompt, bug fixes ([#139](https://github.com/sern-handler/cli/issues/139)) ([20364fa](https://github.com/sern-handler/cli/commit/20364fa20d1f3bf70a1c0cfefbc1d6c9365a4925))
+
+
+### Bug Fixes
+
+* fix publish command for bun & pnpm ([#137](https://github.com/sern-handler/cli/issues/137)) ([d581142](https://github.com/sern-handler/cli/commit/d581142f082ed888036e58aa33e9d88d84d34c2f))
+
 ## [1.2.1](https://github.com/sern-handler/cli/compare/v1.2.0...v1.2.1) (2024-02-08)
 
 
