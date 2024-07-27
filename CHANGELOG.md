@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1](https://github.com/sern-handler/cli/compare/v1.3.0...v1.3.1) (2024-07-27)
+
+
+### Miscellaneous Chores
+
+* release 1.3.1 ([2bb169f](https://github.com/sern-handler/cli/commit/2bb169f600172af8c8316b6c9420684a4de34e0d))
+
 ## [1.3.0](https://github.com/sern-handler/cli/compare/v1.2.1...v1.3.0) (2024-07-27)
 
 
