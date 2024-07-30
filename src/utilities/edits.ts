@@ -1,6 +1,7 @@
 import { findUp } from 'find-up';
 import { readFile, rename, writeFile } from 'node:fs/promises';
 import { fromCwd } from './fromCwd.js';
+import { parseTsConfig } from './parseTsconfig.js';
 
 /**
  * It takes a string, finds the package.json file in the directory of the string, and changes the name
@@ -61,10 +62,12 @@ export async function editDirs(
     });
 
     if (tsconfig) {
-        const output = JSON.parse(await readFile(tsconfig, 'utf8'));
+        const output = await parseTsConfig(tsconfig);
         if (!output) throw new Error("Can't read your tsconfig.json.");
+        if (!output.compilerOptions) throw new Error("Can't find compilerOptions in your tsconfig.json.");
         output.compilerOptions.rootDir = srcName;
 
+        // This will strip comments/trailing commas from the tsconfig.json file
         await writeFile(tsconfig, JSON.stringify(output, null, 2));
     }
 
