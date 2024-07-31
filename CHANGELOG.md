@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2](https://github.com/sern-handler/cli/compare/v1.3.1...v1.3.2) (2024-07-31)
+
+
+### Bug Fixes
+
+* make tsconfig work with comments/trailing commas ([#142](https://github.com/sern-handler/cli/issues/142)) ([53ca446](https://github.com/sern-handler/cli/commit/53ca446a38076ed7b165dbbb41f346f028b7e394))
+
 ## [1.3.1](https://github.com/sern-handler/cli/compare/v1.3.0...v1.3.1) (2024-07-27)
 
 
