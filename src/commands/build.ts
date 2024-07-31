@@ -10,6 +10,7 @@ import { pathExists, pathExistsSync } from 'find-up';
 import { mkdir, writeFile, readFile } from 'fs/promises';
 import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
+import { parseTsConfig } from '../utilities/parseTsconfig';
 
 const VALID_EXTENSIONS = ['.ts', '.js' ];
 
@@ -103,8 +104,8 @@ export async function build(options: Record<string, any>) {
     }
     assert(buildConfig.mode === 'development' || buildConfig.mode === 'production', 'Mode is not `production` or `development`');
     try {
-        let config = JSON.parse(await readFile(buildConfig.tsconfig!, 'utf8'));
-        config.extends && console.warn("Extend the generated tsconfig")
+        let config = await parseTsConfig(buildConfig.tsconfig!);
+        config?.extends && console.warn("Extend the generated tsconfig")
     } catch(e) {
          console.error("no tsconfig / jsconfig found");
          console.error(`Please create a ${sernConfig.language === 'javascript' ? 'jsconfig.json' : 'tsconfig.json' }`);
