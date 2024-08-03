@@ -44,6 +44,11 @@ type BuildOptions = {
      * default to .env.
      */
     env?: string;
+    /**
+     * flag: default false
+     */
+    sourcemap?: boolean;
+
 };
 
 const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePath: string, sernTsConfigPath: string) => {
@@ -76,6 +81,7 @@ export async function build(options: Record<string, any>) {
     if (!options.supressWarnings) {
         console.info(`${magentaBright('EXPERIMENTAL')}: This API has not been stabilized. add -W or --suppress-warnings flag to suppress`);
     }
+    console.log(options)
     const sernConfig = await getConfig();
     let buildConfig: BuildOptions; 
     const buildConfigPath = p.resolve(options.project ?? 'sern.build.js');
@@ -85,6 +91,7 @@ export async function build(options: Record<string, any>) {
         format: options.format ?? 'esm',
         mode: options.mode ?? 'development',
         dropLabels: [],
+        sourcemap: options.sourceMaps,
         tsconfig: resolveBuildConfig(options.tsconfig, sernConfig.language),
         env: options.env ?? '.env',
         include: []
@@ -120,6 +127,7 @@ export async function build(options: Record<string, any>) {
     console.log(' ', magentaBright('mode'), buildConfig.mode);
     console.log(' ', magentaBright('tsconfig'), buildConfig.tsconfig);
     console.log(' ', magentaBright('env'), buildConfig.env);
+    console.log(' ', magentaBright('sourceMaps'), buildConfig.sourcemap);
 
     const sernDir = p.resolve('.sern'),
           [ambientFilePath, sernTsConfigPath, genDir] = 
@@ -139,6 +147,7 @@ export async function build(options: Record<string, any>) {
     const ctx = await esbuild.context({
         entryPoints,
         plugins: [CommandHandlerPlugin(buildConfig, ambientFilePath, sernTsConfigPath)],
+        sourcemap: buildConfig.sourcemap,
         ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
         dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
     });

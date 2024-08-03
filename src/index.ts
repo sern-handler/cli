@@ -61,6 +61,7 @@ program
     .option('-W --suppress-warnings', 'suppress experimental warning')
     .option('-p --project [filePath]', 'build with the provided sern.build file')
     .option('-e --env', 'path to .env file')
+    .option('--source-maps', 'Whether to add source-maps to configuration', false)
     .option('--tsconfig [filePath]', 'Use this tsconfig')
     .action(async (...args) => importDynamic('build.js').then((m) => m.build(...args)));
 
