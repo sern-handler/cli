@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3](https://github.com/sern-handler/cli/compare/v1.3.2...v1.3.3) (2024-08-07)
+
+
+### Bug Fixes
+
+* bunpnpminstall ([9c2d6d7](https://github.com/sern-handler/cli/commit/9c2d6d7389c41a071ab86570cebf987b02bbf450))
+
 ## [1.3.2](https://github.com/sern-handler/cli/compare/v1.3.1...v1.3.2) (2024-07-31)
 
 
