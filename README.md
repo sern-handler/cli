@@ -61,3 +61,23 @@ Run `npm create @sern/bot` for an interactive setup on a brand new project using
 
 sern runs on your plugins. Contribute to our [repository](https://github.com/sern-handler/awesome-plugins) and then install the plugins via our cli! <br>
 Run `sern plugins` to see all installable plugins.
+
+
+## Development
+
+```sh
+git clone https://github.com/sern-handler/cli.git
+```
+## insall i
+```sh 
+npm i 
+```
+## build it
+```sh 
+npm run build
+```
+## make it usable globally
+- if sern is installed globally already, you may need to uninstall it.
+```sh 
+npm link
+```
