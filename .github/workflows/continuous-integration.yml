@@ -42,7 +42,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # v3
         with:
-          node-version: 17
+          node-version: 20
 
       - name: Install Node.js dependencies
         run: npm i && npm run build
