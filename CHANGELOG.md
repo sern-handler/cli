@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.4](https://github.com/sern-handler/cli/compare/v1.3.3...v1.3.4) (2025-01-22)
+
+
+### Bug Fixes
+
+* tsconfig generator ([#145](https://github.com/sern-handler/cli/issues/145)) ([23d70c6](https://github.com/sern-handler/cli/commit/23d70c6e03860d1a69e3bffedd6910aba82071ab))
+
 ## [1.3.3](https://github.com/sern-handler/cli/compare/v1.3.2...v1.3.3) (2024-08-07)
 
 
