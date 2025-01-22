@@ -41,7 +41,7 @@ const writeTsConfig = async (format: 'cjs' | 'esm', configPath: string, fw: File
         compilerOptions: {
             //module determines top level await. CJS doesn't have that abliity afaik
             module: format === 'cjs' ? 'node' : 'esnext',
-            moduleResolution: 'node16',
+            moduleResolution: 'node',
             strict: true,
             skipLibCheck: true,
             target: 'esnext',
