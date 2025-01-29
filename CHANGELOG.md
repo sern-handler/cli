@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.5](https://github.com/sern-handler/cli/compare/v1.3.4...v1.3.5) (2025-01-29)
+
+
+### Bug Fixes
+
+* Update Dockerfile.TS.sern ([#149](https://github.com/sern-handler/cli/issues/149)) ([fca3c76](https://github.com/sern-handler/cli/commit/fca3c7601604215af9b6d66a137370064ae656e1))
+
 ## [1.3.4](https://github.com/sern-handler/cli/compare/v1.3.3...v1.3.4) (2025-01-22)
 
 
