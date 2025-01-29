@@ -7,10 +7,11 @@ import assert from 'node:assert';
 import defaultEsbuild from '../utilities/defaultEsbuildConfig';
 import { require } from '../utilities/require';
 import { pathExists, pathExistsSync } from 'find-up';
-import { mkdir, writeFile, readFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
 import { parseTsConfig } from '../utilities/parseTsconfig';
+import { execa, type ExecaChildProcess } from 'execa';
 
 const VALID_EXTENSIONS = ['.ts', '.js' ];
 
@@ -48,7 +49,12 @@ type BuildOptions = {
      * flag: default false
      */
     sourcemap?: boolean;
-
+    /**
+     * command to run.
+     * defaults to your package
+     * manager's start command.
+     */
+    watchCommand?: string;
 };
 
 const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePath: string, sernTsConfigPath: string) => {
@@ -58,18 +64,63 @@ const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePat
 
             const options = build.initialOptions
             const defVersion = () => JSON.stringify(require(p.resolve('package.json')).version);
+            // for some reason it errored out, should fix it
             options.define = { 
-                ...buildConfig.define ?? {},
+                ...(buildConfig.define ?? {}),
                 __DEV__: `${buildConfig.mode === 'development'}`,
                 __PROD__: `${buildConfig.mode === 'production'}`,
                 __VERSION__: `${buildConfig.defineVersion ? `${defVersion()}` : 'undefined'}`
-            } ?? {} 
+            }
             Preprocessor.writeTsConfig(buildConfig.format!, sernTsConfigPath, writeFile);
             Preprocessor.writeAmbientFile(ambientFilePath, options.define!, writeFile);
             
         }
     } as esbuild.Plugin
 }
+const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
+    // for some reason it runs the command twice on first build
+    let isFirstBuild = true;
+    let currentProcess: ExecaChildProcess | null = null;
+
+    return {
+        name: 'command-on-end',
+        setup(build: esbuild.PluginBuild) {
+            build.onEnd((result) => {
+                if (!watching || result.errors.length !== 0) return;
+                if (isFirstBuild) {
+                    isFirstBuild = false;
+                    return;
+                }
+                if (watchCommand === '') {
+                    console.log('[watch] no command provided, skipping');
+                    return;
+                }
+
+                if (currentProcess) {
+                    console.log('[watch] stopping previous process...');
+                    currentProcess.cancel()
+                    currentProcess = null;
+                }
+
+                const cmd = watchCommand || (() => {
+                    if (pathExistsSync('package-lock.json')) return 'npm start';
+                    if (pathExistsSync('yarn.lock')) return 'yarn start';
+                    if (pathExistsSync('pnpm-lock.yaml')) return 'pnpm start';
+                    if (pathExistsSync('bun.lockb')) return 'bun run start';
+                    throw new Error('[watch] no package manager lockfile found, cannot run default command');
+                })();
+
+                console.log(`[watch] running command: ${cmd}`);
+
+                currentProcess = execa(cmd, { stdio: 'inherit', shell: true });
+                currentProcess.catch(error => {
+                    if (error.isCanceled) return;
+                    console.error(`[watch] Command execution error: ${error.message}`);
+                });
+            });
+        }
+    } as esbuild.Plugin;
+};
 const resolveBuildConfig = (path: string|undefined, language: string) => {
     if(language === 'javascript') {
         return path ?? 'jsconfig.json'
@@ -146,14 +197,17 @@ export async function build(options: Record<string, any>) {
     //https://esbuild.github.io/content-types/#tsconfig-json
     const ctx = await esbuild.context({
         entryPoints,
-        plugins: [CommandHandlerPlugin(buildConfig, ambientFilePath, sernTsConfigPath)],
+        plugins: [
+            CommandHandlerPlugin(buildConfig, ambientFilePath, sernTsConfigPath),
+            CommandOnEndPlugin(options.watch, buildConfig.watchCommand)
+        ],
         sourcemap: buildConfig.sourcemap,
         ...defaultEsbuild(buildConfig.format!, buildConfig.tsconfig),
         dropLabels: [buildConfig.mode === 'production' ? '__DEV__' : '__PROD__', ...buildConfig.dropLabels!],
     });
 
     await ctx.rebuild()
-    if(options.watch) {
+    if (options.watch) {
         await ctx.watch()
     } else {
         await ctx.dispose()
