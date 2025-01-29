@@ -64,7 +64,7 @@ const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePat
 
             const options = build.initialOptions
             const defVersion = () => JSON.stringify(require(p.resolve('package.json')).version);
-            // for some reason it errored out, should fix it
+            // should fix a type error
             options.define = { 
                 ...(buildConfig.define ?? {}),
                 __DEV__: `${buildConfig.mode === 'development'}`,
