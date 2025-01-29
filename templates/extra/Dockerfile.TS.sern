@@ -1,15 +1,15 @@
 FROM node:latest
 
+RUN npm install -g @sern/cli typescript@latest
+
 WORKDIR /app
 
 COPY package.json ./
 
 RUN npm install
 
-RUN npm install -D typescript
-
 COPY . .
 
-RUN tsc --build || npx -p typescript tsc --build
+RUN sern build
 
 CMD node dist/index.js
