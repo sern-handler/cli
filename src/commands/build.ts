@@ -83,7 +83,7 @@ const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
     let currentProcess: ExecaChildProcess | null = null;
 
     return {
-        name: 'command-on-end',
+        name: 'watchruncommand',
         setup(build: esbuild.PluginBuild) {
             build.onEnd((result) => {
                 if (!watching || result.errors.length !== 0) return;
@@ -115,7 +115,7 @@ const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
                 currentProcess = execa(cmd, { stdio: 'inherit', shell: true });
                 currentProcess.catch(error => {
                     if (error.isCanceled) return;
-                    console.error(`[watch] Command execution error: ${error.message}`);
+                    console.error(`[watch] command execution error: ${error.message}`);
                 });
             });
         }
