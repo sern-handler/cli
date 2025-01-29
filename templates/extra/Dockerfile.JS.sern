@@ -1,5 +1,7 @@
 FROM node:latest
 
+RUN npm install -g @sern/cli
+
 WORKDIR /app
 
 COPY package.json ./
@@ -8,4 +10,6 @@ RUN npm install
 
 COPY . .
 
-CMD node src/index.js
+RUN sern build
+
+CMD node .
