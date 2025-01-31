@@ -12,6 +12,7 @@ import * as Preprocessor from '../utilities/preprocessor';
 import { bold, magentaBright } from 'colorette';
 import { parseTsConfig } from '../utilities/parseTsconfig';
 import { execa, type ExecaChildProcess } from 'execa';
+import { setTimeout } from 'node:timers/promises';
 
 const VALID_EXTENSIONS = ['.ts', '.js' ];
 
@@ -85,9 +86,9 @@ const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
     return {
         name: 'watchRunCommand',
         setup(build: esbuild.PluginBuild) {
-            build.onEnd((result) => {
+            build.onEnd(async (result) => {
                 if (!watching || result.errors.length !== 0) return;
-                if (isFirstBuild) {
+                if (isFirstBuild === true) {
                     isFirstBuild = false;
                     return;
                 }
@@ -106,12 +107,16 @@ const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
                     if (pathExistsSync('package-lock.json')) return 'npm start';
                     if (pathExistsSync('yarn.lock')) return 'yarn start';
                     if (pathExistsSync('pnpm-lock.yaml')) return 'pnpm start';
-                    if (pathExistsSync('bun.lockb')) return 'bun run start';
-                    throw new Error('[watch] no package manager lockfile found, cannot run default command');
+                    if (pathExistsSync('bun.lockb')) return 'bun start';
+                    if (pathExistsSync('bun.lock')) return 'bun start';
+
+                    throw new Error('[watch] default package manager start command not found');
                 })();
 
-                console.log(`[watch] running command: ${cmd}`);
+                console.log(`[watch] waiting 1 second before running command...`);
+                await setTimeout(1000);
 
+                console.log(`[watch] running command: ${cmd}`);
                 currentProcess = execa(cmd, { stdio: 'inherit', shell: true });
                 currentProcess.catch(error => {
                     if (error.isCanceled) return;
@@ -121,8 +126,8 @@ const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
         }
     } as esbuild.Plugin;
 };
-const resolveBuildConfig = (path: string|undefined, language: string) => {
-    if(language === 'javascript') {
+const resolveBuildConfig = (path: string | undefined, language: string) => {
+    if (language === 'javascript') {
         return path ?? 'jsconfig.json'
     }
     return path ?? 'tsconfig.json'
