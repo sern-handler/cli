@@ -59,7 +59,7 @@ type BuildOptions = {
 
 const CommandHandlerPlugin = (buildConfig: Partial<BuildOptions>, ambientFilePath: string, sernTsConfigPath: string) => {
     return {
-        name: "commandhandler",
+        name: "commandHandler",
         setup(build) {
 
             const options = build.initialOptions
@@ -83,7 +83,7 @@ const CommandOnEndPlugin = (watching: boolean, watchCommand?: string) => {
     let currentProcess: ExecaChildProcess | null = null;
 
     return {
-        name: 'watchruncommand',
+        name: 'watchRunCommand',
         setup(build: esbuild.PluginBuild) {
             build.onEnd((result) => {
                 if (!watching || result.errors.length !== 0) return;
