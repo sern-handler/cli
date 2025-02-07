@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0](https://github.com/sern-handler/cli/compare/v1.3.5...v1.4.0) (2025-02-07)
+
+
+### Features
+
+* watch command execute on successful build ([#151](https://github.com/sern-handler/cli/issues/151)) ([1695956](https://github.com/sern-handler/cli/commit/1695956350a55bb4a28839b427d1bf46cf518b01))
+
 ## [1.3.5](https://github.com/sern-handler/cli/compare/v1.3.4...v1.3.5) (2025-01-29)
 
 
