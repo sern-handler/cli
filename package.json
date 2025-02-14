@@ -35,23 +35,23 @@
     "@esbuild-kit/cjs-loader": "^2.4.2",
     "@esbuild-kit/esm-loader": "^2.5.5",
     "colorette": "2.0.20",
-    "commander": "11.0.0",
+    "commander": "11.1.0",
     "dotenv": "^16.3.1",
-    "esbuild": "^0.19.1",
+    "esbuild": "^0.25.0",
     "execa": "7.2.0",
     "find-up": "6.3.0",
     "glob": "^10.3.3",
     "ora": "6.3.1",
     "prompts": "2.4.2",
-    "undici": "5.23.0"
+    "undici": "5.28.5"
   },
   "devDependencies": {
     "@babel/parser": "^7.22.5",
     "@favware/npm-deprecate": "1.0.7",
-    "@types/prompts": "2.4.4",
+    "@types/prompts": "2.4.9",
     "prettier": "2.8.8",
     "tsup": "^6.7.0",
-    "typescript": "5.2.2"
+    "typescript": "5.7.3"
   },
   "engines": {
     "node": ">= 18.16.x"
