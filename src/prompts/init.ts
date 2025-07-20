@@ -49,7 +49,7 @@ export const npmInit: PromptObject = {
 export const gitInit: PromptObject = {
     name: 'gitinit',
     type: 'confirm',
-    message: `Do you want to ${blueBright('me')} to initialize git?`,
+    message: `Do you want ${blueBright('me')} to initialize git?`,
     initial: true,
 };
 
